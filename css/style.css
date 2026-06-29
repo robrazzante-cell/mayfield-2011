@@ -83,6 +83,7 @@ body {
     box-shadow: var(--shadow-hover);
     padding: 0.4rem 0;
     z-index: 200;
+    list-style: none;
 }
 .dropdown:hover .dropdown-menu { display: block; }
 .dropdown-menu li a {
