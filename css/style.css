@@ -1,14 +1,14 @@
 :root {
-    --green: #2B6B3C;
-    --green-dark: #1D4A27;
-    --green-light: #EBF5EE;
+    --green: #3A9A3A;
+    --green-dark: #1F6B1F;
+    --green-light: #EAF7EA;
     --gold: #C8A32A;
     --gold-light: #FDF8E3;
     --white: #FFFFFF;
     --text: #1A1A1A;
     --text-muted: #6B6B6B;
-    --border: #D0E4D8;
-    --bg-light: #F4FAF6;
+    --border: #C8E6C8;
+    --bg-light: #F2FAF2;
     --shadow: 0 2px 12px rgba(0,0,0,0.08);
     --shadow-hover: 0 6px 24px rgba(0,0,0,0.14);
     --radius: 8px;
@@ -124,7 +124,7 @@ body {
 
 /* ── Hero ── */
 .hero {
-    background: linear-gradient(135deg, #1B4A27 0%, #2B6B3C 55%, #3A7D4A 100%);
+    background: linear-gradient(135deg, #1A5C1A 0%, #2E8B2E 55%, #3A9A3A 100%);
     padding: 4rem 0 3rem;
     color: var(--white);
     text-align: center;
@@ -246,7 +246,7 @@ body {
 
 /* ── Page header ── */
 .page-header {
-    background: linear-gradient(135deg, #1D4A27 0%, #2B6B3C 100%);
+    background: linear-gradient(135deg, #1A5C1A 0%, #3A9A3A 100%);
     padding: 2.25rem 0;
     color: var(--white);
 }
