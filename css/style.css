@@ -13,9 +13,9 @@
     --shadow-hover: 0 6px 24px rgba(0,0,0,0.14);
     --radius: 8px;
     --radius-lg: 16px;
-    --hero-gradient: linear-gradient(135deg, #1A5C1A 0%, #2E8B2E 55%, #3A9A3A 100%);
-    --header-gradient: linear-gradient(135deg, #1A5C1A 0%, #3A9A3A 100%);
-    --mem-header-gradient: linear-gradient(135deg, #1A1A2E 0%, #1A3A1A 100%);
+    --hero-gradient: #1F6B1F;
+    --header-gradient: #1F6B1F;
+    --mem-header-gradient: #1A1A2E;
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -667,7 +667,7 @@ footer {
     --green-light: #EBF5EE;
     --border: #C0D8C0;
     --bg-light: #F0F7F0;
-    --hero-gradient: linear-gradient(135deg, #0F2A0F 0%, #1A4A1A 55%, #2D6A2D 100%);
-    --header-gradient: linear-gradient(135deg, #0F2A0F 0%, #2D6A2D 100%);
-    --mem-header-gradient: linear-gradient(135deg, #0A0A1E 0%, #1A3A1A 100%);
+    --hero-gradient: #1A4A1A;
+    --header-gradient: #1A4A1A;
+    --mem-header-gradient: #0A0A1E;
 }
