@@ -98,8 +98,8 @@ body {
 
 .nav-auth { display: flex; align-items: center; gap: 0.75rem; flex-shrink: 0; }
 .btn-signin {
-    background: var(--text);
-    color: var(--white);
+    background: var(--white);
+    color: var(--text);
     border: none;
     padding: 0.45rem 1rem;
     border-radius: 4px;
