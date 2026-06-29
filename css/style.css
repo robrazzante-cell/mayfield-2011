@@ -129,29 +129,29 @@ body {
 }
 .hero-badge {
     display: inline-block;
-    background: rgba(255,255,255,0.12);
-    border: 1px solid rgba(255,255,255,0.25);
+    background: var(--white);
+    border: 1px solid var(--white);
     border-radius: 20px;
     padding: 0.35rem 1rem;
     font-size: 0.82rem;
     font-weight: 600;
     letter-spacing: 0.5px;
     margin-bottom: 1.25rem;
+    color: var(--green);
 }
 .hero-title {
     font-size: clamp(2rem, 5vw, 3.25rem);
     font-weight: 800;
     margin-bottom: 0.4rem;
-    text-shadow: 0 2px 8px rgba(0,0,0,0.2);
 }
 .hero-subtitle {
     font-size: 1.2rem;
-    color: rgba(255,255,255,0.8);
+    color: rgba(255,255,255,0.85);
     margin-bottom: 2rem;
 }
 .countdown-container {
-    background: rgba(0,0,0,0.2);
-    border: 1px solid rgba(255,255,255,0.15);
+    background: var(--white);
+    border: 1px solid var(--white);
     border-radius: var(--radius-lg);
     padding: 1.5rem 2rem;
     margin: 0 auto 2rem;
@@ -161,7 +161,7 @@ body {
     font-size: 0.78rem;
     text-transform: uppercase;
     letter-spacing: 1px;
-    color: rgba(255,255,255,0.65);
+    color: var(--text-muted);
     margin-bottom: 1rem;
 }
 .countdown-tbd {
@@ -183,7 +183,7 @@ body {
     font-size: 0.7rem;
     text-transform: uppercase;
     letter-spacing: 1px;
-    color: rgba(255,255,255,0.65);
+    color: var(--text-muted);
     display: block;
     margin-top: 0.25rem;
 }
@@ -193,13 +193,13 @@ body {
 .stat-box {
     text-align: center;
     padding: 1.1rem 1.5rem;
-    background: rgba(255,255,255,0.1);
+    background: var(--white);
     border-radius: var(--radius);
-    border: 1px solid rgba(255,255,255,0.18);
+    border: 1px solid var(--white);
     min-width: 110px;
 }
 .stat-number { font-size: 1.9rem; font-weight: 800; color: var(--green); line-height: 1; }
-.stat-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px; color: rgba(255,255,255,0.65); margin-top: 0.2rem; }
+.stat-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); margin-top: 0.2rem; }
 
 /* ── Feature tiles ── */
 .feature-grid {
