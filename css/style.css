@@ -1,7 +1,7 @@
 :root {
-    --green: #4CBB17;
-    --green-dark: #2E7010;
-    --green-light: #EAF8D8;
+    --green: #46C646;
+    --green-dark: #2A772A;
+    --green-light: #E8F9E8;
     --gold: #C8A32A;
     --gold-light: #FDF8E3;
     --white: #FFFFFF;
@@ -13,8 +13,8 @@
     --shadow-hover: 0 6px 24px rgba(0,0,0,0.14);
     --radius: 8px;
     --radius-lg: 16px;
-    --hero-gradient: #2E7010;
-    --header-gradient: #2E7010;
+    --hero-gradient: #2A772A;
+    --header-gradient: #2A772A;
     --mem-header-gradient: #1A1A2E;
 }
 
@@ -662,12 +662,12 @@ footer {
 
 /* ── Throwback 2011 Theme ── */
 [data-theme="throwback"] {
-    --green: #142b14;
-    --green-dark: #0D1E0D;
-    --green-light: #E8F2E8;
-    --border: #BCCFBC;
-    --bg-light: #EFF7EF;
-    --hero-gradient: #142b14;
-    --header-gradient: #142b14;
+    --green: #0F4D0F;
+    --green-dark: #0A330A;
+    --green-light: #E4EEE4;
+    --border: #B8CCB8;
+    --bg-light: #EDF5ED;
+    --hero-gradient: #0F4D0F;
+    --header-gradient: #0F4D0F;
     --mem-header-gradient: #0A0A1E;
 }
