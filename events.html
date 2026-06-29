@@ -182,25 +182,48 @@
         <h2 class="section-title"><i class="fas fa-road" style="color:var(--green);"></i> Future Reunions</h2>
         <p style="font-size:0.875rem;color:var(--text-muted);margin-bottom:1.5rem;">Major milestones to put on your radar — major reunions (20, 25, 30+) are typically 3-day affairs.</p>
         <div class="grid-4">
-            <div class="card no-hover" style="text-align:center;padding:1.5rem 1rem;">
+            <div class="card" style="text-align:center;padding:1.5rem 1rem;cursor:pointer;" onclick="openSuggest('2031','20-Year')">
                 <div style="font-size:2rem;font-weight:800;color:var(--green);">2031</div>
                 <div style="font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-muted);">20-Year</div>
                 <div class="badge badge-green" style="margin-top:0.5rem;">Milestone</div>
+                <div style="font-size:0.72rem;color:var(--text-muted);margin-top:0.6rem;"><i class="fas fa-lightbulb"></i> Suggest an idea</div>
             </div>
-            <div class="card no-hover" style="text-align:center;padding:1.5rem 1rem;">
+            <div class="card" style="text-align:center;padding:1.5rem 1rem;cursor:pointer;" onclick="openSuggest('2036','25-Year')">
                 <div style="font-size:2rem;font-weight:800;color:var(--green);">2036</div>
                 <div style="font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-muted);">25-Year</div>
                 <div class="badge badge-green" style="margin-top:0.5rem;">Silver</div>
+                <div style="font-size:0.72rem;color:var(--text-muted);margin-top:0.6rem;"><i class="fas fa-lightbulb"></i> Suggest an idea</div>
             </div>
-            <div class="card no-hover" style="text-align:center;padding:1.5rem 1rem;">
+            <div class="card" style="text-align:center;padding:1.5rem 1rem;cursor:pointer;" onclick="openSuggest('2041','30-Year')">
                 <div style="font-size:2rem;font-weight:800;color:var(--green);">2041</div>
                 <div style="font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-muted);">30-Year</div>
-                <div class="badge badge-gray" style="margin-top:0.5rem;">Coming Up</div>
+                <div class="badge badge-green" style="margin-top:0.5rem;">Coming Up</div>
+                <div style="font-size:0.72rem;color:var(--text-muted);margin-top:0.6rem;"><i class="fas fa-lightbulb"></i> Suggest an idea</div>
             </div>
-            <div class="card no-hover" style="text-align:center;padding:1.5rem 1rem;">
+            <div class="card" style="text-align:center;padding:1.5rem 1rem;cursor:pointer;" onclick="openSuggest('2061','50-Year')">
                 <div style="font-size:2rem;font-weight:800;color:var(--green);">2061</div>
                 <div style="font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-muted);">50-Year</div>
                 <div class="badge badge-green" style="margin-top:0.5rem;">Golden</div>
+                <div style="font-size:0.72rem;color:var(--text-muted);margin-top:0.6rem;"><i class="fas fa-lightbulb"></i> Suggest an idea</div>
+            </div>
+        </div>
+
+        <!-- Suggestion modal -->
+        <div class="modal-overlay" id="suggestModal" style="display:none;">
+            <div class="modal">
+                <button class="modal-close" onclick="closeSuggest()">&times;</button>
+                <h3 class="modal-title"><span id="suggestYear"></span> Reunion — Ideas</h3>
+                <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:1rem;">What should we do for the <span id="suggestLabel"></span> reunion? Drop an idea — the class can see all suggestions.</p>
+                <div id="suggestList" style="max-height:200px;overflow-y:auto;margin-bottom:1rem;display:flex;flex-direction:column;gap:0.5rem;"></div>
+                <div id="suggestFormWrap">
+                    <textarea id="suggestInput" rows="3" placeholder="e.g. Weekend trip to Nashville, dinner at a restaurant downtown, golf outing..." style="width:100%;border:1px solid var(--border);border-radius:var(--radius);padding:0.65rem;font-size:0.875rem;resize:vertical;font-family:inherit;"></textarea>
+                    <button class="btn btn-primary" style="margin-top:0.65rem;width:100%;" onclick="submitSuggestion()">
+                        <i class="fas fa-paper-plane"></i> Submit Idea
+                    </button>
+                </div>
+                <p id="suggestSignin" style="font-size:0.82rem;color:var(--text-muted);display:none;">
+                    <a href="#" onclick="handleAuth();return false;" style="color:var(--green);">Sign in</a> to submit an idea.
+                </p>
             </div>
         </div>
     </div>
@@ -287,6 +310,60 @@ async function rsvp(eventId) {
 window.rsvp = rsvp;
 
 auth.onAuthStateChanged(() => loadRSVPs());
+
+let _suggestYear = null;
+
+function openSuggest(year, label) {
+    _suggestYear = year;
+    document.getElementById('suggestYear').textContent = year;
+    document.getElementById('suggestLabel').textContent = label;
+    document.getElementById('suggestInput').value = '';
+    document.getElementById('suggestModal').style.display = 'flex';
+    const user = auth.currentUser;
+    document.getElementById('suggestFormWrap').style.display = user ? 'block' : 'none';
+    document.getElementById('suggestSignin').style.display = user ? 'none' : 'block';
+    loadSuggestions(year);
+}
+window.openSuggest = openSuggest;
+
+function closeSuggest() {
+    document.getElementById('suggestModal').style.display = 'none';
+}
+window.closeSuggest = closeSuggest;
+
+async function loadSuggestions(year) {
+    const list = document.getElementById('suggestList');
+    list.innerHTML = '<p style="font-size:0.8rem;color:var(--text-muted);">Loading...</p>';
+    const snap = await db.collection('reunion_suggestions').where('year','==',year).orderBy('timestamp','asc').get();
+    if (snap.empty) {
+        list.innerHTML = '<p style="font-size:0.8rem;color:var(--text-muted);font-style:italic;">No ideas yet — be the first!</p>';
+        return;
+    }
+    list.innerHTML = snap.docs.map(doc => {
+        const d = doc.data();
+        return `<div style="background:var(--bg-light);border:1px solid var(--border);border-radius:var(--radius);padding:0.6rem 0.75rem;">
+            <div style="font-size:0.8rem;font-weight:600;">${d.userName || 'Classmate'}</div>
+            <div style="font-size:0.82rem;color:var(--text);margin-top:0.2rem;">${d.text}</div>
+        </div>`;
+    }).join('');
+}
+
+async function submitSuggestion() {
+    const user = auth.currentUser;
+    if (!user) { alert('Please sign in first.'); return; }
+    const text = document.getElementById('suggestInput').value.trim();
+    if (!text) return;
+    await db.collection('reunion_suggestions').add({
+        year: _suggestYear,
+        userId: user.uid,
+        userName: user.displayName,
+        text,
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    document.getElementById('suggestInput').value = '';
+    loadSuggestions(_suggestYear);
+}
+window.submitSuggestion = submitSuggestion;
 </script>
 </body>
 </html>
