@@ -9,13 +9,24 @@ if (navToggle && navMenu) {
 }
 
 // Auth state handling
+auth.getRedirectResult().catch(err => console.error('Redirect sign-in error:', err));
+
 function handleAuth() {
     const user = auth.currentUser;
     if (user) {
         if (confirm('Sign out?')) auth.signOut();
+        return;
+    }
+    const isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+    if (isMobile) {
+        auth.signInWithRedirect(googleProvider);
     } else {
         auth.signInWithPopup(googleProvider).catch(err => {
-            console.error('Sign-in error:', err);
+            if (err.code === 'auth/popup-blocked' || err.code === 'auth/popup-closed-by-user') {
+                auth.signInWithRedirect(googleProvider);
+            } else {
+                console.error('Sign-in error:', err);
+            }
         });
     }
 }
