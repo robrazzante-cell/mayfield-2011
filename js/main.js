@@ -1,32 +1,3 @@
-// Theme toggle
-function initTheme() {
-    const saved = localStorage.getItem('mayfieldTheme') || 'current';
-    document.documentElement.setAttribute('data-theme', saved === 'throwback' ? 'throwback' : '');
-    updateThemeBtn(saved);
-}
-
-function toggleTheme() {
-    const isThrowback = document.documentElement.getAttribute('data-theme') === 'throwback';
-    const next = isThrowback ? '' : 'throwback';
-    document.documentElement.setAttribute('data-theme', next);
-    localStorage.setItem('mayfieldTheme', next === 'throwback' ? 'throwback' : 'current');
-    updateThemeBtn(next === 'throwback' ? 'throwback' : 'current');
-}
-
-function updateThemeBtn(theme) {
-    document.querySelectorAll('.theme-toggle-btn').forEach(btn => {
-        if (theme === 'throwback') {
-            btn.innerHTML = '<i class="fas fa-bolt"></i> Now';
-            btn.title = 'Switch to current Mayfield branding';
-        } else {
-            btn.innerHTML = '<i class="fas fa-history"></i> \'11';
-            btn.title = 'Switch to Class of 2011 throwback';
-        }
-    });
-}
-window.toggleTheme = toggleTheme;
-initTheme();
-
 // Mobile nav toggle
 const navToggle = document.getElementById('navToggle');
 const navMenu = document.getElementById('navMenu');

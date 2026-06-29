@@ -36,9 +36,8 @@
                 </li>
             </ul>
             <div class="nav-auth">
-                <button class="theme-toggle-btn" onclick="toggleTheme()" title="Switch to Class of 2011 throwback"><i class="fas fa-history"></i> '11</button>
                 <div id="userAvatar" style="display:none;align-items:center;gap:0.5rem;">
-                    <img id="userPhoto" src="" alt="" style="width:30px;height:30px;border-radius:50%;border:2px solid var(--gold);">
+                    <img id="userPhoto" src="" alt="" style="width:30px;height:30px;border-radius:50%;border:2px solid var(--green);">
                     <a href="profile.html" style="color:rgba(255,255,255,0.85);font-size:0.8rem;text-decoration:none;" id="userName"></a>
                 </div>
                 <button class="btn-signin" id="authBtn" onclick="handleAuth()">
@@ -110,7 +109,7 @@
     <div class="container">
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:2rem;align-items:start;">
             <div>
-                <span class="badge badge-gold" style="margin-bottom:0.75rem;display:inline-block;">Faculty</span>
+                <span class="badge badge-green" style="margin-bottom:0.75rem;display:inline-block;">Faculty</span>
                 <h2 class="section-title" style="margin-bottom:0.75rem;">Teacher Meetup</h2>
                 <div style="display:flex;flex-direction:column;gap:0.6rem;margin-bottom:1.25rem;">
                     <div class="event-meta"><i class="fas fa-map-marker-alt" style="color:var(--green);width:16px;"></i> Mayfield High School Campus</div>
@@ -121,7 +120,7 @@
                     Reconnect with the teachers who shaped your Mayfield experience. Teachers can log their availability and interest through the <a href="teacher.html" style="color:var(--green);">Teacher Portal</a>. Classmates can browse who's coming and send messages.
                 </p>
                 <div id="rsvpContainer-teacher">
-                    <button class="btn btn-gold" onclick="rsvp('teacher-meetup')" id="rsvpBtn-teacher-meetup">
+                    <button class="btn btn-primary" onclick="rsvp('teacher-meetup')" id="rsvpBtn-teacher-meetup">
                         <i class="fas fa-check"></i> I Want to Attend
                     </button>
                 </div>
@@ -202,7 +201,7 @@
             <div class="card no-hover" style="text-align:center;padding:1.5rem 1rem;">
                 <div style="font-size:2rem;font-weight:800;color:var(--green);">2036</div>
                 <div style="font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-muted);">25-Year</div>
-                <div class="badge badge-gold" style="margin-top:0.5rem;">Silver</div>
+                <div class="badge badge-green" style="margin-top:0.5rem;">Silver</div>
             </div>
             <div class="card no-hover" style="text-align:center;padding:1.5rem 1rem;">
                 <div style="font-size:2rem;font-weight:800;color:var(--green);">2041</div>
@@ -212,7 +211,7 @@
             <div class="card no-hover" style="text-align:center;padding:1.5rem 1rem;">
                 <div style="font-size:2rem;font-weight:800;color:var(--green);">2061</div>
                 <div style="font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-muted);">50-Year</div>
-                <div class="badge badge-gold" style="margin-top:0.5rem;">Golden</div>
+                <div class="badge badge-green" style="margin-top:0.5rem;">Golden</div>
             </div>
         </div>
     </div>
@@ -224,7 +223,7 @@
         <div class="paw-divider"><i class="fas fa-paw"></i></div>
         <h2>Sign in to RSVP</h2>
         <p>Create your account to RSVP to events and let classmates know you're coming.</p>
-        <button class="btn btn-gold" style="margin-top:1.25rem;" onclick="handleAuth()">
+        <button class="btn btn-primary" style="margin-top:1.25rem;" onclick="handleAuth()">
             <i class="fab fa-google"></i> Sign In with Google
         </button>
     </div>

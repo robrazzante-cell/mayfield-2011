@@ -36,9 +36,8 @@
                 </li>
             </ul>
             <div class="nav-auth">
-                <button class="theme-toggle-btn" onclick="toggleTheme()" title="Switch to Class of 2011 throwback"><i class="fas fa-history"></i> '11</button>
                 <div id="userAvatar" style="display:none;align-items:center;gap:0.5rem;">
-                    <img id="userPhoto" src="" alt="" style="width:30px;height:30px;border-radius:50%;border:2px solid var(--gold);">
+                    <img id="userPhoto" src="" alt="" style="width:30px;height:30px;border-radius:50%;border:2px solid var(--green);">
                     <a href="profile.html" style="color:rgba(255,255,255,0.85);font-size:0.8rem;text-decoration:none;" id="userName"></a>
                 </div>
                 <button class="btn-signin" id="authBtn" onclick="handleAuth()">
@@ -69,7 +68,7 @@
 
             <!-- FOR TEACHERS: Log availability -->
             <div>
-                <span class="badge badge-gold" style="margin-bottom:0.75rem;display:inline-block;">For Teachers</span>
+                <span class="badge badge-green" style="margin-bottom:0.75rem;display:inline-block;">For Teachers</span>
                 <h2 class="section-title" style="margin-bottom:0.75rem;">Log Your Interest</h2>
                 <p style="font-size:0.875rem;color:var(--text-muted);margin-bottom:1.5rem;">
                     If you taught at Mayfield during 2007–2011 and would like to reconnect with our class, fill out the form below. Attendance is free and fully optional.
@@ -116,7 +115,7 @@
                             <label>Message to the Class of 2011 <span style="font-weight:400;color:var(--text-muted);">(optional)</span></label>
                             <textarea id="tMessage" rows="3" placeholder="Anything you'd like your former students to know..."></textarea>
                         </div>
-                        <button type="submit" class="btn btn-gold btn-block">
+                        <button type="submit" class="btn btn-primary btn-block">
                             <i class="fas fa-paper-plane"></i> Submit
                         </button>
                         <div class="form-message" id="teacherFormMsg" style="display:none;"></div>
@@ -195,7 +194,7 @@ async function loadTeachers() {
         const d = doc.data();
         const badge = d.interest === 'yes'
             ? '<span class="badge badge-green">Attending</span>'
-            : '<span class="badge badge-gold">Maybe</span>';
+            : '<span class="badge badge-green">Maybe</span>';
         return `
         <div class="card no-hover" style="margin-bottom:0.75rem;padding:1rem;">
             <div style="display:flex;align-items:center;justify-content:space-between;gap:0.75rem;flex-wrap:wrap;">

@@ -44,9 +44,8 @@
                 </li>
             </ul>
             <div class="nav-auth">
-                <button class="theme-toggle-btn" onclick="toggleTheme()" title="Switch to Class of 2011 throwback"><i class="fas fa-history"></i> '11</button>
                 <div id="userAvatar" style="display:none;align-items:center;gap:0.5rem;">
-                    <img id="userPhoto" src="" alt="" style="width:30px;height:30px;border-radius:50%;border:2px solid var(--gold);">
+                    <img id="userPhoto" src="" alt="" style="width:30px;height:30px;border-radius:50%;border:2px solid var(--green);">
                     <a href="profile.html" style="color:rgba(255,255,255,0.85);font-size:0.8rem;text-decoration:none;" id="userName"></a>
                 </div>
                 <button class="btn-signin" id="authBtn" onclick="handleAuth()">
@@ -130,7 +129,7 @@
         <div class="paw-divider"><i class="fas fa-paw"></i></div>
         <h2>Add your pin to the map</h2>
         <p>Sign in to add your city to the classmate map and appear in the directory.</p>
-        <button class="btn btn-gold" style="margin-top:1.25rem;" onclick="handleAuth()">
+        <button class="btn btn-primary" style="margin-top:1.25rem;" onclick="handleAuth()">
             <i class="fab fa-google"></i> Sign In with Google
         </button>
     </div>
@@ -186,7 +185,7 @@ const greenIcon = L.divIcon({
 // Mayfield HS marker
 L.marker([41.519, -81.462], {icon: L.divIcon({
     className:'',
-    html:'<div style="width:18px;height:18px;border-radius:50%;background:var(--gold,#C8A32A);border:2px solid white;box-shadow:0 1px 4px rgba(0,0,0,0.4);display:flex;align-items:center;justify-content:center;font-size:9px;">🏫</div>',
+    html:'<div style="width:18px;height:18px;border-radius:50%;background:var(--green,#46C646);border:2px solid white;box-shadow:0 1px 4px rgba(0,0,0,0.4);display:flex;align-items:center;justify-content:center;font-size:9px;">🏫</div>',
     iconSize:[18,18], iconAnchor:[9,9]
 })}).addTo(map).bindPopup('<strong>Mayfield High School</strong><br>Where it all started');
 
