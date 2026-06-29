@@ -78,10 +78,6 @@
                 <div class="stat-label">Events</div>
             </div>
             <div class="stat-box">
-                <div class="stat-number" id="statFund">—</div>
-                <div class="stat-label">Class Fund</div>
-            </div>
-            <div class="stat-box">
                 <div class="stat-number">15</div>
                 <div class="stat-label">Years Since Grad</div>
             </div>
@@ -135,8 +131,16 @@
                 <h3>Homecoming Tailgate</h3>
                 <p class="event-meta"><i class="fas fa-map-marker-alt"></i> Alumni Pavilion, Wildcat Stadium</p>
                 <p class="event-meta"><i class="far fa-calendar"></i> Fri, Sep 19, 2026 &middot; 7:00 PM EDT</p>
-                <p class="event-meta" style="margin-top:0.5rem;font-size:0.8rem;color:var(--text-muted);">Alcohol permitted · Free use of pavilion</p>
                 <a href="events.html#tailgate" class="btn btn-outline btn-sm" style="margin-top:0.75rem;display:inline-flex;">Learn More</a>
+            </div>
+            <div class="card event-card">
+                <div class="event-icon"><i class="fas fa-school"></i></div>
+                <span class="badge badge-green">Tour</span>
+                <h3>School Tour</h3>
+                <p class="event-meta"><i class="fas fa-map-marker-alt"></i> Mayfield High School</p>
+                <p class="event-meta"><i class="far fa-calendar"></i> Sat, Sep 20, 2026 &middot; 11:00 AM</p>
+                <p class="event-meta" style="margin-top:0.5rem;font-size:0.8rem;color:var(--text-muted);">~1.5 hrs &middot; Hosted by Wayne, Alumni Assoc.</p>
+                <a href="events.html#campus-tour" class="btn btn-outline btn-sm" style="margin-top:0.75rem;display:inline-flex;">Learn More</a>
             </div>
             <div class="card event-card">
                 <div class="event-icon"><i class="fas fa-chalkboard-teacher"></i></div>
@@ -144,35 +148,9 @@
                 <h3>Teacher Meetup</h3>
                 <p class="event-meta"><i class="fas fa-map-marker-alt"></i> Mayfield High School Campus</p>
                 <p class="event-meta"><i class="far fa-calendar"></i> Sat, Sep 20, 2026 &middot; 12:30 PM</p>
-                <p class="event-meta" style="margin-top:0.5rem;font-size:0.8rem;color:var(--text-muted);">Teachers attend free · RSVP required</p>
+                <p class="event-meta" style="margin-top:0.5rem;font-size:0.8rem;color:var(--text-muted);">RSVP required</p>
                 <a href="events.html#teacher-meetup" class="btn btn-outline btn-sm" style="margin-top:0.75rem;display:inline-flex;">Learn More</a>
             </div>
-            <div class="card event-card">
-                <div class="event-icon"><i class="fas fa-school"></i></div>
-                <span class="badge badge-green">Tour</span>
-                <h3>School Tour</h3>
-                <p class="event-meta"><i class="fas fa-map-marker-alt"></i> 6116 Wilson Mills Road, Mayfield Village, OH 44143</p>
-                <p class="event-meta"><i class="far fa-clock"></i> ~1.5 hours · Hosted by Alumni Assoc.</p>
-                <p class="event-meta"><i class="far fa-calendar"></i> Sat, Sep 20, 2026 &middot; 11:00 AM</p>
-                <p class="event-meta" style="margin-top:0.5rem;font-size:0.8rem;color:var(--text-muted);">~1.5 hrs · Hosted by Wayne, Alumni Assoc.</p>
-                <a href="events.html#campus-tour" class="btn btn-outline btn-sm" style="margin-top:0.75rem;display:inline-flex;">Learn More</a>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- CLASS FUND TRANSPARENCY -->
-<section class="section">
-    <div class="container" style="max-width:600px;">
-        <h2 class="section-title centered">Class Fund</h2>
-        <p class="section-subtitle centered">Transparent and managed by your class treasurer</p>
-        <div class="fund-display">
-            <div class="fund-amount" id="fundAmount">$0</div>
-            <div class="fund-label">Total Class Savings</div>
-            <div class="fund-updated" id="fundUpdated">Updated by Treasurer</div>
-        </div>
-        <div class="note-box" style="margin-top:1rem;">
-            <strong>How funds are used:</strong> Venue costs, supplies, communications, and reunion events. Questions? <a href="leadership.html" style="color:inherit;">Contact your Treasurer</a>.
         </div>
     </div>
 </section>
@@ -225,18 +203,6 @@
             const usersSnap = await db.collection('users').get();
             const el = document.getElementById('statClassmates');
             if (el) el.textContent = usersSnap.size;
-        } catch(e) {}
-        try {
-            const fundSnap = await db.collection('settings').doc('fund').get();
-            if (fundSnap.exists) {
-                const d = fundSnap.data();
-                const amtEl = document.getElementById('fundAmount');
-                const updEl = document.getElementById('fundUpdated');
-                if (amtEl) amtEl.textContent = formatCurrency(d.balance || 0);
-                if (updEl && d.updatedAt) updEl.textContent = 'Last updated ' + d.updatedAt.toDate().toLocaleDateString('en-US', {month:'short',day:'numeric',year:'numeric'});
-            }
-            const statEl = document.getElementById('statFund');
-            if (statEl && fundSnap.exists) statEl.textContent = formatCurrency(fundSnap.data().balance || 0);
         } catch(e) {}
     });
 

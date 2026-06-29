@@ -94,7 +94,7 @@
                 <div class="leader-photo-placeholder">$</div>
                 <div class="leader-role"><i class="fas fa-coins"></i> Treasurer</div>
                 <h3>[ Name ]</h3>
-                <p>Manages the class fund and financial transparency. Questions about the budget? Reach out.</p>
+                <p>Handles class finances and planning logistics. Questions? Reach out.</p>
                 <a href="mailto:placeholder@email.com" class="btn btn-outline btn-sm btn-block">
                     <i class="fas fa-envelope"></i> Send Email
                 </a>
@@ -111,23 +111,6 @@
                 </a>
             </div>
 
-        </div>
-
-        <hr class="divider">
-
-        <!-- Fund Transparency -->
-        <h2 class="section-title" style="margin-bottom:0.5rem;"><i class="fas fa-coins" style="color:var(--green);"></i> Class Fund</h2>
-        <p style="font-size:0.875rem;color:var(--text-muted);margin-bottom:1.5rem;">Managed by your Treasurer and updated regularly. Every dollar is accounted for.</p>
-
-        <div style="max-width:480px;margin:0 auto;">
-            <div class="fund-display">
-                <div class="fund-amount" id="fundAmount">$0</div>
-                <div class="fund-label">Total Class Savings</div>
-                <div class="fund-updated" id="fundUpdated">Updated by Treasurer</div>
-            </div>
-            <div class="note-box" style="margin-top:1rem;">
-                <strong>Where the money goes:</strong> Alumni Pavilion supplies, event communications, printing, and future reunion seed funds. No personal expenses.
-            </div>
         </div>
 
         <hr class="divider">
@@ -175,16 +158,6 @@
 <script src="js/main.js"></script>
 <script>
 auth.onAuthStateChanged(async () => {
-    try {
-        const snap = await db.collection('settings').doc('fund').get();
-        if (snap.exists) {
-            const d = snap.data();
-            const amtEl = document.getElementById('fundAmount');
-            const updEl = document.getElementById('fundUpdated');
-            if (amtEl) amtEl.textContent = formatCurrency(d.balance || 0);
-            if (updEl && d.updatedAt) updEl.textContent = 'Last updated ' + d.updatedAt.toDate().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
-        }
-    } catch(e) {}
 });
 </script>
 </body>
