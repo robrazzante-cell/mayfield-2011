@@ -163,77 +163,14 @@
             </div>
         </div>
 
-        <div class="card no-hover" id="memberFormCard">
-            <h4 style="margin-bottom:1.25rem;font-size:0.95rem;font-weight:700;"><i class="fas fa-user-plus" style="color:var(--green);"></i> Registration Form</h4>
-            <form id="memberForm" onsubmit="submitMembership(event)">
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Last Name *</label>
-                        <input type="text" id="mLast" required>
-                    </div>
-                    <div class="form-group">
-                        <label>First Name *</label>
-                        <input type="text" id="mFirst" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Maiden Name</label>
-                        <input type="text" id="mMaiden">
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group" style="flex:2;">
-                        <label>Street Address *</label>
-                        <input type="text" id="mStreet" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Class Year</label>
-                        <input type="text" id="mClass" value="2011">
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group" style="flex:2;">
-                        <label>City *</label>
-                        <input type="text" id="mCity" required>
-                    </div>
-                    <div class="form-group">
-                        <label>State *</label>
-                        <input type="text" id="mState" maxlength="2" style="text-transform:uppercase;" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Zip *</label>
-                        <input type="text" id="mZip" maxlength="10" required>
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Spouse Name</label>
-                        <input type="text" id="mSpouse" placeholder="If joining together">
-                    </div>
-                    <div class="form-group">
-                        <label>Phone Number</label>
-                        <input type="tel" id="mPhone">
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label>Email Address *</label>
-                    <input type="email" id="mEmail" required>
-                </div>
-                <div class="form-group">
-                    <label>Membership Type *</label>
-                    <select id="mType" required>
-                        <option value="">Select</option>
-                        <option value="lifetime">Lifetime Membership — $35.00</option>
-                        <option value="permanent">Permanent Membership — No fee (age 65+)</option>
-                    </select>
-                </div>
-                <div class="note-box" style="margin-bottom:1.25rem;">
-                    <strong>After submitting:</strong> Mail your $35 check (if applicable) made out to <em>Mayfield H.S. Alumni Association</em> to 6116 Wilson Mills Rd., Mayfield Village, OH 44143. Your information will also be shared with the Alumni Association to update their records.
-                </div>
-                <button type="submit" class="btn btn-primary btn-block">
-                    <i class="fas fa-paper-plane"></i> Submit Registration
-                </button>
-                <div class="form-message" id="memberFormMsg" style="display:none;margin-top:1rem;"></div>
-            </form>
+        <div style="text-align:center;">
+            <a href="assets/membership-form.pdf" download="Mayfield-Alumni-Association-Membership-Form.pdf" class="btn btn-primary" style="font-size:1rem;padding:0.85rem 2rem;display:inline-flex;gap:0.5rem;align-items:center;">
+                <i class="fas fa-download"></i> Download Membership Form (PDF)
+            </a>
+            <p style="font-size:0.82rem;color:var(--text-muted);margin-top:1rem;line-height:1.8;">
+                Print, complete, and mail the form with your $35 check (made out to <em>Mayfield H.S. Alumni Association</em>) to:<br>
+                <strong>6116 Wilson Mills Rd., Mayfield Village, OH 44143</strong>
+            </p>
         </div>
 
     </div>
@@ -270,41 +207,6 @@
 <script src="js/main.js"></script>
 <script>
 auth.onAuthStateChanged(async () => {});
-
-async function submitMembership(e) {
-    e.preventDefault();
-    const msg = document.getElementById('memberFormMsg');
-    const btn = e.target.querySelector('[type=submit]');
-    btn.disabled = true; btn.textContent = 'Submitting...';
-    const type = document.getElementById('mType').value;
-    try {
-        await db.collection('alumni_membership').add({
-            lastName:   document.getElementById('mLast').value.trim(),
-            firstName:  document.getElementById('mFirst').value.trim(),
-            maiden:     document.getElementById('mMaiden').value.trim(),
-            street:     document.getElementById('mStreet').value.trim(),
-            classYear:  document.getElementById('mClass').value.trim(),
-            city:       document.getElementById('mCity').value.trim(),
-            state:      document.getElementById('mState').value.trim().toUpperCase(),
-            zip:        document.getElementById('mZip').value.trim(),
-            spouse:     document.getElementById('mSpouse').value.trim(),
-            phone:      document.getElementById('mPhone').value.trim(),
-            email:      document.getElementById('mEmail').value.trim(),
-            membershipType: type,
-            submittedAt: firebase.firestore.FieldValue.serverTimestamp()
-        });
-        document.getElementById('memberForm').style.display = 'none';
-        msg.innerHTML = type === 'lifetime'
-            ? '<strong>You\'re registered!</strong> Please mail your $35 check made out to <em>Mayfield H.S. Alumni Association</em> to 6116 Wilson Mills Rd., Mayfield Village, OH 44143.'
-            : '<strong>You\'re registered!</strong> Your information has been submitted. Welcome to the Alumni Association!';
-        msg.className = 'form-message success'; msg.style.display = 'block';
-    } catch(err) {
-        msg.textContent = 'Something went wrong. Please try again.';
-        msg.className = 'form-message error'; msg.style.display = 'block';
-        btn.disabled = false; btn.textContent = 'Submit Registration';
-    }
-}
-window.submitMembership = submitMembership;
 </script>
 </body>
 </html>
