@@ -98,7 +98,7 @@ body {
 .nav-auth { display: flex; align-items: center; gap: 0.75rem; flex-shrink: 0; }
 .btn-signin {
     background: var(--white);
-    color: var(--green-dark);
+    color: var(--green);
     border: none;
     padding: 0.45rem 1rem;
     border-radius: 4px;
@@ -261,6 +261,9 @@ body {
 .page-header h1 { font-size: 1.65rem; font-weight: 700; margin-bottom: 0.2rem; display: flex; align-items: center; gap: 0.5rem; color: var(--text); }
 .page-header h1 i { color: var(--green); }
 .page-header p { color: var(--text-muted); font-size: 0.9rem; }
+
+/* ── All heading icons → kelly green ── */
+h1 i, h2 i, h3 i, h4 i, .section-title i { color: var(--green); }
 .page-header.mem-header h1 { color: var(--white); }
 .page-header.mem-header h1 i { color: var(--white); }
 .page-header.mem-header p { color: rgba(255,255,255,0.75); }
