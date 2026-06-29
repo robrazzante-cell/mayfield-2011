@@ -13,6 +13,9 @@
     --shadow-hover: 0 6px 24px rgba(0,0,0,0.14);
     --radius: 8px;
     --radius-lg: 16px;
+    --hero-gradient: linear-gradient(135deg, #1A5C1A 0%, #2E8B2E 55%, #3A9A3A 100%);
+    --header-gradient: linear-gradient(135deg, #1A5C1A 0%, #3A9A3A 100%);
+    --mem-header-gradient: linear-gradient(135deg, #1A1A2E 0%, #1A3A1A 100%);
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -124,7 +127,7 @@ body {
 
 /* ── Hero ── */
 .hero {
-    background: linear-gradient(135deg, #1A5C1A 0%, #2E8B2E 55%, #3A9A3A 100%);
+    background: var(--hero-gradient);
     padding: 4rem 0 3rem;
     color: var(--white);
     text-align: center;
@@ -246,7 +249,10 @@ body {
 
 /* ── Page header ── */
 .page-header {
-    background: linear-gradient(135deg, #1A5C1A 0%, #3A9A3A 100%);
+    background: var(--header-gradient);
+}
+.page-header.mem-header {
+    background: var(--mem-header-gradient);
     padding: 2.25rem 0;
     color: var(--white);
 }
@@ -629,4 +635,39 @@ footer {
     .feature-grid { grid-template-columns: 1fr; }
     .stats-row { gap: 0.5rem; }
     .stat-box { min-width: 80px; padding: 0.75rem 0.875rem; }
+}
+
+/* ── Theme toggle button ── */
+.theme-toggle-btn {
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.3);
+    color: rgba(255,255,255,0.9);
+    border-radius: 20px;
+    padding: 0.28rem 0.75rem;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.4px;
+    cursor: pointer;
+    display: flex; align-items: center; gap: 0.3rem;
+    transition: all 0.2s;
+    font-family: inherit;
+    white-space: nowrap;
+    flex-shrink: 0;
+    text-transform: uppercase;
+}
+.theme-toggle-btn:hover {
+    background: rgba(255,255,255,0.22);
+    border-color: rgba(255,255,255,0.5);
+}
+
+/* ── Throwback 2011 Theme ── */
+[data-theme="throwback"] {
+    --green: #2D6A2D;
+    --green-dark: #1A4A1A;
+    --green-light: #EBF5EE;
+    --border: #C0D8C0;
+    --bg-light: #F0F7F0;
+    --hero-gradient: linear-gradient(135deg, #0F2A0F 0%, #1A4A1A 55%, #2D6A2D 100%);
+    --header-gradient: linear-gradient(135deg, #0F2A0F 0%, #2D6A2D 100%);
+    --mem-header-gradient: linear-gradient(135deg, #0A0A1E 0%, #1A3A1A 100%);
 }
