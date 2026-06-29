@@ -79,12 +79,19 @@
         <!-- Category filter -->
         <div class="filter-bar" id="categoryFilter">
             <button class="filter-btn active" data-cat="all" onclick="filterBiz('all',this)">All</button>
+            <button class="filter-btn" data-cat="Consulting & Strategy" onclick="filterBiz('Consulting & Strategy',this)">Consulting &amp; Strategy</button>
+            <button class="filter-btn" data-cat="Management & Leadership" onclick="filterBiz('Management & Leadership',this)">Management &amp; Leadership</button>
+            <button class="filter-btn" data-cat="Marketing & Communications" onclick="filterBiz('Marketing & Communications',this)">Marketing &amp; Communications</button>
             <button class="filter-btn" data-cat="Legal" onclick="filterBiz('Legal',this)">Legal</button>
             <button class="filter-btn" data-cat="Finance" onclick="filterBiz('Finance',this)">Finance</button>
-            <button class="filter-btn" data-cat="Health" onclick="filterBiz('Health',this)">Health &amp; Wellness</button>
-            <button class="filter-btn" data-cat="Tech" onclick="filterBiz('Tech',this)">Technology</button>
+            <button class="filter-btn" data-cat="Insurance" onclick="filterBiz('Insurance',this)">Insurance</button>
+            <button class="filter-btn" data-cat="Human Resources" onclick="filterBiz('Human Resources',this)">Human Resources</button>
+            <button class="filter-btn" data-cat="Health & Wellness" onclick="filterBiz('Health & Wellness',this)">Health &amp; Wellness</button>
+            <button class="filter-btn" data-cat="Technology" onclick="filterBiz('Technology',this)">Technology</button>
             <button class="filter-btn" data-cat="Real Estate" onclick="filterBiz('Real Estate',this)">Real Estate</button>
-            <button class="filter-btn" data-cat="Trades" onclick="filterBiz('Trades',this)">Trades &amp; Contractors</button>
+            <button class="filter-btn" data-cat="Trades & Contractors" onclick="filterBiz('Trades & Contractors',this)">Trades &amp; Contractors</button>
+            <button class="filter-btn" data-cat="Education & Coaching" onclick="filterBiz('Education & Coaching',this)">Education &amp; Coaching</button>
+            <button class="filter-btn" data-cat="Food & Hospitality" onclick="filterBiz('Food & Hospitality',this)">Food &amp; Hospitality</button>
             <button class="filter-btn" data-cat="Creative" onclick="filterBiz('Creative',this)">Creative</button>
             <button class="filter-btn" data-cat="Other" onclick="filterBiz('Other',this)">Other</button>
         </div>
@@ -153,12 +160,19 @@
                 <label>Category</label>
                 <select id="bizCategory" required>
                     <option value="">Select category</option>
+                    <option>Consulting &amp; Strategy</option>
+                    <option>Management &amp; Leadership</option>
+                    <option>Marketing &amp; Communications</option>
                     <option>Legal</option>
                     <option>Finance</option>
+                    <option>Insurance</option>
+                    <option>Human Resources</option>
                     <option>Health &amp; Wellness</option>
                     <option>Technology</option>
                     <option>Real Estate</option>
                     <option>Trades &amp; Contractors</option>
+                    <option>Education &amp; Coaching</option>
+                    <option>Food &amp; Hospitality</option>
                     <option>Creative</option>
                     <option>Other</option>
                 </select>
