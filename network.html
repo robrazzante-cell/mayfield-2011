@@ -79,6 +79,20 @@
         <!-- Category filter -->
         <div class="filter-bar" id="categoryFilter">
             <button class="filter-btn active" data-cat="all" onclick="filterBiz('all',this)">All</button>
+            <button class="filter-btn" data-cat="Construction & Contracting" onclick="filterBiz('Construction & Contracting',this)">Construction &amp; Contracting</button>
+            <button class="filter-btn" data-cat="Plumbing" onclick="filterBiz('Plumbing',this)">Plumbing</button>
+            <button class="filter-btn" data-cat="Electrical" onclick="filterBiz('Electrical',this)">Electrical</button>
+            <button class="filter-btn" data-cat="HVAC & Heating" onclick="filterBiz('HVAC & Heating',this)">HVAC &amp; Heating</button>
+            <button class="filter-btn" data-cat="Carpentry & Woodworking" onclick="filterBiz('Carpentry & Woodworking',this)">Carpentry &amp; Woodworking</button>
+            <button class="filter-btn" data-cat="Roofing" onclick="filterBiz('Roofing',this)">Roofing</button>
+            <button class="filter-btn" data-cat="Painting & Flooring" onclick="filterBiz('Painting & Flooring',this)">Painting &amp; Flooring</button>
+            <button class="filter-btn" data-cat="Auto & Automotive" onclick="filterBiz('Auto & Automotive',this)">Auto &amp; Automotive</button>
+            <button class="filter-btn" data-cat="Landscaping" onclick="filterBiz('Landscaping',this)">Landscaping</button>
+            <button class="filter-btn" data-cat="Trucking & Logistics" onclick="filterBiz('Trucking & Logistics',this)">Trucking &amp; Logistics</button>
+            <button class="filter-btn" data-cat="Cleaning & Maintenance" onclick="filterBiz('Cleaning & Maintenance',this)">Cleaning &amp; Maintenance</button>
+            <button class="filter-btn" data-cat="Manufacturing" onclick="filterBiz('Manufacturing',this)">Manufacturing</button>
+            <button class="filter-btn" data-cat="Welding & Fabrication" onclick="filterBiz('Welding & Fabrication',this)">Welding &amp; Fabrication</button>
+            <button class="filter-btn" data-cat="Food & Hospitality" onclick="filterBiz('Food & Hospitality',this)">Food &amp; Hospitality</button>
             <button class="filter-btn" data-cat="Consulting & Strategy" onclick="filterBiz('Consulting & Strategy',this)">Consulting &amp; Strategy</button>
             <button class="filter-btn" data-cat="Management & Leadership" onclick="filterBiz('Management & Leadership',this)">Management &amp; Leadership</button>
             <button class="filter-btn" data-cat="Marketing & Communications" onclick="filterBiz('Marketing & Communications',this)">Marketing &amp; Communications</button>
@@ -89,9 +103,7 @@
             <button class="filter-btn" data-cat="Health & Wellness" onclick="filterBiz('Health & Wellness',this)">Health &amp; Wellness</button>
             <button class="filter-btn" data-cat="Technology" onclick="filterBiz('Technology',this)">Technology</button>
             <button class="filter-btn" data-cat="Real Estate" onclick="filterBiz('Real Estate',this)">Real Estate</button>
-            <button class="filter-btn" data-cat="Trades & Contractors" onclick="filterBiz('Trades & Contractors',this)">Trades &amp; Contractors</button>
             <button class="filter-btn" data-cat="Education & Coaching" onclick="filterBiz('Education & Coaching',this)">Education &amp; Coaching</button>
-            <button class="filter-btn" data-cat="Food & Hospitality" onclick="filterBiz('Food & Hospitality',this)">Food &amp; Hospitality</button>
             <button class="filter-btn" data-cat="Creative" onclick="filterBiz('Creative',this)">Creative</button>
             <button class="filter-btn" data-cat="Other" onclick="filterBiz('Other',this)">Other</button>
         </div>
@@ -160,20 +172,36 @@
                 <label>Category</label>
                 <select id="bizCategory" required>
                     <option value="">Select category</option>
-                    <option>Consulting &amp; Strategy</option>
-                    <option>Management &amp; Leadership</option>
-                    <option>Marketing &amp; Communications</option>
-                    <option>Legal</option>
-                    <option>Finance</option>
-                    <option>Insurance</option>
-                    <option>Human Resources</option>
-                    <option>Health &amp; Wellness</option>
-                    <option>Technology</option>
-                    <option>Real Estate</option>
-                    <option>Trades &amp; Contractors</option>
-                    <option>Education &amp; Coaching</option>
-                    <option>Food &amp; Hospitality</option>
-                    <option>Creative</option>
+                    <optgroup label="Skilled Trades">
+                        <option>Construction &amp; Contracting</option>
+                        <option>Plumbing</option>
+                        <option>Electrical</option>
+                        <option>HVAC &amp; Heating</option>
+                        <option>Carpentry &amp; Woodworking</option>
+                        <option>Roofing</option>
+                        <option>Painting &amp; Flooring</option>
+                        <option>Auto &amp; Automotive</option>
+                        <option>Landscaping</option>
+                        <option>Trucking &amp; Logistics</option>
+                        <option>Cleaning &amp; Maintenance</option>
+                        <option>Manufacturing</option>
+                        <option>Welding &amp; Fabrication</option>
+                        <option>Food &amp; Hospitality</option>
+                    </optgroup>
+                    <optgroup label="Professional Services">
+                        <option>Consulting &amp; Strategy</option>
+                        <option>Management &amp; Leadership</option>
+                        <option>Marketing &amp; Communications</option>
+                        <option>Legal</option>
+                        <option>Finance</option>
+                        <option>Insurance</option>
+                        <option>Human Resources</option>
+                        <option>Health &amp; Wellness</option>
+                        <option>Technology</option>
+                        <option>Real Estate</option>
+                        <option>Education &amp; Coaching</option>
+                        <option>Creative</option>
+                    </optgroup>
                     <option>Other</option>
                 </select>
             </div>

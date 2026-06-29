@@ -38,6 +38,10 @@ auth.onAuthStateChanged(user => {
         }
         if (signinPrompt) signinPrompt.style.display = 'none';
         ensureUserDoc(user);
+        if (!localStorage.getItem('welcomed_' + user.uid)) {
+            localStorage.setItem('welcomed_' + user.uid, '1');
+            setTimeout(() => showWelcomeTour(user), 600);
+        }
     } else {
         if (authBtnText) authBtnText.textContent = 'Sign In';
         if (authBtn) authBtn.querySelector('i').className = 'fab fa-google';
@@ -134,6 +138,54 @@ function timeAgo(ts) {
 
 function formatCurrency(n) {
     return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0 }).format(n);
+}
+
+function showWelcomeTour(user) {
+    const firstName = user.displayName ? user.displayName.split(' ')[0] : 'Wildcat';
+    const features = [
+        ['fa-map-marked-alt', 'Classmate Map', 'Pin your city and see where the Class of 2011 spread after graduation.'],
+        ['fa-briefcase', 'Business Network', 'List your business or find a classmate to hire — hire local, hire trusted.'],
+        ['fa-football-ball', 'Events', 'Homecoming tailgate Sept 19 · Firestone vs Mayfield. RSVP and see what\'s planned.'],
+        ['fa-trophy', 'Class Pride', 'Class superlatives, song, colors, and memories from our time at Mayfield.'],
+        ['fa-book-open', 'Digital Yearbook', '<em>The Mayfielder</em> — our yearbook, digitized and online.'],
+        ['fa-heart', 'In Memoriam', 'A space to honor and remember the classmates we\'ve lost.'],
+    ];
+    const overlay = document.createElement('div');
+    overlay.id = 'welcomeModal';
+    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:2000;display:flex;align-items:center;justify-content:center;padding:1rem;';
+    overlay.innerHTML = `
+        <div style="background:#fff;border-radius:16px;max-width:500px;width:100%;padding:2rem;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.3);">
+            <div style="text-align:center;margin-bottom:1.5rem;">
+                <div style="width:54px;height:54px;background:var(--green);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 0.85rem;">
+                    <i class="fas fa-paw" style="color:#fff;font-size:1.3rem;"></i>
+                </div>
+                <h2 style="font-size:1.35rem;font-weight:800;margin-bottom:0.3rem;">Welcome, ${firstName}!</h2>
+                <p style="color:var(--text-muted);font-size:0.85rem;">Here's what the Class of 2011 hub has to offer:</p>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:0.8rem;margin-bottom:1.75rem;">
+                ${features.map(([icon, title, desc]) => `
+                    <div style="display:flex;align-items:flex-start;gap:0.85rem;">
+                        <div style="width:36px;height:36px;background:var(--green-light);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;border:1px solid var(--border);">
+                            <i class="fas ${icon}" style="color:var(--green);font-size:0.875rem;"></i>
+                        </div>
+                        <div>
+                            <div style="font-weight:700;font-size:0.875rem;margin-bottom:0.1rem;">${title}</div>
+                            <div style="font-size:0.8rem;color:var(--text-muted);line-height:1.5;">${desc}</div>
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+            <div style="display:flex;gap:0.65rem;flex-wrap:wrap;">
+                <a href="profile.html" onclick="document.getElementById('welcomeModal').remove()" style="flex:1;min-width:140px;background:var(--green);color:#fff;padding:0.7rem 1rem;border-radius:8px;font-weight:700;font-size:0.85rem;text-align:center;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:0.4rem;">
+                    <i class="fas fa-user-edit"></i> Complete My Profile
+                </a>
+                <button onclick="document.getElementById('welcomeModal').remove()" style="flex:1;min-width:140px;background:#fff;color:var(--text);border:1px solid var(--border);padding:0.7rem 1rem;border-radius:8px;font-weight:600;font-size:0.85rem;cursor:pointer;">
+                    Explore the Site
+                </button>
+            </div>
+        </div>`;
+    document.body.appendChild(overlay);
+    overlay.addEventListener('click', e => { if (e.target === overlay) overlay.remove(); });
 }
 
 // Attach to window for inline handlers
