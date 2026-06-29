@@ -248,15 +248,22 @@ body {
 
 /* ── Page header ── */
 .page-header {
-    background: var(--green-dark);
+    background: var(--white);
+    padding: 2.25rem 0;
+    color: var(--text);
+    border-bottom: 1px solid var(--border);
 }
 .page-header.mem-header {
     background: #1A1A2E;
-    padding: 2.25rem 0;
     color: var(--white);
+    border-bottom: none;
 }
-.page-header h1 { font-size: 1.65rem; font-weight: 700; margin-bottom: 0.2rem; display: flex; align-items: center; gap: 0.5rem; }
-.page-header p { color: rgba(255,255,255,0.75); font-size: 0.9rem; }
+.page-header h1 { font-size: 1.65rem; font-weight: 700; margin-bottom: 0.2rem; display: flex; align-items: center; gap: 0.5rem; color: var(--text); }
+.page-header h1 i { color: var(--green); }
+.page-header p { color: var(--text-muted); font-size: 0.9rem; }
+.page-header.mem-header h1 { color: var(--white); }
+.page-header.mem-header h1 i { color: var(--white); }
+.page-header.mem-header p { color: rgba(255,255,255,0.75); }
 
 /* ── Breadcrumb ── */
 .breadcrumb {
