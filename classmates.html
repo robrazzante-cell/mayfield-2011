@@ -110,9 +110,7 @@
         <!-- CLASSMATE DIRECTORY -->
         <h2 class="section-title">Classmate Directory</h2>
         <div class="filter-bar" id="filterBar">
-            <button class="filter-btn active" onclick="filterClassmates('all', this)">All</button>
-            <button class="filter-btn" onclick="filterClassmates('ohio', this)">Ohio</button>
-            <button class="filter-btn" onclick="filterClassmates('out-of-state', this)">Out of State</button>
+            <button class="filter-btn active" onclick="applyFilter('all', this)">All</button>
         </div>
         <div class="grid-4" id="classmatesGrid">
             <!-- Populated by JS -->
@@ -165,44 +163,121 @@
 <script src="js/firebase-config.js"></script>
 <script src="js/main.js"></script>
 <script>
-// Initialize Leaflet map centered on Mayfield Heights, OH
+const STATE_ABBR = {
+    'alabama':'AL','alaska':'AK','arizona':'AZ','arkansas':'AR','california':'CA',
+    'colorado':'CO','connecticut':'CT','delaware':'DE','florida':'FL','georgia':'GA',
+    'hawaii':'HI','idaho':'ID','illinois':'IL','indiana':'IN','iowa':'IA',
+    'kansas':'KS','kentucky':'KY','louisiana':'LA','maine':'ME','maryland':'MD',
+    'massachusetts':'MA','michigan':'MI','minnesota':'MN','mississippi':'MS','missouri':'MO',
+    'montana':'MT','nebraska':'NE','nevada':'NV','new hampshire':'NH','new jersey':'NJ',
+    'new mexico':'NM','new york':'NY','north carolina':'NC','north dakota':'ND','ohio':'OH',
+    'oklahoma':'OK','oregon':'OR','pennsylvania':'PA','rhode island':'RI','south carolina':'SC',
+    'south dakota':'SD','tennessee':'TN','texas':'TX','utah':'UT','vermont':'VT',
+    'virginia':'VA','washington':'WA','west virginia':'WV','wisconsin':'WI','wyoming':'WY',
+    'district of columbia':'DC','washington dc':'DC','washington d.c.':'DC'
+};
+const STATE_NAMES = {
+    'AL':'Alabama','AK':'Alaska','AZ':'Arizona','AR':'Arkansas','CA':'California',
+    'CO':'Colorado','CT':'Connecticut','DE':'Delaware','FL':'Florida','GA':'Georgia',
+    'HI':'Hawaii','ID':'Idaho','IL':'Illinois','IN':'Indiana','IA':'Iowa',
+    'KS':'Kansas','KY':'Kentucky','LA':'Louisiana','ME':'Maine','MD':'Maryland',
+    'MA':'Massachusetts','MI':'Michigan','MN':'Minnesota','MS':'Mississippi','MO':'Missouri',
+    'MT':'Montana','NE':'Nebraska','NV':'Nevada','NH':'New Hampshire','NJ':'New Jersey',
+    'NM':'New Mexico','NY':'New York','NC':'North Carolina','ND':'North Dakota','OH':'Ohio',
+    'OK':'Oklahoma','OR':'Oregon','PA':'Pennsylvania','RI':'Rhode Island','SC':'South Carolina',
+    'SD':'South Dakota','TN':'Tennessee','TX':'Texas','UT':'Utah','VT':'Vermont',
+    'VA':'Virginia','WA':'Washington','WV':'West Virginia','WI':'Wisconsin','WY':'Wyoming',
+    'DC':'Washington D.C.'
+};
+
+function normalizeState(input) {
+    const t = (input || '').trim();
+    if (t.length === 2) return t.toUpperCase();
+    return STATE_ABBR[t.toLowerCase()] || t;
+}
+
+let allDocs = [];
+let allMarkers = [];
+
 const map = L.map('classmate-map').setView([41.519, -81.462], 5);
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
 }).addTo(map);
 
-// Custom green marker
 const greenIcon = L.divIcon({
     className: '',
     html: '<div style="width:14px;height:14px;border-radius:50%;background:#2B6B3C;border:2px solid white;box-shadow:0 1px 4px rgba(0,0,0,0.4);"></div>',
     iconSize: [14,14], iconAnchor: [7,7]
 });
 
-// Mayfield HS marker
 L.marker([41.5164, -81.4627], {icon: L.divIcon({
     className:'',
     html:'<div style="width:22px;height:22px;border-radius:50%;background:#2A772A;border:3px solid white;box-shadow:0 2px 6px rgba(0,0,0,0.5);"></div>',
     iconSize:[22,22], iconAnchor:[11,11]
 })}).addTo(map).bindPopup('<strong>Mayfield High School</strong>');
 
-async function loadPins() {
+async function loadAll() {
     const snap = await db.collection('users').where('lat','!=',null).get();
-    snap.forEach(doc => {
+    allDocs = snap.docs;
+
+    allMarkers.forEach(m => map.removeLayer(m.marker));
+    allMarkers = [];
+    allDocs.forEach(doc => {
         const d = doc.data();
         if (d.lat && d.lng) {
-            L.marker([d.lat, d.lng], {icon: greenIcon})
+            const stateAbbr = normalizeState(d.state || '');
+            const marker = L.marker([d.lat, d.lng], {icon: greenIcon})
                 .addTo(map)
                 .bindPopup(`<strong>${d.displayName || 'Classmate'}</strong><br>${d.city || ''}${d.state ? ', ' + d.state : ''}`);
+            allMarkers.push({ marker, stateAbbr });
         }
     });
-    renderDirectory(snap.docs);
+
+    buildStateFilters();
+    renderDirectory(allDocs);
 }
+
+function buildStateFilters() {
+    const counts = {};
+    allDocs.forEach(doc => {
+        const s = normalizeState(doc.data().state || '');
+        if (s) counts[s] = (counts[s] || 0) + 1;
+    });
+    const states = Object.entries(counts).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]));
+
+    const bar = document.getElementById('filterBar');
+    bar.innerHTML = `<button class="filter-btn active" onclick="applyFilter('all',this)">All (${allDocs.length})</button>`;
+    states.forEach(([abbr, count]) => {
+        const name = STATE_NAMES[abbr] || abbr;
+        bar.innerHTML += `<button class="filter-btn" onclick="applyFilter('${abbr}',this)">${name} (${count})</button>`;
+    });
+}
+
+function applyFilter(state, btn) {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+
+    const filtered = state === 'all'
+        ? allDocs
+        : allDocs.filter(doc => normalizeState(doc.data().state || '') === state);
+
+    allMarkers.forEach(m => {
+        if (state === 'all' || m.stateAbbr === state) {
+            m.marker.addTo(map);
+        } else {
+            map.removeLayer(m.marker);
+        }
+    });
+
+    renderDirectory(filtered);
+}
+window.applyFilter = applyFilter;
 
 function renderDirectory(docs) {
     const grid = document.getElementById('classmatesGrid');
     if (!grid) return;
     if (docs.length === 0) {
-        grid.innerHTML = '<div style="text-align:center;color:var(--text-muted);grid-column:1/-1;padding:2rem 0;"><i class="fas fa-user-friends" style="font-size:2rem;display:block;margin-bottom:0.5rem;"></i>No classmates yet — be the first to add your location!</div>';
+        grid.innerHTML = '<div style="text-align:center;color:var(--text-muted);grid-column:1/-1;padding:2rem 0;"><i class="fas fa-user-friends" style="font-size:2rem;display:block;margin-bottom:0.5rem;"></i>No classmates in this location yet.</div>';
         return;
     }
     grid.innerHTML = docs.map(doc => {
@@ -222,31 +297,6 @@ function renderDirectory(docs) {
     }).join('');
 }
 
-function filterClassmates(filter, btn) {
-    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    // Re-render with filter — simplified: reload and filter client-side
-    loadPinsFiltered(filter);
-}
-
-async function loadPinsFiltered(filter) {
-    let snap;
-    if (filter === 'ohio') {
-        snap = await db.collection('users').where('state','in',['OH','Ohio']).get();
-    } else if (filter === 'out-of-state') {
-        snap = await db.collection('users').where('lat','!=',null).get();
-        const filtered = snap.docs.filter(d => {
-            const s = (d.data().state || '').toLowerCase();
-            return s !== 'oh' && s !== 'ohio';
-        });
-        renderDirectory(filtered);
-        return;
-    } else {
-        snap = await db.collection('users').get();
-    }
-    renderDirectory(snap.docs);
-}
-
 function showPinForm() {
     const box = document.getElementById('pinFormBox');
     if (box) box.style.display = box.style.display === 'none' ? 'block' : 'none';
@@ -257,23 +307,22 @@ async function saveLocation() {
     const user = auth.currentUser;
     if (!user) { alert('Please sign in first.'); return; }
     const city = document.getElementById('pinCity').value.trim();
-    const state = document.getElementById('pinState').value.trim();
-    if (!city || !state) { alert('Please enter both city and state.'); return; }
+    const rawState = document.getElementById('pinState').value.trim();
+    if (!city || !rawState) { alert('Please enter both city and state.'); return; }
+    const state = normalizeState(rawState);
 
-    // Geocode with Nominatim (free, no key needed)
     try {
         const res = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(city + ', ' + state)}&format=json&limit=1`);
         const results = await res.json();
         if (!results.length) { alert('City not found. Try again.'); return; }
         const lat = parseFloat(results[0].lat);
         const lng = parseFloat(results[0].lon);
-        // Round to 2 decimal places (~1km radius) for privacy
         const latFuzzy = Math.round(lat * 10) / 10;
         const lngFuzzy = Math.round(lng * 10) / 10;
         await db.collection('users').doc(user.uid).update({ city, state, lat: latFuzzy, lng: lngFuzzy });
         document.getElementById('pinFormBox').style.display = 'none';
         alert('📍 Your location has been added to the map!');
-        loadPins();
+        loadAll();
     } catch(e) {
         alert('Error saving location. Please try again.');
     }
@@ -283,7 +332,7 @@ window.saveLocation = saveLocation;
 auth.onAuthStateChanged(user => {
     const btn = document.getElementById('addPinBtn');
     if (btn) btn.style.display = user ? 'inline-flex' : 'none';
-    loadPins();
+    loadAll();
 });
 </script>
 </body>
