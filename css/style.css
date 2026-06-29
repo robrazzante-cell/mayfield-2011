@@ -122,15 +122,16 @@ body {
 
 /* ── Hero ── */
 .hero {
-    background: var(--green-dark);
+    background: var(--white);
     padding: 4rem 0 3rem;
-    color: var(--white);
+    color: var(--text);
     text-align: center;
+    border-bottom: 1px solid var(--border);
 }
 .hero-badge {
     display: inline-block;
-    background: var(--white);
-    border: 1px solid var(--white);
+    background: var(--green-light);
+    border: 1px solid var(--border);
     border-radius: 20px;
     padding: 0.35rem 1rem;
     font-size: 0.82rem;
@@ -143,19 +144,21 @@ body {
     font-size: clamp(2rem, 5vw, 3.25rem);
     font-weight: 800;
     margin-bottom: 0.4rem;
+    color: var(--text);
 }
 .hero-subtitle {
     font-size: 1.2rem;
-    color: rgba(255,255,255,0.85);
+    color: var(--text-muted);
     margin-bottom: 2rem;
 }
 .countdown-container {
     background: var(--white);
-    border: 1px solid var(--white);
+    border: 1px solid var(--border);
     border-radius: var(--radius-lg);
     padding: 1.5rem 2rem;
     margin: 0 auto 2rem;
     max-width: 580px;
+    box-shadow: var(--shadow);
 }
 .countdown-heading {
     font-size: 0.78rem;
@@ -195,8 +198,9 @@ body {
     padding: 1.1rem 1.5rem;
     background: var(--white);
     border-radius: var(--radius);
-    border: 1px solid var(--white);
+    border: 1px solid var(--border);
     min-width: 110px;
+    box-shadow: var(--shadow);
 }
 .stat-number { font-size: 1.9rem; font-weight: 800; color: var(--green); line-height: 1; }
 .stat-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); margin-top: 0.2rem; }
