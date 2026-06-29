@@ -183,11 +183,11 @@ const greenIcon = L.divIcon({
 });
 
 // Mayfield HS marker
-L.marker([41.519, -81.462], {icon: L.divIcon({
+L.marker([41.5164, -81.4627], {icon: L.divIcon({
     className:'',
-    html:'<div style="width:18px;height:18px;border-radius:50%;background:var(--green,#46C646);border:2px solid white;box-shadow:0 1px 4px rgba(0,0,0,0.4);display:flex;align-items:center;justify-content:center;font-size:9px;">🏫</div>',
-    iconSize:[18,18], iconAnchor:[9,9]
-})}).addTo(map).bindPopup('<strong>Mayfield High School</strong><br>Where it all started');
+    html:'<div style="width:22px;height:22px;border-radius:50%;background:#46C646;border:3px solid white;box-shadow:0 2px 6px rgba(0,0,0,0.5);"></div>',
+    iconSize:[22,22], iconAnchor:[11,11]
+})}).addTo(map).bindPopup('<strong>Mayfield High School</strong>');
 
 async function loadPins() {
     const snap = await db.collection('users').where('lat','!=',null).get();
