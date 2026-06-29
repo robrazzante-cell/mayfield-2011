@@ -51,8 +51,8 @@
 
 <div class="page-header">
     <div class="container">
-        <h1><i class="fas fa-chalkboard-teacher"></i> Teacher Portal</h1>
-        <p>For former Mayfield faculty — log your interest in reconnecting with the Class of 2011</p>
+        <h1><i class="fas fa-utensils"></i> Lunch with Teachers</h1>
+        <p>Saturday, September 20, 2026 &middot; 12:30 PM &middot; Mayfield High School</p>
     </div>
 </div>
 <div class="breadcrumb">
@@ -66,12 +66,12 @@
     <div class="container">
         <div class="grid-2" style="gap:2.5rem;align-items:start;">
 
-            <!-- FOR TEACHERS: Log availability -->
+            <!-- FOR TEACHERS: RSVP -->
             <div>
                 <span class="badge badge-green" style="margin-bottom:0.75rem;display:inline-block;">For Teachers</span>
-                <h2 class="section-title" style="margin-bottom:0.75rem;">Log Your Interest</h2>
+                <h2 class="section-title" style="margin-bottom:0.75rem;">RSVP for Lunch</h2>
                 <p style="font-size:0.875rem;color:var(--text-muted);margin-bottom:1.5rem;">
-                    If you taught at Mayfield during 2007–2011 and would like to reconnect with our class, fill out the form below. Attendance is free and fully optional.
+                    The Mayfield Class of 2011 is hosting a catered lunch on <strong>Saturday, September 20 at 12:30 PM</strong> at Mayfield High School — right after our homecoming School Tour. If you taught at Mayfield between 2007–2011, we'd love to have you. Lunch is on us.
                 </p>
 
                 <div class="card no-hover" id="teacherFormCard">
@@ -99,24 +99,19 @@
                             <input type="text" id="tYears" placeholder="e.g. 2005 – 2014">
                         </div>
                         <div class="form-group">
-                            <label>Are you interested in attending the teacher meetup?</label>
+                            <label>Will you join us for lunch on Saturday, September 20? *</label>
                             <select id="tInterest" required>
                                 <option value="">Select</option>
-                                <option value="yes">Yes, I'd love to come!</option>
-                                <option value="maybe">Maybe — depends on the date</option>
-                                <option value="no">Not this time</option>
+                                <option value="yes">Yes, I'll be there!</option>
+                                <option value="no">Can't make it this time</option>
                             </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Preferred availability <span style="font-weight:400;color:var(--text-muted);">(optional)</span></label>
-                            <input type="text" id="tAvailability" placeholder="e.g. Weekday evenings, Saturday mornings">
                         </div>
                         <div class="form-group">
                             <label>Message to the Class of 2011 <span style="font-weight:400;color:var(--text-muted);">(optional)</span></label>
                             <textarea id="tMessage" rows="3" placeholder="Anything you'd like your former students to know..."></textarea>
                         </div>
                         <button type="submit" class="btn btn-primary btn-block">
-                            <i class="fas fa-paper-plane"></i> Submit
+                            <i class="fas fa-paper-plane"></i> Submit RSVP
                         </button>
                         <div class="form-message" id="teacherFormMsg" style="display:none;"></div>
                     </form>
@@ -126,22 +121,22 @@
             <!-- FOR STUDENTS: See which teachers are coming -->
             <div>
                 <span class="badge badge-green" style="margin-bottom:0.75rem;display:inline-block;">For Classmates</span>
-                <h2 class="section-title" style="margin-bottom:0.75rem;">Teachers Coming</h2>
+                <h2 class="section-title" style="margin-bottom:0.75rem;">Teachers Joining Lunch</h2>
                 <p style="font-size:0.875rem;color:var(--text-muted);margin-bottom:1.5rem;">
-                    These are the teachers who've expressed interest in reconnecting with the Class of 2011.
+                    These are the teachers who've RSVP'd for the homecoming lunch on Saturday, September 20 at Mayfield High School.
                 </p>
 
                 <div id="teachersList">
                     <div style="text-align:center;color:var(--text-muted);padding:2rem 0;">
-                        <i class="fas fa-chalkboard-teacher" style="font-size:2rem;display:block;margin-bottom:0.5rem;"></i>
-                        <p style="font-size:0.875rem;">No teachers have logged in yet — share this page with your favorite Mayfield teacher!</p>
+                        <i class="fas fa-utensils" style="font-size:2rem;display:block;margin-bottom:0.5rem;"></i>
+                        <p style="font-size:0.875rem;">No RSVPs yet — share this page with a teacher you'd love to see!</p>
                     </div>
                 </div>
 
                 <hr class="divider">
 
                 <h3 style="font-size:0.95rem;font-weight:700;margin-bottom:0.75rem;">Know a teacher who should be here?</h3>
-                <p style="font-size:0.82rem;color:var(--text-muted);margin-bottom:0.75rem;">Send them the link to this page, or email Rob and he'll reach out directly.</p>
+                <p style="font-size:0.82rem;color:var(--text-muted);margin-bottom:0.75rem;">Send them this page directly, or email Rob and he'll reach out personally.</p>
                 <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
                     <button class="btn btn-outline btn-sm" onclick="copyLink()"><i class="fas fa-link"></i> Copy Page Link</button>
                     <a href="mailto:rob.razzante@gmail.com?subject=Teacher suggestion for Class of 2011 reunion" class="btn btn-primary btn-sm"><i class="fas fa-envelope"></i> Suggest a Teacher</a>
@@ -219,11 +214,10 @@ async function submitTeacher(e) {
             subject: document.getElementById('tSubject').value,
             years: document.getElementById('tYears').value,
             interest: document.getElementById('tInterest').value,
-            availability: document.getElementById('tAvailability').value,
             message: document.getElementById('tMessage').value,
             createdAt: firebase.firestore.FieldValue.serverTimestamp()
         });
-        msg.textContent = 'Thank you! We\'ll be in touch as the date gets confirmed.';
+        msg.textContent = 'You\'re on the list! We\'ll follow up closer to September 20 with details.';
         msg.className = 'form-message success'; msg.style.display = 'block';
         document.getElementById('teacherForm').reset();
         loadTeachers();
