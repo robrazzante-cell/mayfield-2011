@@ -66,16 +66,18 @@
 <!-- TAILGATE -->
 <section class="section" id="tailgate">
     <div class="container">
-        <div>
-            <div style="max-width:600px;">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:2rem;align-items:start;">
+            <div>
                 <span class="badge badge-green" style="margin-bottom:0.75rem;display:inline-block;">Football Weekend</span>
                 <h2 class="section-title" style="margin-bottom:0.75rem;">Homecoming Tailgate</h2>
                 <div style="display:flex;flex-direction:column;gap:0.6rem;margin-bottom:1.25rem;">
-                    <div class="event-meta"><i class="fas fa-map-marker-alt" style="color:var(--green);width:16px;"></i> <strong>Alumni Pavilion</strong> — next to Wildcat Stadium</div>
-                    <div class="event-meta"><i class="far fa-calendar" style="color:var(--green);width:16px;"></i> Fri, Sep 19, 2026 &middot; 7:00 PM EDT &mdash; Firestone vs Mayfield</div>
+                    <div class="event-meta"><i class="fas fa-map-marker-alt" style="color:var(--green);width:16px;"></i> Alumni Pavilion — next to the football field</div>
+                    <div class="event-meta"><i class="far fa-calendar" style="color:var(--green);width:16px;"></i> Fri, Sep 18, 2026 &middot; 5:15 – 6:45 PM</div>
+                    <div class="event-meta"><i class="fas fa-dollar-sign" style="color:var(--green);width:16px;"></i> No charge</div>
+                    <div class="event-meta"><i class="fas fa-user-friends" style="color:var(--green);width:16px;"></i> Hosted by the Mayfield Alumni Association</div>
                 </div>
                 <p style="font-size:0.875rem;line-height:1.7;color:var(--text-muted);margin-bottom:1.25rem;">
-                    Kick off the reunion weekend at the Alumni Pavilion right next to Wildcat Stadium. This is our ice-breaker event — catch up with classmates before the game and cheer on the current Wildcats.
+                    The Mayfield Alumni Association hosts a Homecoming Tailgate Party every year for alums and friends. The Class of 2011 is welcome to join. After the tailgate, head to the game or stay and enjoy the Pavilion.
                 </p>
                 <div id="rsvpContainer">
                     <button class="btn btn-primary" onclick="rsvp('tailgate')" id="rsvpBtn-tailgate">
@@ -83,6 +85,18 @@
                     </button>
                 </div>
                 <p style="font-size:0.78rem;color:var(--text-muted);margin-top:0.5rem;" id="rsvpCount-tailgate"></p>
+            </div>
+            <div>
+                <div class="card no-hover" style="background:var(--bg-light);">
+                    <h4 style="margin-bottom:0.75rem;font-size:0.875rem;"><i class="fas fa-utensils" style="color:var(--green);"></i> Menu</h4>
+                    <ul style="padding-left:1.25rem;font-size:0.82rem;color:var(--text-muted);line-height:2;margin:0;">
+                        <li>Sausage with peppers and onions</li>
+                        <li>Burgers &amp; Hotdogs</li>
+                        <li>Sauerkraut &amp; Pizza</li>
+                        <li>Chips, Candy &amp; Cookies</li>
+                        <li>Variety of sodas and water</li>
+                    </ul>
+                </div>
             </div>
         </div>
     </div>
@@ -99,13 +113,15 @@
                 <h2 class="section-title" style="margin-bottom:0.75rem;">School Tour</h2>
                 <div style="display:flex;flex-direction:column;gap:0.6rem;margin-bottom:1.25rem;">
                     <div class="event-meta"><i class="fas fa-map-marker-alt" style="color:var(--green);width:16px;"></i> 6116 Wilson Mills Road, Mayfield Village, OH 44143</div>
-                    <div class="event-meta"><i class="far fa-calendar" style="color:var(--green);width:16px;"></i> Sat, Sep 20, 2026 &middot; 11:00 AM</div>
-                    <div class="event-meta"><i class="far fa-clock" style="color:var(--green);width:16px;"></i> ~1.5 hours · followed by lunch with teachers at 12:30 PM</div>
+                    <div class="event-meta"><i class="far fa-calendar" style="color:var(--green);width:16px;"></i> Sat, Sep 19, 2026 &middot; 11:00 AM</div>
+                    <div class="event-meta"><i class="far fa-clock" style="color:var(--green);width:16px;"></i> ~1.5 hours &middot; followed by lunch with teachers at 12:30 PM</div>
                     <div class="event-meta"><i class="fas fa-user-friends" style="color:var(--green);width:16px;"></i> Hosted by Wayne Farinacci — Alumni Association</div>
                     <div class="event-meta"><i class="fas fa-dollar-sign" style="color:var(--green);width:16px;"></i> Complimentary</div>
+                    <div class="event-meta"><i class="fas fa-car" style="color:var(--green);width:16px;"></i> Park in the back of the school near the Pavilion</div>
+                    <div class="event-meta"><i class="fas fa-door-open" style="color:var(--green);width:16px;"></i> Enter through Door 16 in the back</div>
                 </div>
                 <p style="font-size:0.875rem;line-height:1.7;color:var(--text-muted);margin-bottom:1.25rem;">
-                    Walk the halls of Mayfield High School for the first time since graduation. Wayne loves doing tours for reunion classes — see what's changed and what's stayed the same since 2011.
+                    Walk the halls of Mayfield High School for the first time since graduation. Wayne Farinacci of the Alumni Association will lead the tour. <strong style="color:var(--text);">Please arrive on time — the doors will be locked and late arrivals may not be able to enter.</strong>
                 </p>
                 <div id="rsvpContainer-tour">
                     <button class="btn btn-primary" onclick="rsvp('campus-tour')" id="rsvpBtn-campus-tour">
@@ -129,7 +145,7 @@
                 <h2 class="section-title" style="margin-bottom:0.75rem;">Lunch with Teachers</h2>
                 <div style="display:flex;flex-direction:column;gap:0.6rem;margin-bottom:1.25rem;">
                     <div class="event-meta"><i class="fas fa-map-marker-alt" style="color:var(--green);width:16px;"></i> Mayfield High School</div>
-                    <div class="event-meta"><i class="far fa-calendar" style="color:var(--green);width:16px;"></i> Sat, Sep 20, 2026 &middot; 12:30 PM</div>
+                    <div class="event-meta"><i class="far fa-calendar" style="color:var(--green);width:16px;"></i> Sat, Sep 19, 2026 &middot; 12:30 PM</div>
                     <div class="event-meta"><i class="fas fa-utensils" style="color:var(--green);width:16px;"></i> Catered lunch provided</div>
                 </div>
                 <p style="font-size:0.875rem;line-height:1.7;color:var(--text-muted);margin-bottom:1.25rem;">
