@@ -155,11 +155,11 @@ function showWelcomeTour(user) {
     const firstName = user.displayName ? user.displayName.split(' ')[0] : 'Wildcat';
     const features = [
         ['fa-map-marked-alt', 'Classmate Map', 'Pin your city and see where the Class of 2011 spread after graduation.'],
-        ['fa-briefcase', 'Business Network', 'List your business or find a classmate to hire — hire local, hire trusted.'],
-        ['fa-football-ball', 'Events', 'Homecoming tailgate Sept 19 · Firestone vs Mayfield. RSVP and see what\'s planned.'],
+        ['fa-briefcase', 'Business Network', 'List your business or find a classmate to hire.'],
+        ['fa-football-ball', 'Events', 'Homecoming tailgate Sep 18 · Mayfield vs Barberton. School tour &amp; lunch Sep 19. RSVP now.'],
         ['fa-trophy', 'Class Pride', 'Class superlatives, song, colors, and memories from our time at Mayfield.'],
-        ['fa-book-open', 'Digital Yearbook', '<em>The Mayfielder</em> — our yearbook, digitized and online.'],
         ['fa-heart', 'In Memoriam', 'A space to honor and remember the classmates we\'ve lost.'],
+        ['fa-id-card', 'Alumni Association', 'Download the membership form and join 2,500+ Mayfield alums.'],
     ];
     const overlay = document.createElement('div');
     overlay.id = 'welcomeModal';

@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="theme-color" content="#FFFFFF">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin | Mayfield Class of 2011</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <style>
+        .admin-card { background:#fff;border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.5rem;margin-bottom:1.5rem; }
+        .admin-card h3 { font-size:1rem;font-weight:700;margin-bottom:0.25rem;display:flex;align-items:center;gap:0.5rem; }
+        .admin-stat { font-size:2rem;font-weight:800;color:var(--green); }
+        .stat-row { display:flex;gap:2rem;flex-wrap:wrap;margin:0.75rem 0 1rem; }
+        .stat-item { text-align:center; }
+        .stat-label { font-size:0.72rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.04em; }
+        .rsvp-table { width:100%;border-collapse:collapse;font-size:0.82rem; }
+        .rsvp-table th { text-align:left;padding:0.5rem 0.75rem;border-bottom:2px solid var(--border);font-size:0.75rem;text-transform:uppercase;letter-spacing:0.04em;color:var(--text-muted); }
+        .rsvp-table td { padding:0.5rem 0.75rem;border-bottom:1px solid var(--border); }
+        .rsvp-table tr:last-child td { border-bottom:none; }
+        .badge-sm { font-size:0.68rem;padding:0.2rem 0.5rem;border-radius:4px;font-weight:600; }
+        .badge-yes { background:var(--green-light);color:var(--green); }
+        .badge-no { background:#f3f4f6;color:var(--text-muted); }
+        #accessDenied { text-align:center;padding:4rem 2rem; }
+        .copy-btn { font-size:0.75rem;padding:0.3rem 0.75rem;margin-left:0.5rem; }
+        .section-divider { font-size:0.7rem;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-muted);margin:0.5rem 0 0.75rem;font-weight:700; }
+    </style>
+</head>
+<body>
+
+<header>
+    <nav class="navbar">
+        <div class="container">
+            <a href="index.html" class="nav-brand">
+                <div class="brand-icon"><i class="fas fa-paw"></i></div>
+                <div class="brand-text"><h1>Mayfield Wildcats</h1><span>Class of 2011 — Admin</span></div>
+            </a>
+            <div class="nav-auth">
+                <div id="userAvatar" style="display:none;align-items:center;gap:0.5rem;">
+                    <img id="userPhoto" src="" alt="" style="width:30px;height:30px;border-radius:50%;border:2px solid var(--green);">
+                    <span id="userName" style="color:rgba(255,255,255,0.85);font-size:0.8rem;"></span>
+                </div>
+                <button class="btn-signin" id="authBtn" onclick="handleAuth()">
+                    <i class="fab fa-google"></i> <span id="authBtnText">Sign In</span>
+                </button>
+            </div>
+        </div>
+    </nav>
+</header>
+
+<div class="page-header">
+    <div class="container">
+        <h1><i class="fas fa-chart-bar"></i> Admin Dashboard</h1>
+        <p>RSVP counts, headcounts, and teacher registrations</p>
+    </div>
+</div>
+
+<main>
+<section class="section">
+    <div class="container" id="accessDenied" style="display:none;">
+        <i class="fas fa-lock" style="font-size:3rem;color:var(--text-muted);display:block;margin-bottom:1rem;"></i>
+        <h2>Access Restricted</h2>
+        <p style="color:var(--text-muted);margin-top:0.5rem;">This page is only accessible to the class organizer.</p>
+        <a href="index.html" class="btn btn-primary" style="margin-top:1.5rem;display:inline-flex;">Back to Site</a>
+    </div>
+
+    <div class="container" id="adminContent" style="display:none;">
+
+        <!-- SUMMARY ROW -->
+        <div class="admin-card">
+            <h3><i class="fas fa-users" style="color:var(--green);"></i> Reunion Weekend Headcount</h3>
+            <p style="font-size:0.82rem;color:var(--text-muted);margin-bottom:1rem;">Total people attending each event (classmates + guests)</p>
+            <div class="stat-row" id="summaryStats">
+                <div style="color:var(--text-muted);font-size:0.875rem;"><i class="fas fa-spinner fa-spin"></i> Loading...</div>
+            </div>
+            <button class="btn btn-outline btn-sm copy-btn" onclick="copyHeadcount()"><i class="fas fa-copy"></i> Copy for Wayne</button>
+        </div>
+
+        <!-- TAILGATE -->
+        <div class="admin-card">
+            <h3><i class="fas fa-football-ball" style="color:var(--green);"></i> Homecoming Tailgate — Fri Sep 18</h3>
+            <div id="tailgateStats" class="stat-row"></div>
+            <div id="tailgateList"></div>
+        </div>
+
+        <!-- SCHOOL TOUR -->
+        <div class="admin-card">
+            <h3><i class="fas fa-school" style="color:var(--green);"></i> School Tour — Sat Sep 19 · 11:00 AM</h3>
+            <div id="tourStats" class="stat-row"></div>
+            <div id="tourList"></div>
+        </div>
+
+        <!-- LUNCH WITH TEACHERS -->
+        <div class="admin-card">
+            <h3><i class="fas fa-utensils" style="color:var(--green);"></i> Lunch with Teachers — Sat Sep 19 · 12:30 PM</h3>
+            <div id="lunchStats" class="stat-row"></div>
+            <div id="lunchList"></div>
+        </div>
+
+        <!-- TEACHER PORTAL -->
+        <div class="admin-card">
+            <h3><i class="fas fa-chalkboard-teacher" style="color:var(--green);"></i> Teacher Portal RSVPs</h3>
+            <div id="teacherList"></div>
+        </div>
+
+        <!-- CLASSMATES REGISTERED -->
+        <div class="admin-card">
+            <h3><i class="fas fa-user-circle" style="color:var(--green);"></i> Classmates Registered on Site</h3>
+            <div id="classmateCount" class="stat-row"></div>
+            <div id="classmateList"></div>
+        </div>
+
+    </div>
+</section>
+</main>
+
+<script src="js/firebase-config.js"></script>
+<script src="js/main.js"></script>
+<script>
+const ADMIN_EMAIL = 'rob.razzante@gmail.com';
+
+function statBlock(number, label) {
+    return `<div class="stat-item"><div class="admin-stat">${number}</div><div class="stat-label">${label}</div></div>`;
+}
+
+function rsvpTable(docs) {
+    if (!docs.length) return '<p style="font-size:0.82rem;color:var(--text-muted);">No RSVPs yet.</p>';
+    return `<table class="rsvp-table">
+        <thead><tr><th>#</th><th>Name</th><th>+1 Guest</th><th>Total</th></tr></thead>
+        <tbody>${docs.map((d, i) => {
+            const data = d.data ? d.data() : d;
+            const plus = data.plusOne;
+            return `<tr>
+                <td style="color:var(--text-muted);">${i+1}</td>
+                <td><strong>${data.userName || data.firstName + ' ' + data.lastName || '—'}</strong></td>
+                <td><span class="badge-sm ${plus ? 'badge-yes' : 'badge-no'}">${plus ? 'Yes' : 'No'}</span></td>
+                <td>${plus ? 2 : 1}</td>
+            </tr>`;
+        }).join('')}</tbody>
+    </table>`;
+}
+
+let summaryData = {};
+
+async function loadEvent(eventId, statsElId, listElId) {
+    const snap = await db.collection('rsvps').where('eventId','==',eventId).orderBy('timestamp','asc').get();
+    const classmates = snap.size;
+    const guests = snap.docs.filter(d => d.data().plusOne).length;
+    const total = classmates + guests;
+    summaryData[eventId] = { classmates, guests, total };
+    document.getElementById(statsElId).innerHTML =
+        statBlock(classmates, 'Classmates') +
+        statBlock(guests, 'Bringing +1') +
+        statBlock(total, 'Total Attending');
+    document.getElementById(listElId).innerHTML = rsvpTable(snap.docs);
+    return { classmates, guests, total };
+}
+
+async function loadTeachers() {
+    const snap = await db.collection('teachers').where('interest','==','yes').orderBy('createdAt','asc').get();
+    const el = document.getElementById('teacherList');
+    if (snap.empty) { el.innerHTML = '<p style="font-size:0.82rem;color:var(--text-muted);">No teacher RSVPs yet.</p>'; return; }
+    el.innerHTML = `<table class="rsvp-table">
+        <thead><tr><th>#</th><th>Name</th><th>Subject</th><th>Years at MHS</th><th>Email</th></tr></thead>
+        <tbody>${snap.docs.map((doc, i) => {
+            const d = doc.data();
+            return `<tr>
+                <td style="color:var(--text-muted);">${i+1}</td>
+                <td><strong>${d.firstName} ${d.lastName}</strong></td>
+                <td>${d.subject || '—'}</td>
+                <td>${d.years || '—'}</td>
+                <td><a href="mailto:${d.email}" style="color:var(--green);">${d.email}</a></td>
+            </tr>`;
+        }).join('')}</tbody>
+    </table>`;
+}
+
+async function loadClassmates() {
+    const snap = await db.collection('users').get();
+    const el = document.getElementById('classmateCount');
+    el.innerHTML = statBlock(snap.size, 'Registered');
+    const listEl = document.getElementById('classmateList');
+    if (snap.empty) { listEl.innerHTML = '<p style="font-size:0.82rem;color:var(--text-muted);">No classmates yet.</p>'; return; }
+    listEl.innerHTML = `<table class="rsvp-table">
+        <thead><tr><th>#</th><th>Name</th><th>Location</th><th>Employer</th></tr></thead>
+        <tbody>${snap.docs.map((doc, i) => {
+            const d = doc.data();
+            const loc = [d.city, d.state].filter(Boolean).join(', ') || '—';
+            return `<tr>
+                <td style="color:var(--text-muted);">${i+1}</td>
+                <td><strong>${d.displayName || '—'}</strong></td>
+                <td>${loc}</td>
+                <td>${d.employer || '—'}</td>
+            </tr>`;
+        }).join('')}</tbody>
+    </table>`;
+}
+
+function updateSummary() {
+    const events = [
+        { id: 'tailgate', label: 'Tailgate' },
+        { id: 'campus-tour', label: 'School Tour' },
+        { id: 'teacher-meetup', label: 'Lunch' },
+    ];
+    document.getElementById('summaryStats').innerHTML = events.map(e => {
+        const d = summaryData[e.id] || { classmates: 0, guests: 0, total: 0 };
+        return statBlock(d.total, e.label + ' Total');
+    }).join('');
+}
+
+function copyHeadcount() {
+    const lines = [
+        'Mayfield Class of 2011 — Reunion Headcount',
+        new Date().toLocaleDateString('en-US', {month:'long', day:'numeric', year:'numeric'}),
+        '',
+        'Homecoming Tailgate (Sep 18):',
+        `  Classmates: ${summaryData['tailgate']?.classmates || 0}`,
+        `  Guests: ${summaryData['tailgate']?.guests || 0}`,
+        `  Total: ${summaryData['tailgate']?.total || 0}`,
+        '',
+        'School Tour (Sep 19, 11am):',
+        `  Classmates: ${summaryData['campus-tour']?.classmates || 0}`,
+        `  Guests: ${summaryData['campus-tour']?.guests || 0}`,
+        `  Total: ${summaryData['campus-tour']?.total || 0}`,
+        '',
+        'Lunch with Teachers (Sep 19, 12:30pm):',
+        `  Classmates: ${summaryData['teacher-meetup']?.classmates || 0}`,
+        `  Guests: ${summaryData['teacher-meetup']?.guests || 0}`,
+        `  Total: ${summaryData['teacher-meetup']?.total || 0}`,
+    ];
+    navigator.clipboard.writeText(lines.join('\n')).then(() => alert('Headcount copied to clipboard!'));
+}
+window.copyHeadcount = copyHeadcount;
+
+async function loadAdmin() {
+    await Promise.all([
+        loadEvent('tailgate', 'tailgateStats', 'tailgateList'),
+        loadEvent('campus-tour', 'tourStats', 'tourList'),
+        loadEvent('teacher-meetup', 'lunchStats', 'lunchList'),
+        loadTeachers(),
+        loadClassmates(),
+    ]);
+    updateSummary();
+}
+
+auth.onAuthStateChanged(user => {
+    const denied = document.getElementById('accessDenied');
+    const content = document.getElementById('adminContent');
+    if (!user) {
+        denied.style.display = 'block';
+        content.style.display = 'none';
+        return;
+    }
+    if (user.email !== ADMIN_EMAIL) {
+        denied.style.display = 'block';
+        content.style.display = 'none';
+        return;
+    }
+    denied.style.display = 'none';
+    content.style.display = 'block';
+    // Update nav
+    const photo = document.getElementById('userPhoto');
+    const avatar = document.getElementById('userAvatar');
+    const nameEl = document.getElementById('userName');
+    const btn = document.getElementById('authBtn');
+    const btnText = document.getElementById('authBtnText');
+    if (photo && user.photoURL) photo.src = user.photoURL;
+    if (avatar) avatar.style.display = 'flex';
+    if (nameEl) nameEl.textContent = user.displayName || '';
+    if (btnText) btnText.textContent = 'Sign Out';
+    if (btn) btn.querySelector('i').className = 'fas fa-sign-out-alt';
+    loadAdmin();
+});
+</script>
+</body>
+</html>
