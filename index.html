@@ -60,10 +60,13 @@
         <p class="hero-subtitle">Class of 2011 &mdash; 15-Year Reunion</p>
 
         <div class="countdown-container">
-            <p class="countdown-heading"><i class="fas fa-football-ball"></i> &nbsp;Homecoming Tailgate &mdash; Alumni Pavilion</p>
-            <div class="countdown-tbd">
-                <i class="far fa-calendar-alt"></i>
-                <span>Date to be announced &mdash; stay tuned!</span>
+            <p class="countdown-heading"><i class="fas fa-football-ball"></i> &nbsp;Homecoming &mdash; Fri, Sep 19, 2026 &middot; 7:00 PM EDT</p>
+            <p style="font-size:0.75rem;color:var(--text-muted);margin-bottom:0.75rem;">Firestone vs Mayfield &mdash; Wildcat Stadium</p>
+            <div class="countdown-grid">
+                <div class="countdown-unit"><span class="countdown-number" id="cdDays">—</span><span class="countdown-label">Days</span></div>
+                <div class="countdown-unit"><span class="countdown-number" id="cdHours">—</span><span class="countdown-label">Hours</span></div>
+                <div class="countdown-unit"><span class="countdown-number" id="cdMinutes">—</span><span class="countdown-label">Minutes</span></div>
+                <div class="countdown-unit"><span class="countdown-number" id="cdSeconds">—</span><span class="countdown-label">Seconds</span></div>
             </div>
         </div>
 
@@ -138,7 +141,7 @@
                 <span class="badge badge-green">Football</span>
                 <h3>Homecoming Tailgate</h3>
                 <p class="event-meta"><i class="fas fa-map-marker-alt"></i> Alumni Pavilion, Wildcat Stadium</p>
-                <p class="event-meta"><i class="far fa-calendar"></i> Date TBD — Homecoming 2026</p>
+                <p class="event-meta"><i class="far fa-calendar"></i> Fri, Sep 19, 2026 &middot; 7:00 PM EDT</p>
                 <p class="event-meta" style="margin-top:0.5rem;font-size:0.8rem;color:var(--text-muted);">Alcohol permitted · Free use of pavilion</p>
                 <a href="events.html#tailgate" class="btn btn-outline btn-sm" style="margin-top:0.75rem;display:inline-flex;">Learn More</a>
             </div>
@@ -246,6 +249,26 @@
             if (statEl && fundSnap.exists) statEl.textContent = formatCurrency(fundSnap.data().balance || 0);
         } catch(e) {}
     });
+
+    // Live countdown to homecoming game: Sep 19, 2026 7:00 PM EDT
+    (function() {
+        const target = new Date('2026-09-19T19:00:00-04:00');
+        function tick() {
+            const diff = target - new Date();
+            const clamp = v => Math.max(0, v);
+            const days = clamp(Math.floor(diff / 86400000));
+            const hours = clamp(Math.floor((diff % 86400000) / 3600000));
+            const mins = clamp(Math.floor((diff % 3600000) / 60000));
+            const secs = clamp(Math.floor((diff % 60000) / 1000));
+            const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = String(v).padStart(2, '0'); };
+            set('cdDays', days);
+            set('cdHours', hours);
+            set('cdMinutes', mins);
+            set('cdSeconds', secs);
+        }
+        tick();
+        setInterval(tick, 1000);
+    })();
 </script>
 </body>
 </html>
