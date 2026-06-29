@@ -77,7 +77,7 @@
                     <div class="event-meta"><i class="fas fa-user-friends" style="color:var(--green);width:16px;"></i> Hosted by the Mayfield Alumni Association</div>
                 </div>
                 <p style="font-size:0.875rem;line-height:1.7;color:var(--text-muted);margin-bottom:1.25rem;">
-                    The Mayfield Alumni Association hosts a Homecoming Tailgate Party every year for alums and friends. The Class of 2011 is welcome to join. After the tailgate, head to the game or stay and enjoy the Pavilion.
+                    The Mayfield Alumni Association hosts a Homecoming Tailgate Party every year for alums and friends. The Class of 2011 is welcome to join. Spouses and guests are welcome. After the tailgate, head to the game or stay and enjoy the Pavilion.
                 </p>
                 <div id="rsvpContainer">
                     <button class="btn btn-primary" onclick="rsvp('tailgate')" id="rsvpBtn-tailgate">
@@ -126,7 +126,7 @@
                     <div class="event-meta"><i class="fas fa-door-open" style="color:var(--green);width:16px;"></i> Enter through Door 16 in the back</div>
                 </div>
                 <p style="font-size:0.875rem;line-height:1.7;color:var(--text-muted);margin-bottom:1.25rem;">
-                    Walk the halls of Mayfield High School for the first time since graduation. Wayne Farinacci of the Alumni Association will lead the tour. <strong style="color:var(--text);">Please arrive on time — the doors will be locked and late arrivals may not be able to enter.</strong>
+                    Walk the halls of Mayfield High School for the first time since graduation. Wayne Farinacci of the Alumni Association will lead the tour. Spouses and guests are welcome. <strong style="color:var(--text);">Please arrive on time — the doors will be locked and late arrivals may not be able to enter.</strong>
                 </p>
                 <div id="rsvpContainer-tour">
                     <button class="btn btn-primary" onclick="rsvp('campus-tour')" id="rsvpBtn-campus-tour">
@@ -281,17 +281,31 @@
 <script>
 const EVENTS = ['tailgate', 'teacher-meetup', 'campus-tour'];
 
+function rsvpContainerId(eventId) {
+    if (eventId === 'tailgate') return 'rsvpContainer';
+    if (eventId === 'campus-tour') return 'rsvpContainer-tour';
+    if (eventId === 'teacher-meetup') return 'rsvpContainer-teacher';
+    return 'rsvpContainer-' + eventId;
+}
+
 async function loadRSVPs() {
     const user = auth.currentUser;
     for (const eventId of EVENTS) {
         const snap = await db.collection('rsvps').where('eventId','==',eventId).get();
+        const classmates = snap.size;
+        const totalGuests = snap.docs.filter(d => d.data().plusOne).length;
+        const total = classmates + totalGuests;
         const countEl = document.getElementById('rsvpCount-' + eventId);
-        if (countEl) countEl.textContent = snap.size + ' classmate' + (snap.size !== 1 ? 's' : '') + ' going';
+        if (countEl) {
+            countEl.textContent = classmates + ' classmate' + (classmates !== 1 ? 's' : '') + ' going'
+                + (totalGuests > 0 ? ' · ' + total + ' total with guests' : '');
+        }
         if (user) {
             const userRsvp = snap.docs.find(d => d.data().userId === user.uid);
             const btn = document.getElementById('rsvpBtn-' + eventId);
             if (btn && userRsvp) {
-                btn.innerHTML = '<i class="fas fa-check-circle"></i> You\'re Going!';
+                const label = userRsvp.data().plusOne ? 'You\'re Going (+ 1 guest)!' : 'You\'re Going!';
+                btn.innerHTML = '<i class="fas fa-check-circle"></i> ' + label;
                 btn.disabled = true;
                 btn.style.opacity = '0.7';
             }
@@ -299,20 +313,36 @@ async function loadRSVPs() {
     }
 }
 
-async function rsvp(eventId) {
+function rsvp(eventId) {
     const user = auth.currentUser;
     if (!user) { alert('Please sign in to RSVP.'); return; }
+    const containerId = rsvpContainerId(eventId);
+    const container = document.getElementById(containerId);
+    if (!container) return;
+    container.innerHTML = `
+        <p style="font-size:0.875rem;font-weight:600;margin-bottom:0.6rem;color:var(--text);">Bringing a spouse or guest?</p>
+        <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
+            <button class="btn btn-primary btn-sm" onclick="confirmRsvp('${eventId}', false)"><i class="fas fa-user"></i> Just Me</button>
+            <button class="btn btn-outline btn-sm" onclick="confirmRsvp('${eventId}', true)"><i class="fas fa-user-friends"></i> Me + 1 Guest</button>
+        </div>`;
+}
+window.rsvp = rsvp;
+
+async function confirmRsvp(eventId, plusOne) {
+    const user = auth.currentUser;
+    if (!user) return;
     const existing = await db.collection('rsvps').where('eventId','==',eventId).where('userId','==',user.uid).get();
-    if (!existing.empty) return;
+    if (!existing.empty) { loadRSVPs(); return; }
     await db.collection('rsvps').add({
         eventId,
         userId: user.uid,
         userName: user.displayName,
+        plusOne: plusOne,
         timestamp: firebase.firestore.FieldValue.serverTimestamp()
     });
     loadRSVPs();
 }
-window.rsvp = rsvp;
+window.confirmRsvp = confirmRsvp;
 
 auth.onAuthStateChanged(() => loadRSVPs());
 
