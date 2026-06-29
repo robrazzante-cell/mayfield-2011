@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digital Yearbook | Mayfield Class of 2011</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+</head>
+<body>
+
+<header>
+    <nav class="navbar">
+        <div class="container">
+            <a href="index.html" class="nav-brand">
+                <div class="brand-icon"><i class="fas fa-paw"></i></div>
+                <div class="brand-text"><h1>Mayfield Wildcats</h1><span>Class of 2011</span></div>
+            </a>
+            <ul class="nav-menu" id="navMenu">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="events.html">Events</a></li>
+                <li><a href="classmates.html">Classmates</a></li>
+                <li><a href="network.html">Network</a></li>
+                <li><a href="class-pride.html">Class Pride</a></li>
+                <li><a href="memoriam.html">In Memoriam</a></li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle">More <i class="fas fa-chevron-down"></i></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="yearbook.html" class="active"><i class="fas fa-book-open"></i> Digital Yearbook</a></li>
+                        <li><a href="leadership.html"><i class="fas fa-star"></i> Leadership</a></li>
+                        <li><a href="teacher.html"><i class="fas fa-chalkboard-teacher"></i> Teacher Portal</a></li>
+                    </ul>
+                </li>
+            </ul>
+            <div class="nav-auth">
+                <div id="userAvatar" style="display:none;align-items:center;gap:0.5rem;">
+                    <img id="userPhoto" src="" alt="" style="width:30px;height:30px;border-radius:50%;border:2px solid var(--gold);">
+                    <a href="profile.html" style="color:rgba(255,255,255,0.85);font-size:0.8rem;text-decoration:none;" id="userName"></a>
+                </div>
+                <button class="btn-signin" id="authBtn" onclick="handleAuth()">
+                    <i class="fab fa-google"></i> <span id="authBtnText">Sign In</span>
+                </button>
+            </div>
+            <button class="nav-toggle" id="navToggle"><span></span><span></span><span></span></button>
+        </div>
+    </nav>
+</header>
+
+<div class="page-header">
+    <div class="container">
+        <h1><i class="fas fa-book-open"></i> Digital Yearbook</h1>
+        <p><em>The Mayfielder</em> — Class of 2011 — now online</p>
+    </div>
+</div>
+<div class="breadcrumb">
+    <div class="container">
+        <a href="index.html">Home</a><span class="sep">/</span><span>Digital Yearbook</span>
+    </div>
+</div>
+
+<main>
+
+<!-- Status -->
+<section class="section">
+    <div class="container" style="max-width:800px;">
+        <div class="note-box gold" style="margin-bottom:2rem;text-align:center;">
+            <i class="fas fa-clock" style="color:var(--gold);"></i>
+            <strong>Coming Soon</strong> — We're working on digitizing <em>The Mayfielder</em>. Once complete, signed-in classmates can browse it here.
+        </div>
+
+        <!-- Yearbook placeholder viewer -->
+        <div style="background:var(--bg-light);border:2px dashed var(--border);border-radius:var(--radius-lg);padding:4rem 2rem;text-align:center;margin-bottom:2rem;">
+            <i class="fas fa-book-open" style="font-size:3rem;color:var(--border);display:block;margin-bottom:1rem;"></i>
+            <p style="color:var(--text-muted);font-size:0.875rem;">Yearbook viewer will appear here once pages are uploaded</p>
+        </div>
+
+        <hr class="divider">
+
+        <h2 class="section-title"><i class="fas fa-camera" style="color:var(--green);"></i> How to Digitize Your Yearbook</h2>
+        <p style="font-size:0.875rem;color:var(--text-muted);margin-bottom:1.75rem;">Three solid options — from free to professional. Each produces a different result.</p>
+
+        <div class="yearbook-step">
+            <div class="yearbook-step-num">1</div>
+            <div>
+                <h4>Google PhotoScan (Free)</h4>
+                <p>The Google PhotoScan app (iOS &amp; Android) uses multi-angle captures to eliminate glare — great for portrait pages. Point your phone at each page and it stitches a clean scan. Upload to Google Photos and share the album link with classmates. <strong>Best for: portraits and casual sharing.</strong></p>
+            </div>
+        </div>
+
+        <div class="yearbook-step">
+            <div class="yearbook-step-num">2</div>
+            <div>
+                <h4>Flatbed Scanner + Adobe Scan or CamScanner (~Free)</h4>
+                <p>If someone has access to an office scanner (or an Epson/Canon flatbed), scan at 300–600 DPI and export as PDF. CamScanner's mobile app also does a respectable job for book pages. Once you have a PDF, we can embed it directly in this page using a PDF viewer. <strong>Best for: full page spreads and text-heavy pages.</strong></p>
+            </div>
+        </div>
+
+        <div class="yearbook-step">
+            <div class="yearbook-step-num">3</div>
+            <div>
+                <h4>Professional Service — YearbookLife or ScanMyPhotos</h4>
+                <p>Mail your physical yearbook and get back a high-resolution PDF within days. YearbookLife specializes in school yearbooks specifically. ScanMyPhotos handles full books too. Costs typically $30–$80 depending on page count. The result is a clean, searchable PDF ready for this page. <strong>Best for: the full archival-quality digital yearbook.</strong></p>
+                <div style="display:flex;gap:0.5rem;margin-top:0.5rem;flex-wrap:wrap;">
+                    <span class="badge badge-green">Recommended</span>
+                    <span class="badge badge-gray">~$50 one-time cost</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="yearbook-step">
+            <div class="yearbook-step-num">4</div>
+            <div>
+                <h4>Once digitized — embed it here</h4>
+                <p>Upload the PDF to Google Drive or Firebase Storage, then share the link with Rob. We'll embed a PDF viewer directly on this page that classmates can browse without downloading the file. We can also add a per-page comment system so people can tag themselves in photos.</p>
+            </div>
+        </div>
+
+        <div class="note-box" style="margin-top:1.5rem;">
+            <strong>Privacy note:</strong> The digital yearbook will be visible to signed-in classmates only — it won't be publicly accessible to the web.
+        </div>
+
+        <div style="text-align:center;margin-top:2rem;">
+            <a href="mailto:rob.razzante@gmail.com?subject=Yearbook Digitization" class="btn btn-primary">
+                <i class="fas fa-envelope"></i> I Can Help Scan the Yearbook
+            </a>
+        </div>
+    </div>
+</section>
+
+</main>
+
+<footer>
+    <div class="container">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h4><i class="fas fa-paw"></i> Mayfield Wildcats — Class of 2011</h4>
+                <p>Connecting classmates for our 15-year reunion and beyond.</p>
+            </div>
+            <div class="footer-section">
+                <h4>Pages</h4>
+                <a href="events.html">Events</a>
+                <a href="classmates.html">Classmates</a>
+                <a href="network.html">Business Network</a>
+                <a href="class-pride.html">Class Pride</a>
+                <a href="memoriam.html">In Memoriam</a>
+            </div>
+            <div class="footer-section">
+                <h4>More</h4>
+                <a href="yearbook.html">Digital Yearbook</a>
+                <a href="leadership.html">Leadership</a>
+                <a href="teacher.html">Teacher Portal</a>
+                <a href="profile.html">My Profile</a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 Mayfield High School Class of 2011. All rights reserved.</p>
+            <p>Wildcats Forever &mdash; Est. 1899</p>
+        </div>
+    </div>
+</footer>
+
+<script src="js/firebase-config.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>

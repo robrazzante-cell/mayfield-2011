@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Classmates | Mayfield Class of 2011</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <style>
+        #classmate-map { height: 460px; border-radius: var(--radius-lg); border: 1px solid var(--border); }
+        .leaflet-popup-content { font-family: 'Segoe UI', sans-serif; font-size: 0.875rem; }
+        .location-form { display: grid; grid-template-columns: 1fr 1fr auto; gap: 0.75rem; align-items: end; }
+        @media (max-width: 600px) { .location-form { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+
+<header>
+    <nav class="navbar">
+        <div class="container">
+            <a href="index.html" class="nav-brand">
+                <div class="brand-icon"><i class="fas fa-paw"></i></div>
+                <div class="brand-text"><h1>Mayfield Wildcats</h1><span>Class of 2011</span></div>
+            </a>
+            <ul class="nav-menu" id="navMenu">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="events.html">Events</a></li>
+                <li><a href="classmates.html" class="active">Classmates</a></li>
+                <li><a href="network.html">Network</a></li>
+                <li><a href="class-pride.html">Class Pride</a></li>
+                <li><a href="memoriam.html">In Memoriam</a></li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle">More <i class="fas fa-chevron-down"></i></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="yearbook.html"><i class="fas fa-book-open"></i> Digital Yearbook</a></li>
+                        <li><a href="leadership.html"><i class="fas fa-star"></i> Leadership</a></li>
+                        <li><a href="teacher.html"><i class="fas fa-chalkboard-teacher"></i> Teacher Portal</a></li>
+                    </ul>
+                </li>
+            </ul>
+            <div class="nav-auth">
+                <div id="userAvatar" style="display:none;align-items:center;gap:0.5rem;">
+                    <img id="userPhoto" src="" alt="" style="width:30px;height:30px;border-radius:50%;border:2px solid var(--gold);">
+                    <a href="profile.html" style="color:rgba(255,255,255,0.85);font-size:0.8rem;text-decoration:none;" id="userName"></a>
+                </div>
+                <button class="btn-signin" id="authBtn" onclick="handleAuth()">
+                    <i class="fab fa-google"></i> <span id="authBtnText">Sign In</span>
+                </button>
+            </div>
+            <button class="nav-toggle" id="navToggle"><span></span><span></span><span></span></button>
+        </div>
+    </nav>
+</header>
+
+<div class="page-header">
+    <div class="container">
+        <h1><i class="fas fa-map-marked-alt"></i> Classmates</h1>
+        <p>See where the Class of 2011 has spread across the country — and the world</p>
+    </div>
+</div>
+<div class="breadcrumb">
+    <div class="container">
+        <a href="index.html">Home</a><span class="sep">/</span><span>Classmates</span>
+    </div>
+</div>
+
+<main>
+<section class="section">
+    <div class="container">
+
+        <!-- MAP -->
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;flex-wrap:wrap;gap:0.5rem;">
+            <div>
+                <h2 class="section-title" style="margin-bottom:0.15rem;">Classmate Map</h2>
+                <p style="font-size:0.82rem;color:var(--text-muted);"><i class="fas fa-lock" style="color:var(--green);"></i> Pins show city-level location only — exact address is never shared</p>
+            </div>
+            <button class="btn btn-primary btn-sm" id="addPinBtn" onclick="showPinForm()" style="display:none;">
+                <i class="fas fa-map-marker-alt"></i> Add My Location
+            </button>
+        </div>
+
+        <div id="classmate-map"></div>
+
+        <!-- Add location form (signed in only) -->
+        <div id="pinFormBox" style="display:none;margin-top:1.25rem;" class="card no-hover" style="background:var(--bg-light);">
+            <h4 style="margin-bottom:0.75rem;font-size:0.9rem;"><i class="fas fa-map-pin" style="color:var(--green);"></i> Pin Your Location</h4>
+            <div class="location-form">
+                <div class="form-group" style="margin-bottom:0;">
+                    <label>City</label>
+                    <input type="text" id="pinCity" placeholder="e.g. Chicago">
+                </div>
+                <div class="form-group" style="margin-bottom:0;">
+                    <label>State / Country</label>
+                    <input type="text" id="pinState" placeholder="e.g. IL or Germany">
+                </div>
+                <button class="btn btn-primary" onclick="saveLocation()" style="white-space:nowrap;">
+                    <i class="fas fa-check"></i> Save
+                </button>
+            </div>
+            <p style="font-size:0.75rem;color:var(--text-muted);margin-top:0.5rem;">Your pin will show the city area — not your exact street or address.</p>
+        </div>
+
+        <hr class="divider">
+
+        <!-- CLASSMATE DIRECTORY -->
+        <h2 class="section-title">Classmate Directory</h2>
+        <div class="filter-bar" id="filterBar">
+            <button class="filter-btn active" onclick="filterClassmates('all', this)">All</button>
+            <button class="filter-btn" onclick="filterClassmates('ohio', this)">Ohio</button>
+            <button class="filter-btn" onclick="filterClassmates('out-of-state', this)">Out of State</button>
+        </div>
+        <div class="grid-4" id="classmatesGrid">
+            <!-- Populated by JS -->
+            <div style="text-align:center;color:var(--text-muted);grid-column:1/-1;padding:2rem 0;">
+                <i class="fas fa-spinner fa-spin" style="font-size:1.5rem;"></i>
+                <p style="margin-top:0.5rem;font-size:0.875rem;">Loading classmates...</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="signin-prompt" id="signinPrompt">
+    <div class="container">
+        <div class="paw-divider"><i class="fas fa-paw"></i></div>
+        <h2>Add your pin to the map</h2>
+        <p>Sign in to add your city to the classmate map and appear in the directory.</p>
+        <button class="btn btn-gold" style="margin-top:1.25rem;" onclick="handleAuth()">
+            <i class="fab fa-google"></i> Sign In with Google
+        </button>
+    </div>
+</section>
+</main>
+
+<footer>
+    <div class="container">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h4><i class="fas fa-paw"></i> Mayfield Wildcats — Class of 2011</h4>
+                <p>Connecting classmates for our 15-year reunion and beyond.</p>
+            </div>
+            <div class="footer-section">
+                <h4>Pages</h4>
+                <a href="events.html">Events</a>
+                <a href="classmates.html">Classmates</a>
+                <a href="network.html">Business Network</a>
+                <a href="class-pride.html">Class Pride</a>
+                <a href="memoriam.html">In Memoriam</a>
+            </div>
+            <div class="footer-section">
+                <h4>More</h4>
+                <a href="yearbook.html">Digital Yearbook</a>
+                <a href="leadership.html">Leadership</a>
+                <a href="teacher.html">Teacher Portal</a>
+                <a href="profile.html">My Profile</a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 Mayfield High School Class of 2011. All rights reserved.</p>
+            <p>Wildcats Forever &mdash; Est. 1899</p>
+        </div>
+    </div>
+</footer>
+
+<script src="js/firebase-config.js"></script>
+<script src="js/main.js"></script>
+<script>
+// Initialize Leaflet map centered on Mayfield Heights, OH
+const map = L.map('classmate-map').setView([41.519, -81.462], 5);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+}).addTo(map);
+
+// Custom green marker
+const greenIcon = L.divIcon({
+    className: '',
+    html: '<div style="width:14px;height:14px;border-radius:50%;background:#2B6B3C;border:2px solid white;box-shadow:0 1px 4px rgba(0,0,0,0.4);"></div>',
+    iconSize: [14,14], iconAnchor: [7,7]
+});
+
+// Mayfield HS marker
+L.marker([41.519, -81.462], {icon: L.divIcon({
+    className:'',
+    html:'<div style="width:18px;height:18px;border-radius:50%;background:var(--gold,#C8A32A);border:2px solid white;box-shadow:0 1px 4px rgba(0,0,0,0.4);display:flex;align-items:center;justify-content:center;font-size:9px;">🏫</div>',
+    iconSize:[18,18], iconAnchor:[9,9]
+})}).addTo(map).bindPopup('<strong>Mayfield High School</strong><br>Where it all started');
+
+async function loadPins() {
+    const snap = await db.collection('users').where('lat','!=',null).get();
+    snap.forEach(doc => {
+        const d = doc.data();
+        if (d.lat && d.lng) {
+            L.marker([d.lat, d.lng], {icon: greenIcon})
+                .addTo(map)
+                .bindPopup(`<strong>${d.displayName || 'Classmate'}</strong><br>${d.city || ''}${d.state ? ', ' + d.state : ''}`);
+        }
+    });
+    renderDirectory(snap.docs);
+}
+
+function renderDirectory(docs) {
+    const grid = document.getElementById('classmatesGrid');
+    if (!grid) return;
+    if (docs.length === 0) {
+        grid.innerHTML = '<div style="text-align:center;color:var(--text-muted);grid-column:1/-1;padding:2rem 0;"><i class="fas fa-user-friends" style="font-size:2rem;display:block;margin-bottom:0.5rem;"></i>No classmates yet — be the first to add your location!</div>';
+        return;
+    }
+    grid.innerHTML = docs.map(doc => {
+        const d = doc.data();
+        const initials = (d.displayName || 'MW').split(' ').map(n=>n[0]).join('').slice(0,2).toUpperCase();
+        const location = [d.city, d.state].filter(Boolean).join(', ');
+        return `
+        <div class="card no-hover" style="text-align:center;padding:1.25rem 1rem;">
+            ${d.photoURL
+                ? `<img src="${d.photoURL}" alt="${d.displayName}" class="avatar" style="width:64px;height:64px;margin:0 auto 0.75rem;">`
+                : `<div class="avatar-initials" style="width:64px;height:64px;font-size:1.35rem;margin:0 auto 0.75rem;">${initials}</div>`}
+            <div style="font-size:0.875rem;font-weight:700;">${d.displayName || 'Classmate'}</div>
+            ${d.employer ? `<div style="font-size:0.75rem;color:var(--text-muted);">${d.employer}</div>` : ''}
+            ${location ? `<div style="font-size:0.75rem;color:var(--text-muted);margin-top:0.2rem;"><i class="fas fa-map-marker-alt" style="color:var(--green);font-size:0.7rem;"></i> ${location}</div>` : ''}
+            ${d.linkedin ? `<a href="${d.linkedin}" target="_blank" style="font-size:0.75rem;color:var(--green);text-decoration:none;display:inline-flex;align-items:center;gap:0.2rem;margin-top:0.4rem;"><i class="fab fa-linkedin"></i> LinkedIn</a>` : ''}
+        </div>`;
+    }).join('');
+}
+
+function filterClassmates(filter, btn) {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    // Re-render with filter — simplified: reload and filter client-side
+    loadPinsFiltered(filter);
+}
+
+async function loadPinsFiltered(filter) {
+    let snap;
+    if (filter === 'ohio') {
+        snap = await db.collection('users').where('state','in',['OH','Ohio']).get();
+    } else if (filter === 'out-of-state') {
+        snap = await db.collection('users').where('lat','!=',null).get();
+        const filtered = snap.docs.filter(d => {
+            const s = (d.data().state || '').toLowerCase();
+            return s !== 'oh' && s !== 'ohio';
+        });
+        renderDirectory(filtered);
+        return;
+    } else {
+        snap = await db.collection('users').get();
+    }
+    renderDirectory(snap.docs);
+}
+
+function showPinForm() {
+    const box = document.getElementById('pinFormBox');
+    if (box) box.style.display = box.style.display === 'none' ? 'block' : 'none';
+}
+window.showPinForm = showPinForm;
+
+async function saveLocation() {
+    const user = auth.currentUser;
+    if (!user) { alert('Please sign in first.'); return; }
+    const city = document.getElementById('pinCity').value.trim();
+    const state = document.getElementById('pinState').value.trim();
+    if (!city || !state) { alert('Please enter both city and state.'); return; }
+
+    // Geocode with Nominatim (free, no key needed)
+    try {
+        const res = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(city + ', ' + state)}&format=json&limit=1`);
+        const results = await res.json();
+        if (!results.length) { alert('City not found. Try again.'); return; }
+        const lat = parseFloat(results[0].lat);
+        const lng = parseFloat(results[0].lon);
+        // Round to 2 decimal places (~1km radius) for privacy
+        const latFuzzy = Math.round(lat * 10) / 10;
+        const lngFuzzy = Math.round(lng * 10) / 10;
+        await db.collection('users').doc(user.uid).update({ city, state, lat: latFuzzy, lng: lngFuzzy });
+        document.getElementById('pinFormBox').style.display = 'none';
+        alert('📍 Your location has been added to the map!');
+        loadPins();
+    } catch(e) {
+        alert('Error saving location. Please try again.');
+    }
+}
+window.saveLocation = saveLocation;
+
+auth.onAuthStateChanged(user => {
+    const btn = document.getElementById('addPinBtn');
+    if (btn) btn.style.display = user ? 'inline-flex' : 'none';
+    loadPins();
+});
+</script>
+</body>
+</html>

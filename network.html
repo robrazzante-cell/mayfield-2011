@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Business Network | Mayfield Class of 2011</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+</head>
+<body>
+
+<header>
+    <nav class="navbar">
+        <div class="container">
+            <a href="index.html" class="nav-brand">
+                <div class="brand-icon"><i class="fas fa-paw"></i></div>
+                <div class="brand-text"><h1>Mayfield Wildcats</h1><span>Class of 2011</span></div>
+            </a>
+            <ul class="nav-menu" id="navMenu">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="events.html">Events</a></li>
+                <li><a href="classmates.html">Classmates</a></li>
+                <li><a href="network.html" class="active">Network</a></li>
+                <li><a href="class-pride.html">Class Pride</a></li>
+                <li><a href="memoriam.html">In Memoriam</a></li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle">More <i class="fas fa-chevron-down"></i></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="yearbook.html"><i class="fas fa-book-open"></i> Digital Yearbook</a></li>
+                        <li><a href="leadership.html"><i class="fas fa-star"></i> Leadership</a></li>
+                        <li><a href="teacher.html"><i class="fas fa-chalkboard-teacher"></i> Teacher Portal</a></li>
+                    </ul>
+                </li>
+            </ul>
+            <div class="nav-auth">
+                <div id="userAvatar" style="display:none;align-items:center;gap:0.5rem;">
+                    <img id="userPhoto" src="" alt="" style="width:30px;height:30px;border-radius:50%;border:2px solid var(--gold);">
+                    <a href="profile.html" style="color:rgba(255,255,255,0.85);font-size:0.8rem;text-decoration:none;" id="userName"></a>
+                </div>
+                <button class="btn-signin" id="authBtn" onclick="handleAuth()">
+                    <i class="fab fa-google"></i> <span id="authBtnText">Sign In</span>
+                </button>
+            </div>
+            <button class="nav-toggle" id="navToggle"><span></span><span></span><span></span></button>
+        </div>
+    </nav>
+</header>
+
+<div class="page-header">
+    <div class="container">
+        <h1><i class="fas fa-briefcase"></i> Business Network</h1>
+        <p>Find a contractor, discover a service, or connect with a business partner from the Class of 2011</p>
+    </div>
+</div>
+<div class="breadcrumb">
+    <div class="container">
+        <a href="index.html">Home</a><span class="sep">/</span><span>Network</span>
+    </div>
+</div>
+
+<main>
+<section class="section">
+    <div class="container">
+
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;margin-bottom:1.5rem;">
+            <div>
+                <h2 class="section-title" style="margin-bottom:0.15rem;">Classmate Businesses</h2>
+                <p style="font-size:0.82rem;color:var(--text-muted);">Support your fellow Wildcats — hire local, hire trusted</p>
+            </div>
+            <button class="btn btn-primary btn-sm" id="addBizBtn" onclick="openAddBiz()" style="display:none;">
+                <i class="fas fa-plus"></i> List My Business
+            </button>
+        </div>
+
+        <!-- Category filter -->
+        <div class="filter-bar" id="categoryFilter">
+            <button class="filter-btn active" data-cat="all" onclick="filterBiz('all',this)">All</button>
+            <button class="filter-btn" data-cat="Legal" onclick="filterBiz('Legal',this)">Legal</button>
+            <button class="filter-btn" data-cat="Finance" onclick="filterBiz('Finance',this)">Finance</button>
+            <button class="filter-btn" data-cat="Health" onclick="filterBiz('Health',this)">Health &amp; Wellness</button>
+            <button class="filter-btn" data-cat="Tech" onclick="filterBiz('Tech',this)">Technology</button>
+            <button class="filter-btn" data-cat="Real Estate" onclick="filterBiz('Real Estate',this)">Real Estate</button>
+            <button class="filter-btn" data-cat="Trades" onclick="filterBiz('Trades',this)">Trades &amp; Contractors</button>
+            <button class="filter-btn" data-cat="Creative" onclick="filterBiz('Creative',this)">Creative</button>
+            <button class="filter-btn" data-cat="Other" onclick="filterBiz('Other',this)">Other</button>
+        </div>
+
+        <div class="grid-3" id="bizGrid">
+            <div style="text-align:center;color:var(--text-muted);grid-column:1/-1;padding:3rem 0;">
+                <i class="fas fa-spinner fa-spin" style="font-size:1.5rem;"></i>
+                <p style="margin-top:0.5rem;font-size:0.875rem;">Loading listings...</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="signin-prompt" id="signinPrompt">
+    <div class="container">
+        <div class="paw-divider"><i class="fas fa-paw"></i></div>
+        <h2>Have a business or service to share?</h2>
+        <p>Sign in to list your business and let classmates find you.</p>
+        <button class="btn btn-gold" style="margin-top:1.25rem;" onclick="handleAuth()">
+            <i class="fab fa-google"></i> Sign In with Google
+        </button>
+    </div>
+</section>
+</main>
+
+<!-- Contact Modal -->
+<div class="modal-overlay" id="contactModal">
+    <div class="modal">
+        <button class="modal-close" onclick="closeModal('contactModal')">&times;</button>
+        <h3 class="modal-title" id="contactModalTitle">Contact Classmate</h3>
+        <p style="font-size:0.82rem;color:var(--text-muted);margin-bottom:1.25rem;" id="contactModalSub"></p>
+        <form id="contactForm" onsubmit="sendContact(event)">
+            <input type="hidden" id="contactToEmail">
+            <input type="hidden" id="contactToName">
+            <div class="form-group">
+                <label>Your Name</label>
+                <input type="text" id="contactFromName" required>
+            </div>
+            <div class="form-group">
+                <label>Your Email</label>
+                <input type="email" id="contactFromEmail" required>
+            </div>
+            <div class="form-group">
+                <label>Message</label>
+                <textarea id="contactMessage" rows="4" placeholder="Introduce yourself and describe what you're looking for..." required></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary btn-block">
+                <i class="fas fa-paper-plane"></i> Send Message
+            </button>
+            <div class="form-message" id="contactFormMsg" style="display:none;"></div>
+        </form>
+    </div>
+</div>
+
+<!-- Add Business Modal -->
+<div class="modal-overlay" id="addBizModal">
+    <div class="modal">
+        <button class="modal-close" onclick="closeModal('addBizModal')">&times;</button>
+        <h3 class="modal-title">List Your Business</h3>
+        <form id="addBizForm" onsubmit="saveBiz(event)">
+            <div class="form-group">
+                <label>Business / Service Name</label>
+                <input type="text" id="bizName" placeholder="e.g. Smith Plumbing LLC" required>
+            </div>
+            <div class="form-group">
+                <label>Category</label>
+                <select id="bizCategory" required>
+                    <option value="">Select category</option>
+                    <option>Legal</option>
+                    <option>Finance</option>
+                    <option>Health &amp; Wellness</option>
+                    <option>Technology</option>
+                    <option>Real Estate</option>
+                    <option>Trades &amp; Contractors</option>
+                    <option>Creative</option>
+                    <option>Other</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Description <span style="color:var(--text-muted);font-weight:400;">(2–3 sentences)</span></label>
+                <textarea id="bizDesc" rows="3" placeholder="What services do you offer and who do you serve?" required></textarea>
+            </div>
+            <div class="form-group">
+                <label>Website (optional)</label>
+                <input type="url" id="bizWebsite" placeholder="https://...">
+            </div>
+            <div class="form-group">
+                <label>Contact Email <span style="color:var(--text-muted);font-weight:400;">(for inquiries)</span></label>
+                <input type="email" id="bizEmail" required>
+            </div>
+            <button type="submit" class="btn btn-primary btn-block">
+                <i class="fas fa-plus"></i> Add Listing
+            </button>
+            <div class="form-message" id="addBizMsg" style="display:none;"></div>
+        </form>
+    </div>
+</div>
+
+<footer>
+    <div class="container">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h4><i class="fas fa-paw"></i> Mayfield Wildcats — Class of 2011</h4>
+                <p>Connecting classmates for our 15-year reunion and beyond.</p>
+            </div>
+            <div class="footer-section">
+                <h4>Pages</h4>
+                <a href="events.html">Events</a>
+                <a href="classmates.html">Classmates</a>
+                <a href="network.html">Business Network</a>
+                <a href="class-pride.html">Class Pride</a>
+                <a href="memoriam.html">In Memoriam</a>
+            </div>
+            <div class="footer-section">
+                <h4>More</h4>
+                <a href="yearbook.html">Digital Yearbook</a>
+                <a href="leadership.html">Leadership</a>
+                <a href="teacher.html">Teacher Portal</a>
+                <a href="profile.html">My Profile</a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 Mayfield High School Class of 2011. All rights reserved.</p>
+            <p>Wildcats Forever &mdash; Est. 1899</p>
+        </div>
+    </div>
+</footer>
+
+<script src="js/firebase-config.js"></script>
+<script src="js/main.js"></script>
+<script>
+let allBizDocs = [];
+
+async function loadBiz() {
+    const snap = await db.collection('businesses').orderBy('createdAt','desc').get();
+    allBizDocs = snap.docs;
+    renderBiz(allBizDocs);
+}
+
+function renderBiz(docs) {
+    const grid = document.getElementById('bizGrid');
+    if (!docs.length) {
+        grid.innerHTML = '<div style="text-align:center;color:var(--text-muted);grid-column:1/-1;padding:3rem 0;"><i class="fas fa-briefcase" style="font-size:2rem;display:block;margin-bottom:0.5rem;"></i>No listings yet — be the first to add your business!</div>';
+        return;
+    }
+    grid.innerHTML = docs.map(doc => {
+        const d = doc.data();
+        const initials = (d.ownerName||'WC').split(' ').map(n=>n[0]).join('').slice(0,2).toUpperCase();
+        return `
+        <div class="card biz-card" data-cat="${d.category||'Other'}">
+            <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:0.75rem;">
+                ${d.ownerPhoto
+                    ? `<img src="${d.ownerPhoto}" style="width:44px;height:44px;border-radius:50%;object-fit:cover;">`
+                    : `<div class="avatar-initials" style="width:44px;height:44px;font-size:0.9rem;flex-shrink:0;">${initials}</div>`}
+                <div>
+                    <div style="font-size:0.75rem;color:var(--text-muted);">${d.ownerName || 'Classmate'}</div>
+                    <span class="badge badge-green">${d.category || 'Other'}</span>
+                </div>
+            </div>
+            <h3 class="biz-card" style="font-size:0.95rem;font-weight:700;margin-bottom:0.25rem;">${d.businessName}</h3>
+            <p class="biz-desc">${d.description}</p>
+            <div class="biz-links">
+                <button class="btn btn-primary btn-sm" onclick="openContact('${d.email}','${d.ownerName||''}','${d.businessName}')">
+                    <i class="fas fa-envelope"></i> Contact
+                </button>
+                ${d.website ? `<a href="${d.website}" target="_blank" class="btn btn-outline btn-sm"><i class="fas fa-external-link-alt"></i> Website</a>` : ''}
+            </div>
+        </div>`;
+    }).join('');
+}
+
+function filterBiz(cat, btn) {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    if (cat === 'all') { renderBiz(allBizDocs); return; }
+    renderBiz(allBizDocs.filter(d => (d.data().category||'') === cat));
+}
+window.filterBiz = filterBiz;
+
+function openContact(email, ownerName, bizName) {
+    const user = auth.currentUser;
+    if (!user) { alert('Please sign in to contact classmates.'); return; }
+    document.getElementById('contactToEmail').value = email;
+    document.getElementById('contactToName').value = ownerName;
+    document.getElementById('contactModalTitle').textContent = 'Contact ' + ownerName;
+    document.getElementById('contactModalSub').textContent = 'Reaching out about: ' + bizName;
+    document.getElementById('contactFromName').value = user.displayName || '';
+    document.getElementById('contactFromEmail').value = user.email || '';
+    document.getElementById('contactModal').classList.add('open');
+}
+window.openContact = openContact;
+
+async function sendContact(e) {
+    e.preventDefault();
+    const msg = document.getElementById('contactFormMsg');
+    const btn = e.target.querySelector('[type=submit]');
+    btn.disabled = true; btn.textContent = 'Sending...';
+    try {
+        const res = await fetch('/api/contact', {
+            method: 'POST',
+            headers: {'Content-Type':'application/json'},
+            body: JSON.stringify({
+                to: document.getElementById('contactToEmail').value,
+                toName: document.getElementById('contactToName').value,
+                fromName: document.getElementById('contactFromName').value,
+                fromEmail: document.getElementById('contactFromEmail').value,
+                message: document.getElementById('contactMessage').value
+            })
+        });
+        if (res.ok) {
+            msg.textContent = 'Message sent! They\'ll reply to your email.';
+            msg.className = 'form-message success'; msg.style.display = 'block';
+            setTimeout(() => closeModal('contactModal'), 2500);
+        } else throw new Error();
+    } catch {
+        msg.textContent = 'Something went wrong. Please try again.';
+        msg.className = 'form-message error'; msg.style.display = 'block';
+        btn.disabled = false; btn.textContent = 'Send Message';
+    }
+}
+
+function openAddBiz() { document.getElementById('addBizModal').classList.add('open'); }
+window.openAddBiz = openAddBiz;
+
+async function saveBiz(e) {
+    e.preventDefault();
+    const user = auth.currentUser;
+    if (!user) return;
+    const msg = document.getElementById('addBizMsg');
+    await db.collection('businesses').add({
+        ownerId: user.uid,
+        ownerName: user.displayName,
+        ownerPhoto: user.photoURL || '',
+        businessName: document.getElementById('bizName').value,
+        category: document.getElementById('bizCategory').value,
+        description: document.getElementById('bizDesc').value,
+        website: document.getElementById('bizWebsite').value,
+        email: document.getElementById('bizEmail').value,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    msg.textContent = 'Listing added!';
+    msg.className = 'form-message success'; msg.style.display = 'block';
+    setTimeout(() => { closeModal('addBizModal'); loadBiz(); }, 1500);
+}
+
+function closeModal(id) {
+    document.getElementById(id).classList.remove('open');
+}
+window.closeModal = closeModal;
+
+auth.onAuthStateChanged(user => {
+    const btn = document.getElementById('addBizBtn');
+    if (btn) btn.style.display = user ? 'inline-flex' : 'none';
+    loadBiz();
+});
+</script>
+</body>
+</html>

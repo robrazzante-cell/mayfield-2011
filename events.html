@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Events | Mayfield Class of 2011</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+</head>
+<body>
+
+<header>
+    <nav class="navbar">
+        <div class="container">
+            <a href="index.html" class="nav-brand">
+                <div class="brand-icon"><i class="fas fa-paw"></i></div>
+                <div class="brand-text"><h1>Mayfield Wildcats</h1><span>Class of 2011</span></div>
+            </a>
+            <ul class="nav-menu" id="navMenu">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="events.html" class="active">Events</a></li>
+                <li><a href="classmates.html">Classmates</a></li>
+                <li><a href="network.html">Network</a></li>
+                <li><a href="class-pride.html">Class Pride</a></li>
+                <li><a href="memoriam.html">In Memoriam</a></li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle">More <i class="fas fa-chevron-down"></i></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="yearbook.html"><i class="fas fa-book-open"></i> Digital Yearbook</a></li>
+                        <li><a href="leadership.html"><i class="fas fa-star"></i> Leadership</a></li>
+                        <li><a href="teacher.html"><i class="fas fa-chalkboard-teacher"></i> Teacher Portal</a></li>
+                    </ul>
+                </li>
+            </ul>
+            <div class="nav-auth">
+                <div id="userAvatar" style="display:none;align-items:center;gap:0.5rem;">
+                    <img id="userPhoto" src="" alt="" style="width:30px;height:30px;border-radius:50%;border:2px solid var(--gold);">
+                    <a href="profile.html" style="color:rgba(255,255,255,0.85);font-size:0.8rem;text-decoration:none;" id="userName"></a>
+                </div>
+                <button class="btn-signin" id="authBtn" onclick="handleAuth()">
+                    <i class="fab fa-google"></i> <span id="authBtnText">Sign In</span>
+                </button>
+            </div>
+            <button class="nav-toggle" id="navToggle"><span></span><span></span><span></span></button>
+        </div>
+    </nav>
+</header>
+
+<div class="page-header">
+    <div class="container">
+        <h1><i class="fas fa-calendar-alt"></i> Events</h1>
+        <p>Everything planned for the Class of 2011 — 15-year reunion</p>
+    </div>
+</div>
+<div class="breadcrumb">
+    <div class="container">
+        <a href="index.html">Home</a><span class="sep">/</span><span>Events</span>
+    </div>
+</div>
+
+<main>
+
+<!-- TAILGATE -->
+<section class="section" id="tailgate">
+    <div class="container">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:2rem;align-items:start;">
+            <div>
+                <span class="badge badge-green" style="margin-bottom:0.75rem;display:inline-block;">Football Weekend</span>
+                <h2 class="section-title" style="margin-bottom:0.75rem;">Homecoming Tailgate</h2>
+                <div style="display:flex;flex-direction:column;gap:0.6rem;margin-bottom:1.25rem;">
+                    <div class="event-meta"><i class="fas fa-map-marker-alt" style="color:var(--green);width:16px;"></i> <strong>Alumni Pavilion</strong> — next to Wildcat Stadium</div>
+                    <div class="event-meta"><i class="far fa-calendar" style="color:var(--green);width:16px;"></i> Date TBD — Homecoming 2026</div>
+                    <div class="event-meta"><i class="fas fa-beer" style="color:var(--green);width:16px;"></i> Alcohol permitted (not on Friday game nights)</div>
+                    <div class="event-meta"><i class="fas fa-dollar-sign" style="color:var(--green);width:16px;"></i> Alumni Pavilion is available at no charge</div>
+                </div>
+                <p style="font-size:0.875rem;line-height:1.7;color:var(--text-muted);margin-bottom:1.25rem;">
+                    Kick off the reunion weekend at the Alumni Pavilion right next to Wildcat Stadium. This is our ice-breaker event — catch up with classmates before the game and cheer on the current Wildcats.
+                </p>
+                <div id="rsvpContainer">
+                    <button class="btn btn-primary" onclick="rsvp('tailgate')" id="rsvpBtn-tailgate">
+                        <i class="fas fa-check"></i> RSVP — I'm Coming
+                    </button>
+                </div>
+                <p style="font-size:0.78rem;color:var(--text-muted);margin-top:0.5rem;" id="rsvpCount-tailgate"></p>
+            </div>
+            <div>
+                <div class="card no-hover" style="background:var(--bg-light);">
+                    <h4 style="margin-bottom:0.75rem;font-size:0.875rem;"><i class="fas fa-info-circle" style="color:var(--green);"></i> From the Alumni Association</h4>
+                    <p style="font-size:0.82rem;line-height:1.7;color:var(--text-muted);">
+                        "If you have your reunion on Homecoming weekend, your classmates can attend our Alumni Homecoming Tailgate Party as an ice breaker on Friday — it's complimentary and we usually get 200 alums. Afterwards, you can go to the game, hang out in the Alumni Pavilion, or go to a watering hole."
+                    </p>
+                    <p style="font-size:0.78rem;color:var(--text-muted);margin-top:0.5rem;">— Wayne, Mayfield Alumni Association</p>
+                </div>
+                <div class="note-box" style="margin-top:1rem;">
+                    <strong>Keep it simple, keep it fun, keep it affordable.</strong> Major reunions (20, 25, 30+) are usually 3-day affairs. For our 15-year, a focused weekend works perfectly.
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<hr class="divider" style="margin:0;">
+
+<!-- TEACHER MEETUP -->
+<section class="section" id="teacher-meetup">
+    <div class="container">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:2rem;align-items:start;">
+            <div>
+                <span class="badge badge-gold" style="margin-bottom:0.75rem;display:inline-block;">Faculty</span>
+                <h2 class="section-title" style="margin-bottom:0.75rem;">Teacher Meetup</h2>
+                <div style="display:flex;flex-direction:column;gap:0.6rem;margin-bottom:1.25rem;">
+                    <div class="event-meta"><i class="fas fa-map-marker-alt" style="color:var(--green);width:16px;"></i> Mayfield High School Campus</div>
+                    <div class="event-meta"><i class="far fa-calendar" style="color:var(--green);width:16px;"></i> Date TBD</div>
+                    <div class="event-meta"><i class="fas fa-ticket-alt" style="color:var(--green);width:16px;"></i> Teachers attend free — no charge</div>
+                </div>
+                <p style="font-size:0.875rem;line-height:1.7;color:var(--text-muted);margin-bottom:1.25rem;">
+                    Reconnect with the teachers who shaped your Mayfield experience. Teachers can log their availability and interest through the <a href="teacher.html" style="color:var(--green);">Teacher Portal</a>. Classmates can browse who's coming and send messages.
+                </p>
+                <div id="rsvpContainer-teacher">
+                    <button class="btn btn-gold" onclick="rsvp('teacher-meetup')" id="rsvpBtn-teacher-meetup">
+                        <i class="fas fa-check"></i> I Want to Attend
+                    </button>
+                </div>
+                <p style="font-size:0.78rem;color:var(--text-muted);margin-top:0.5rem;" id="rsvpCount-teacher-meetup"></p>
+            </div>
+            <div>
+                <div class="card no-hover" style="background:var(--bg-light);">
+                    <h4 style="margin-bottom:0.75rem;font-size:0.875rem;"><i class="fas fa-chalkboard-teacher" style="color:var(--green);"></i> How it works</h4>
+                    <ol style="padding-left:1.25rem;font-size:0.82rem;color:var(--text-muted);line-height:2;">
+                        <li>We reach out to former Mayfield teachers</li>
+                        <li>Teachers log availability on the <a href="teacher.html" style="color:var(--green);">Teacher Portal</a></li>
+                        <li>Classmates RSVP and see which teachers are coming</li>
+                        <li>Alumni Association helps identify teacher contacts</li>
+                    </ol>
+                </div>
+                <a href="teacher.html" class="btn btn-outline btn-sm" style="margin-top:1rem;display:inline-flex;">
+                    <i class="fas fa-chalkboard-teacher"></i> Go to Teacher Portal
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<hr class="divider" style="margin:0;">
+
+<!-- CAMPUS TOUR -->
+<section class="section" id="campus-tour">
+    <div class="container">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:2rem;align-items:start;">
+            <div>
+                <span class="badge badge-gray" style="margin-bottom:0.75rem;display:inline-block;">Campus</span>
+                <h2 class="section-title" style="margin-bottom:0.75rem;">Campus Tour</h2>
+                <div style="display:flex;flex-direction:column;gap:0.6rem;margin-bottom:1.25rem;">
+                    <div class="event-meta"><i class="fas fa-map-marker-alt" style="color:var(--green);width:16px;"></i> 6116 Wilson Mills Rd, Mayfield, OH 44143</div>
+                    <div class="event-meta"><i class="far fa-clock" style="color:var(--green);width:16px;"></i> ~1.5 hours · Available at 10am, 11am, or 12pm</div>
+                    <div class="event-meta"><i class="fas fa-user-friends" style="color:var(--green);width:16px;"></i> Hosted by Wayne — Alumni Association</div>
+                    <div class="event-meta"><i class="fas fa-dollar-sign" style="color:var(--green);width:16px;"></i> Complimentary</div>
+                </div>
+                <p style="font-size:0.875rem;line-height:1.7;color:var(--text-muted);margin-bottom:1.25rem;">
+                    Walk the halls of Mayfield High School for the first time since graduation. Wayne loves doing tours for reunion classes — see what's changed and what's stayed the same on the 52-acre campus.
+                </p>
+                <div id="rsvpContainer-tour">
+                    <button class="btn btn-outline" onclick="rsvp('campus-tour')" id="rsvpBtn-campus-tour">
+                        <i class="fas fa-check"></i> Count Me In
+                    </button>
+                </div>
+                <p style="font-size:0.78rem;color:var(--text-muted);margin-top:0.5rem;" id="rsvpCount-campus-tour"></p>
+            </div>
+            <div>
+                <div class="card no-hover" style="background:var(--bg-light);">
+                    <h4 style="margin-bottom:0.75rem;font-size:0.875rem;"><i class="fas fa-school" style="color:var(--green);"></i> About Mayfield HS</h4>
+                    <ul style="font-size:0.82rem;color:var(--text-muted);line-height:2;padding-left:1.1rem;">
+                        <li>52-acre suburban campus</li>
+                        <li>Current campus opened 1963</li>
+                        <li>Original school founded 1899</li>
+                        <li>~1,000 students today</li>
+                        <li>Serves Gates Mills, Highland Heights, Mayfield Heights &amp; Mayfield Village</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<hr class="divider" style="margin:0;">
+
+<!-- FUTURE REUNIONS -->
+<section class="section section-alt">
+    <div class="container">
+        <h2 class="section-title"><i class="fas fa-road" style="color:var(--green);"></i> Future Reunions</h2>
+        <p style="font-size:0.875rem;color:var(--text-muted);margin-bottom:1.5rem;">Major milestones to put on your radar — major reunions (20, 25, 30+) are typically 3-day affairs.</p>
+        <div class="grid-4">
+            <div class="card no-hover" style="text-align:center;padding:1.5rem 1rem;">
+                <div style="font-size:2rem;font-weight:800;color:var(--green);">2031</div>
+                <div style="font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-muted);">20-Year</div>
+                <div class="badge badge-green" style="margin-top:0.5rem;">Milestone</div>
+            </div>
+            <div class="card no-hover" style="text-align:center;padding:1.5rem 1rem;">
+                <div style="font-size:2rem;font-weight:800;color:var(--green);">2036</div>
+                <div style="font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-muted);">25-Year</div>
+                <div class="badge badge-gold" style="margin-top:0.5rem;">Silver</div>
+            </div>
+            <div class="card no-hover" style="text-align:center;padding:1.5rem 1rem;">
+                <div style="font-size:2rem;font-weight:800;color:var(--green);">2041</div>
+                <div style="font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-muted);">30-Year</div>
+                <div class="badge badge-gray" style="margin-top:0.5rem;">Coming Up</div>
+            </div>
+            <div class="card no-hover" style="text-align:center;padding:1.5rem 1rem;">
+                <div style="font-size:2rem;font-weight:800;color:var(--green);">2061</div>
+                <div style="font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-muted);">50-Year</div>
+                <div class="badge badge-gold" style="margin-top:0.5rem;">Golden</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- SIGN-IN PROMPT -->
+<section class="signin-prompt" id="signinPrompt">
+    <div class="container">
+        <div class="paw-divider"><i class="fas fa-paw"></i></div>
+        <h2>Sign in to RSVP</h2>
+        <p>Create your account to RSVP to events and let classmates know you're coming.</p>
+        <button class="btn btn-gold" style="margin-top:1.25rem;" onclick="handleAuth()">
+            <i class="fab fa-google"></i> Sign In with Google
+        </button>
+    </div>
+</section>
+
+</main>
+
+<footer>
+    <div class="container">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h4><i class="fas fa-paw"></i> Mayfield Wildcats — Class of 2011</h4>
+                <p>Connecting classmates for our 15-year reunion and beyond.</p>
+            </div>
+            <div class="footer-section">
+                <h4>Pages</h4>
+                <a href="events.html">Events</a>
+                <a href="classmates.html">Classmates</a>
+                <a href="network.html">Business Network</a>
+                <a href="class-pride.html">Class Pride</a>
+                <a href="memoriam.html">In Memoriam</a>
+            </div>
+            <div class="footer-section">
+                <h4>More</h4>
+                <a href="yearbook.html">Digital Yearbook</a>
+                <a href="leadership.html">Leadership</a>
+                <a href="teacher.html">Teacher Portal</a>
+                <a href="profile.html">My Profile</a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 Mayfield High School Class of 2011. All rights reserved.</p>
+            <p>Wildcats Forever &mdash; Est. 1899</p>
+        </div>
+    </div>
+</footer>
+
+<script src="js/firebase-config.js"></script>
+<script src="js/main.js"></script>
+<script>
+const EVENTS = ['tailgate', 'teacher-meetup', 'campus-tour'];
+
+async function loadRSVPs() {
+    const user = auth.currentUser;
+    for (const eventId of EVENTS) {
+        const snap = await db.collection('rsvps').where('eventId','==',eventId).get();
+        const countEl = document.getElementById('rsvpCount-' + eventId);
+        if (countEl) countEl.textContent = snap.size + ' classmate' + (snap.size !== 1 ? 's' : '') + ' going';
+        if (user) {
+            const userRsvp = snap.docs.find(d => d.data().userId === user.uid);
+            const btn = document.getElementById('rsvpBtn-' + eventId);
+            if (btn && userRsvp) {
+                btn.innerHTML = '<i class="fas fa-check-circle"></i> You\'re Going!';
+                btn.disabled = true;
+                btn.style.opacity = '0.7';
+            }
+        }
+    }
+}
+
+async function rsvp(eventId) {
+    const user = auth.currentUser;
+    if (!user) { alert('Please sign in to RSVP.'); return; }
+    const existing = await db.collection('rsvps').where('eventId','==',eventId).where('userId','==',user.uid).get();
+    if (!existing.empty) return;
+    await db.collection('rsvps').add({
+        eventId,
+        userId: user.uid,
+        userName: user.displayName,
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    loadRSVPs();
+}
+window.rsvp = rsvp;
+
+auth.onAuthStateChanged(() => loadRSVPs());
+</script>
+</body>
+</html>

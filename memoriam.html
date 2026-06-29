@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>In Memoriam | Mayfield Class of 2011</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <style>
+        .mem-detail { display: none; }
+        .mem-detail.open { display: block; }
+        .mem-card-wrapper.expanded .mem-detail { display: block; }
+        .mem-card-wrapper { border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; margin-bottom: 1rem; }
+        .mem-card-header {
+            display: flex; align-items: center; gap: 1rem;
+            padding: 1.25rem; cursor: pointer; background: var(--white);
+            transition: background 0.15s;
+        }
+        .mem-card-header:hover { background: var(--bg-light); }
+        .mem-card-header .mem-info { flex: 1; }
+        .mem-card-header h3 { font-size: 1rem; font-weight: 700; margin-bottom: 0.15rem; }
+        .mem-card-header .mem-years { font-size: 0.8rem; color: var(--text-muted); }
+        .mem-card-header .mem-short { font-size: 0.82rem; color: var(--text-muted); margin-top: 0.25rem; }
+        .mem-card-body { border-top: 1px solid var(--border); padding: 1.5rem; background: #FAFAFA; }
+        .candle { font-size: 1.5rem; }
+    </style>
+</head>
+<body>
+
+<header>
+    <nav class="navbar">
+        <div class="container">
+            <a href="index.html" class="nav-brand">
+                <div class="brand-icon"><i class="fas fa-paw"></i></div>
+                <div class="brand-text"><h1>Mayfield Wildcats</h1><span>Class of 2011</span></div>
+            </a>
+            <ul class="nav-menu" id="navMenu">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="events.html">Events</a></li>
+                <li><a href="classmates.html">Classmates</a></li>
+                <li><a href="network.html">Network</a></li>
+                <li><a href="class-pride.html">Class Pride</a></li>
+                <li><a href="memoriam.html" class="active">In Memoriam</a></li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle">More <i class="fas fa-chevron-down"></i></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="yearbook.html"><i class="fas fa-book-open"></i> Digital Yearbook</a></li>
+                        <li><a href="leadership.html"><i class="fas fa-star"></i> Leadership</a></li>
+                        <li><a href="teacher.html"><i class="fas fa-chalkboard-teacher"></i> Teacher Portal</a></li>
+                    </ul>
+                </li>
+            </ul>
+            <div class="nav-auth">
+                <div id="userAvatar" style="display:none;align-items:center;gap:0.5rem;">
+                    <img id="userPhoto" src="" alt="" style="width:30px;height:30px;border-radius:50%;border:2px solid var(--gold);">
+                    <a href="profile.html" style="color:rgba(255,255,255,0.85);font-size:0.8rem;text-decoration:none;" id="userName"></a>
+                </div>
+                <button class="btn-signin" id="authBtn" onclick="handleAuth()">
+                    <i class="fab fa-google"></i> <span id="authBtnText">Sign In</span>
+                </button>
+            </div>
+            <button class="nav-toggle" id="navToggle"><span></span><span></span><span></span></button>
+        </div>
+    </nav>
+</header>
+
+<div class="page-header" style="background:linear-gradient(135deg,#1A1A2E 0%,#2B3A2E 100%);">
+    <div class="container">
+        <h1><i class="fas fa-heart"></i> In Memoriam</h1>
+        <p>We carry them with us — always Wildcats</p>
+    </div>
+</div>
+<div class="breadcrumb">
+    <div class="container">
+        <a href="index.html">Home</a><span class="sep">/</span><span>In Memoriam</span>
+    </div>
+</div>
+
+<main>
+<section class="section">
+    <div class="container" style="max-width:800px;">
+        <p style="text-align:center;font-size:0.9rem;color:var(--text-muted);margin-bottom:2rem;font-style:italic;">
+            This page is a space to honor and remember the members of our class and community who are no longer with us.<br>
+            Click a name to read their tribute and leave a message.
+        </p>
+
+        <div id="memoriamList">
+            <!-- Placeholder entry -->
+            <div class="mem-card-wrapper" id="mem-placeholder">
+                <div class="mem-card-header" onclick="toggleMem('placeholder')">
+                    <div class="candle">🕯️</div>
+                    <div style="width:56px;height:56px;border-radius:50%;background:var(--bg-light);border:2px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                        <i class="fas fa-user" style="color:var(--text-muted);font-size:1.25rem;"></i>
+                    </div>
+                    <div class="mem-info">
+                        <h3>[ Name ]</h3>
+                        <div class="mem-years">Class of 2011 · [ Birth Year ] – [ Year ]</div>
+                        <div class="mem-short">Add a short description here</div>
+                    </div>
+                    <i class="fas fa-chevron-down" style="color:var(--text-muted);font-size:0.85rem;"></i>
+                </div>
+                <div class="mem-card-body mem-detail" id="mem-body-placeholder">
+                    <p style="font-size:0.875rem;line-height:1.8;color:var(--text-muted);margin-bottom:1.25rem;">
+                        This is a placeholder entry. Once you provide names and details, we'll add real tribute content here with photos.
+                    </p>
+                    <hr class="divider">
+                    <h4 style="font-size:0.875rem;font-weight:700;margin-bottom:1rem;">Leave a tribute</h4>
+                    <div id="comments-placeholder"></div>
+                    <div id="commentForm-placeholder" style="display:none;" class="comment-form">
+                        <textarea id="commentInput-placeholder" placeholder="Share a memory or tribute..."></textarea>
+                        <button class="btn btn-primary btn-sm" onclick="addMemoriamComment('placeholder')"><i class="fas fa-paper-plane"></i></button>
+                    </div>
+                    <p id="signinForComment-placeholder" style="font-size:0.82rem;color:var(--text-muted);">
+                        <a href="#" onclick="handleAuth();return false;" style="color:var(--green);">Sign in</a> to leave a tribute.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="note-box" style="margin-top:2rem;text-align:center;">
+            <i class="fas fa-plus-circle" style="color:var(--green);"></i>
+            To add someone to this page, <a href="mailto:rob.razzante@gmail.com" style="color:var(--green);">contact Rob</a> with their name, years, and a short tribute. Photos welcome.
+        </div>
+    </div>
+</section>
+
+<section class="signin-prompt" id="signinPrompt">
+    <div class="container">
+        <div class="paw-divider"><i class="fas fa-heart"></i></div>
+        <h2>Sign in to leave a tribute</h2>
+        <p>Comments on this page are public — please be respectful and kind.</p>
+        <button class="btn btn-gold" style="margin-top:1.25rem;" onclick="handleAuth()">
+            <i class="fab fa-google"></i> Sign In with Google
+        </button>
+    </div>
+</section>
+</main>
+
+<footer>
+    <div class="container">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h4><i class="fas fa-paw"></i> Mayfield Wildcats — Class of 2011</h4>
+                <p>Connecting classmates for our 15-year reunion and beyond.</p>
+            </div>
+            <div class="footer-section">
+                <h4>Pages</h4>
+                <a href="events.html">Events</a>
+                <a href="classmates.html">Classmates</a>
+                <a href="network.html">Business Network</a>
+                <a href="class-pride.html">Class Pride</a>
+                <a href="memoriam.html">In Memoriam</a>
+            </div>
+            <div class="footer-section">
+                <h4>More</h4>
+                <a href="yearbook.html">Digital Yearbook</a>
+                <a href="leadership.html">Leadership</a>
+                <a href="teacher.html">Teacher Portal</a>
+                <a href="profile.html">My Profile</a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 Mayfield High School Class of 2011. All rights reserved.</p>
+            <p>Wildcats Forever &mdash; Est. 1899</p>
+        </div>
+    </div>
+</footer>
+
+<script src="js/firebase-config.js"></script>
+<script src="js/main.js"></script>
+<script>
+function toggleMem(id) {
+    const body = document.getElementById('mem-body-' + id);
+    const wrapper = document.getElementById('mem-' + id);
+    if (!body) return;
+    const isOpen = body.classList.toggle('mem-detail');
+    // Actually toggle open class on wrapper
+    wrapper.classList.toggle('expanded');
+    if (wrapper.classList.contains('expanded')) {
+        loadMemoriamComments(id);
+    }
+}
+window.toggleMem = toggleMem;
+
+async function loadMemoriamComments(memId) {
+    const container = document.getElementById('comments-' + memId);
+    if (!container) return;
+    const snap = await db.collection('memoriam_comments').where('parentId','==',memId).orderBy('timestamp','asc').get();
+    if (snap.empty) {
+        container.innerHTML = '<p style="color:var(--text-muted);font-size:0.82rem;margin-bottom:0.75rem;">No tributes yet — be the first.</p>';
+        return;
+    }
+    container.innerHTML = snap.docs.map(doc => {
+        const d = doc.data();
+        const initials = (d.userName||'W').split(' ').map(n=>n[0]).join('').slice(0,2).toUpperCase();
+        return `
+        <div class="comment-item">
+            <div class="comment-meta">
+                ${d.userPhoto ? `<img src="${d.userPhoto}" style="width:26px;height:26px;border-radius:50%;">` : `<div class="avatar-initials" style="width:26px;height:26px;font-size:0.6rem;">${initials}</div>`}
+                <strong>${d.userName||'Classmate'}</strong>
+                <time>${timeAgo(d.timestamp)}</time>
+                ${d.flagged ? '<span class="badge badge-red" style="font-size:0.65rem;">Under Review</span>' : ''}
+            </div>
+            <div class="comment-body">${d.flagged ? '<em style="color:var(--text-muted);">This comment is under review.</em>' : d.text}</div>
+            <div class="comment-actions">
+                <button class="btn-flag" onclick="flagComment('memoriam_comments','${doc.id}','${auth.currentUser?.uid||''}')">
+                    <i class="fas fa-flag"></i> Flag as inappropriate
+                </button>
+            </div>
+        </div>`;
+    }).join('');
+}
+
+async function addMemoriamComment(memId) {
+    const user = auth.currentUser;
+    if (!user) { alert('Please sign in to leave a tribute.'); return; }
+    const input = document.getElementById('commentInput-' + memId);
+    const text = input.value.trim();
+    if (!text) return;
+    await postComment('memoriam_comments', memId, text, user);
+    input.value = '';
+    loadMemoriamComments(memId);
+}
+window.addMemoriamComment = addMemoriamComment;
+
+auth.onAuthStateChanged(user => {
+    // Show/hide comment forms for all entries
+    document.querySelectorAll('[id^="commentForm-"]').forEach(el => {
+        el.style.display = user ? 'flex' : 'none';
+    });
+    document.querySelectorAll('[id^="signinForComment-"]').forEach(el => {
+        el.style.display = user ? 'none' : 'block';
+    });
+});
+</script>
+</body>
+</html>

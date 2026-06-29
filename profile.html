@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile | Mayfield Class of 2011</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+</head>
+<body>
+
+<header>
+    <nav class="navbar">
+        <div class="container">
+            <a href="index.html" class="nav-brand">
+                <div class="brand-icon"><i class="fas fa-paw"></i></div>
+                <div class="brand-text"><h1>Mayfield Wildcats</h1><span>Class of 2011</span></div>
+            </a>
+            <ul class="nav-menu" id="navMenu">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="events.html">Events</a></li>
+                <li><a href="classmates.html">Classmates</a></li>
+                <li><a href="network.html">Network</a></li>
+                <li><a href="class-pride.html">Class Pride</a></li>
+                <li><a href="memoriam.html">In Memoriam</a></li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle">More <i class="fas fa-chevron-down"></i></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="yearbook.html"><i class="fas fa-book-open"></i> Digital Yearbook</a></li>
+                        <li><a href="leadership.html"><i class="fas fa-star"></i> Leadership</a></li>
+                        <li><a href="teacher.html"><i class="fas fa-chalkboard-teacher"></i> Teacher Portal</a></li>
+                    </ul>
+                </li>
+            </ul>
+            <div class="nav-auth">
+                <div id="userAvatar" style="display:none;align-items:center;gap:0.5rem;">
+                    <img id="userPhoto" src="" alt="" style="width:30px;height:30px;border-radius:50%;border:2px solid var(--gold);">
+                    <a href="profile.html" style="color:rgba(255,255,255,0.85);font-size:0.8rem;text-decoration:none;" id="userName"></a>
+                </div>
+                <button class="btn-signin" id="authBtn" onclick="handleAuth()">
+                    <i class="fab fa-google"></i> <span id="authBtnText">Sign In</span>
+                </button>
+            </div>
+            <button class="nav-toggle" id="navToggle"><span></span><span></span><span></span></button>
+        </div>
+    </nav>
+</header>
+
+<div class="page-header">
+    <div class="container">
+        <h1><i class="fas fa-user-circle"></i> My Profile</h1>
+        <p>Update your info, add your location, and manage your business listing</p>
+    </div>
+</div>
+<div class="breadcrumb">
+    <div class="container">
+        <a href="index.html">Home</a><span class="sep">/</span><span>My Profile</span>
+    </div>
+</div>
+
+<main>
+
+<!-- Not signed in -->
+<section class="section" id="notSignedIn">
+    <div class="container" style="max-width:480px;text-align:center;">
+        <i class="fas fa-lock" style="font-size:2.5rem;color:var(--border);display:block;margin-bottom:1rem;"></i>
+        <h2 style="font-size:1.25rem;margin-bottom:0.5rem;">Sign in to view your profile</h2>
+        <p style="font-size:0.875rem;color:var(--text-muted);margin-bottom:1.5rem;">Your profile is where you manage your info visible to classmates.</p>
+        <button class="btn btn-primary" onclick="handleAuth()">
+            <i class="fab fa-google"></i> Sign In with Google
+        </button>
+    </div>
+</section>
+
+<!-- Signed in -->
+<section class="section" id="profileSection" style="display:none;">
+    <div class="container">
+        <div class="grid-2" style="gap:2rem;align-items:start;">
+
+            <!-- Preview card -->
+            <div>
+                <h2 class="section-title" style="margin-bottom:1rem;">Your Card</h2>
+                <div class="card no-hover" style="text-align:center;padding:2rem;">
+                    <img id="previewPhoto" src="" alt="" class="avatar" style="width:88px;height:88px;margin:0 auto 1rem;border:3px solid var(--green);">
+                    <h3 id="previewName" style="font-size:1.1rem;margin-bottom:0.2rem;"></h3>
+                    <div id="previewEmployer" style="font-size:0.82rem;color:var(--text-muted);"></div>
+                    <div id="previewLocation" style="font-size:0.78rem;color:var(--text-muted);margin-top:0.2rem;"></div>
+                    <div style="display:flex;justify-content:center;gap:0.5rem;margin-top:0.75rem;flex-wrap:wrap;" id="previewLinks"></div>
+                </div>
+
+                <div class="card no-hover" style="margin-top:1rem;">
+                    <h4 style="font-size:0.875rem;font-weight:700;margin-bottom:0.75rem;"><i class="fas fa-map-marker-alt" style="color:var(--green);"></i> Map Location</h4>
+                    <div class="form-row" style="margin-bottom:0.75rem;">
+                        <div class="form-group" style="margin-bottom:0;">
+                            <label>City</label>
+                            <input type="text" id="profileCity" placeholder="Chicago">
+                        </div>
+                        <div class="form-group" style="margin-bottom:0;">
+                            <label>State</label>
+                            <input type="text" id="profileState" placeholder="IL">
+                        </div>
+                    </div>
+                    <p style="font-size:0.72rem;color:var(--text-muted);">Shows city-level on the map — not your exact address.</p>
+                </div>
+            </div>
+
+            <!-- Edit form -->
+            <div>
+                <h2 class="section-title" style="margin-bottom:1rem;">Edit Your Profile</h2>
+                <form id="profileForm" onsubmit="saveProfile(event)">
+                    <div class="form-group">
+                        <label>Display Name</label>
+                        <input type="text" id="profileName" placeholder="Your full name">
+                    </div>
+                    <div class="form-group">
+                        <label>Employer / Occupation</label>
+                        <input type="text" id="profileEmployer" placeholder="e.g. Deloitte — Senior Consultant">
+                    </div>
+                    <div class="form-group">
+                        <label>LinkedIn Profile URL</label>
+                        <input type="url" id="profileLinkedin" placeholder="https://linkedin.com/in/...">
+                    </div>
+                    <div class="form-group">
+                        <label>Personal Website (optional)</label>
+                        <input type="url" id="profileWebsite" placeholder="https://...">
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block">
+                        <i class="fas fa-save"></i> Save Profile
+                    </button>
+                    <div class="form-message" id="profileMsg" style="display:none;"></div>
+                </form>
+
+                <hr class="divider">
+
+                <!-- Business listing toggle -->
+                <div>
+                    <h3 style="font-size:0.95rem;font-weight:700;margin-bottom:0.75rem;"><i class="fas fa-briefcase" style="color:var(--green);"></i> Business Listing</h3>
+                    <div id="bizListingSection">
+                        <div class="form-group">
+                            <label>Business / Service Name</label>
+                            <input type="text" id="profileBizName" placeholder="e.g. Smith Plumbing LLC">
+                        </div>
+                        <div class="form-group">
+                            <label>Category</label>
+                            <select id="profileBizCat">
+                                <option value="">No listing</option>
+                                <option>Legal</option>
+                                <option>Finance</option>
+                                <option>Health &amp; Wellness</option>
+                                <option>Technology</option>
+                                <option>Real Estate</option>
+                                <option>Trades &amp; Contractors</option>
+                                <option>Creative</option>
+                                <option>Other</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Description</label>
+                            <textarea id="profileBizDesc" rows="2" placeholder="What do you offer?"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Business Website</label>
+                            <input type="url" id="profileBizWebsite" placeholder="https://...">
+                        </div>
+                        <div class="form-group">
+                            <label>Contact Email for inquiries</label>
+                            <input type="email" id="profileBizEmail">
+                        </div>
+                        <button class="btn btn-outline btn-sm" onclick="saveBizListing()">
+                            <i class="fas fa-save"></i> Save Business Listing
+                        </button>
+                        <div class="form-message" id="bizMsg" style="display:none;margin-top:0.5rem;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+</main>
+
+<footer>
+    <div class="container">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h4><i class="fas fa-paw"></i> Mayfield Wildcats — Class of 2011</h4>
+                <p>Connecting classmates for our 15-year reunion and beyond.</p>
+            </div>
+            <div class="footer-section">
+                <h4>Pages</h4>
+                <a href="events.html">Events</a>
+                <a href="classmates.html">Classmates</a>
+                <a href="network.html">Business Network</a>
+                <a href="class-pride.html">Class Pride</a>
+                <a href="memoriam.html">In Memoriam</a>
+            </div>
+            <div class="footer-section">
+                <h4>More</h4>
+                <a href="yearbook.html">Digital Yearbook</a>
+                <a href="leadership.html">Leadership</a>
+                <a href="teacher.html">Teacher Portal</a>
+                <a href="profile.html">My Profile</a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 Mayfield High School Class of 2011. All rights reserved.</p>
+            <p>Wildcats Forever &mdash; Est. 1899</p>
+        </div>
+    </div>
+</footer>
+
+<script src="js/firebase-config.js"></script>
+<script src="js/main.js"></script>
+<script>
+let currentUserData = {};
+
+function updatePreview(data) {
+    const photo = document.getElementById('previewPhoto');
+    const name = document.getElementById('previewName');
+    const emp = document.getElementById('previewEmployer');
+    const loc = document.getElementById('previewLocation');
+    const links = document.getElementById('previewLinks');
+    if (photo) photo.src = data.photoURL || '';
+    if (name) name.textContent = data.displayName || '';
+    if (emp) emp.textContent = data.employer || '';
+    if (loc) loc.textContent = [data.city, data.state].filter(Boolean).join(', ');
+    if (links) {
+        const parts = [];
+        if (data.linkedin) parts.push(`<a href="${data.linkedin}" target="_blank" class="btn btn-outline btn-sm"><i class="fab fa-linkedin"></i> LinkedIn</a>`);
+        if (data.website) parts.push(`<a href="${data.website}" target="_blank" class="btn btn-outline btn-sm"><i class="fas fa-globe"></i> Website</a>`);
+        links.innerHTML = parts.join('');
+    }
+}
+
+async function loadProfile(user) {
+    const snap = await db.collection('users').doc(user.uid).get();
+    const data = snap.exists ? snap.data() : {};
+    currentUserData = data;
+
+    document.getElementById('profileName').value = data.displayName || user.displayName || '';
+    document.getElementById('profileEmployer').value = data.employer || '';
+    document.getElementById('profileLinkedin').value = data.linkedin || '';
+    document.getElementById('profileWebsite').value = data.website || '';
+    document.getElementById('profileCity').value = data.city || '';
+    document.getElementById('profileState').value = data.state || '';
+    document.getElementById('profileBizName').value = data.businessName || '';
+    document.getElementById('profileBizCat').value = data.businessCategory || '';
+    document.getElementById('profileBizDesc').value = data.businessDesc || '';
+    document.getElementById('profileBizWebsite').value = data.businessWebsite || '';
+    document.getElementById('profileBizEmail').value = data.businessEmail || user.email || '';
+
+    updatePreview({...data, photoURL: user.photoURL || data.photoURL});
+}
+
+async function saveProfile(e) {
+    e.preventDefault();
+    const user = auth.currentUser;
+    if (!user) return;
+    const msg = document.getElementById('profileMsg');
+    const city = document.getElementById('profileCity').value.trim();
+    const state = document.getElementById('profileState').value.trim();
+    let lat = null, lng = null;
+    if (city && state && (city !== currentUserData.city || state !== currentUserData.state)) {
+        try {
+            const res = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(city+', '+state)}&format=json&limit=1`);
+            const results = await res.json();
+            if (results.length) {
+                lat = Math.round(parseFloat(results[0].lat) * 10) / 10;
+                lng = Math.round(parseFloat(results[0].lon) * 10) / 10;
+            }
+        } catch(e) {}
+    }
+    const update = {
+        displayName: document.getElementById('profileName').value,
+        employer: document.getElementById('profileEmployer').value,
+        linkedin: document.getElementById('profileLinkedin').value,
+        website: document.getElementById('profileWebsite').value,
+        city, state
+    };
+    if (lat !== null) { update.lat = lat; update.lng = lng; }
+    await db.collection('users').doc(user.uid).update(update);
+    currentUserData = {...currentUserData, ...update};
+    updatePreview({...currentUserData, photoURL: user.photoURL});
+    msg.textContent = 'Profile saved!';
+    msg.className = 'form-message success'; msg.style.display = 'block';
+    setTimeout(() => msg.style.display = 'none', 3000);
+}
+
+async function saveBizListing() {
+    const user = auth.currentUser;
+    if (!user) return;
+    const msg = document.getElementById('bizMsg');
+    const bizName = document.getElementById('profileBizName').value;
+    const cat = document.getElementById('profileBizCat').value;
+    if (bizName && cat) {
+        // Upsert in businesses collection
+        const existing = await db.collection('businesses').where('ownerId','==',user.uid).get();
+        const bizData = {
+            ownerId: user.uid,
+            ownerName: user.displayName,
+            ownerPhoto: user.photoURL || '',
+            businessName: bizName,
+            category: cat,
+            description: document.getElementById('profileBizDesc').value,
+            website: document.getElementById('profileBizWebsite').value,
+            email: document.getElementById('profileBizEmail').value,
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        };
+        if (existing.empty) {
+            bizData.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+            await db.collection('businesses').add(bizData);
+        } else {
+            await db.collection('businesses').doc(existing.docs[0].id).update(bizData);
+        }
+        await db.collection('users').doc(user.uid).update({
+            hasBusiness: true, businessName: bizName, businessCategory: cat,
+            businessDesc: document.getElementById('profileBizDesc').value,
+            businessWebsite: document.getElementById('profileBizWebsite').value,
+            businessEmail: document.getElementById('profileBizEmail').value
+        });
+    } else {
+        // Remove listing
+        const existing = await db.collection('businesses').where('ownerId','==',user.uid).get();
+        for (const doc of existing.docs) await db.collection('businesses').doc(doc.id).delete();
+        await db.collection('users').doc(user.uid).update({ hasBusiness: false, businessName: '', businessCategory: '' });
+    }
+    msg.textContent = 'Business listing saved!';
+    msg.className = 'form-message success'; msg.style.display = 'block';
+    setTimeout(() => msg.style.display = 'none', 3000);
+}
+window.saveBizListing = saveBizListing;
+
+auth.onAuthStateChanged(user => {
+    const notIn = document.getElementById('notSignedIn');
+    const profSec = document.getElementById('profileSection');
+    if (user) {
+        if (notIn) notIn.style.display = 'none';
+        if (profSec) profSec.style.display = '';
+        loadProfile(user);
+    } else {
+        if (notIn) notIn.style.display = '';
+        if (profSec) profSec.style.display = 'none';
+    }
+});
+</script>
+</body>
+</html>

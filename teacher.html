@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teacher Portal | Mayfield Class of 2011</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+</head>
+<body>
+
+<header>
+    <nav class="navbar">
+        <div class="container">
+            <a href="index.html" class="nav-brand">
+                <div class="brand-icon"><i class="fas fa-paw"></i></div>
+                <div class="brand-text"><h1>Mayfield Wildcats</h1><span>Class of 2011</span></div>
+            </a>
+            <ul class="nav-menu" id="navMenu">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="events.html">Events</a></li>
+                <li><a href="classmates.html">Classmates</a></li>
+                <li><a href="network.html">Network</a></li>
+                <li><a href="class-pride.html">Class Pride</a></li>
+                <li><a href="memoriam.html">In Memoriam</a></li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle">More <i class="fas fa-chevron-down"></i></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="yearbook.html"><i class="fas fa-book-open"></i> Digital Yearbook</a></li>
+                        <li><a href="leadership.html"><i class="fas fa-star"></i> Leadership</a></li>
+                        <li><a href="teacher.html" class="active"><i class="fas fa-chalkboard-teacher"></i> Teacher Portal</a></li>
+                    </ul>
+                </li>
+            </ul>
+            <div class="nav-auth">
+                <div id="userAvatar" style="display:none;align-items:center;gap:0.5rem;">
+                    <img id="userPhoto" src="" alt="" style="width:30px;height:30px;border-radius:50%;border:2px solid var(--gold);">
+                    <a href="profile.html" style="color:rgba(255,255,255,0.85);font-size:0.8rem;text-decoration:none;" id="userName"></a>
+                </div>
+                <button class="btn-signin" id="authBtn" onclick="handleAuth()">
+                    <i class="fab fa-google"></i> <span id="authBtnText">Sign In</span>
+                </button>
+            </div>
+            <button class="nav-toggle" id="navToggle"><span></span><span></span><span></span></button>
+        </div>
+    </nav>
+</header>
+
+<div class="page-header">
+    <div class="container">
+        <h1><i class="fas fa-chalkboard-teacher"></i> Teacher Portal</h1>
+        <p>For former Mayfield faculty — log your interest in reconnecting with the Class of 2011</p>
+    </div>
+</div>
+<div class="breadcrumb">
+    <div class="container">
+        <a href="index.html">Home</a><span class="sep">/</span><span>Teacher Portal</span>
+    </div>
+</div>
+
+<main>
+<section class="section">
+    <div class="container">
+        <div class="grid-2" style="gap:2.5rem;align-items:start;">
+
+            <!-- FOR TEACHERS: Log availability -->
+            <div>
+                <span class="badge badge-gold" style="margin-bottom:0.75rem;display:inline-block;">For Teachers</span>
+                <h2 class="section-title" style="margin-bottom:0.75rem;">Log Your Interest</h2>
+                <p style="font-size:0.875rem;color:var(--text-muted);margin-bottom:1.5rem;">
+                    If you taught at Mayfield during 2007–2011 and would like to reconnect with our class, fill out the form below. Attendance is free and fully optional.
+                </p>
+
+                <div class="card no-hover" id="teacherFormCard">
+                    <form id="teacherForm" onsubmit="submitTeacher(event)">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>First Name *</label>
+                                <input type="text" id="tFirstName" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Last Name *</label>
+                                <input type="text" id="tLastName" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Email Address *</label>
+                            <input type="email" id="tEmail" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Subject(s) You Taught</label>
+                            <input type="text" id="tSubject" placeholder="e.g. English, AP History">
+                        </div>
+                        <div class="form-group">
+                            <label>Years at Mayfield HS</label>
+                            <input type="text" id="tYears" placeholder="e.g. 2005 – 2014">
+                        </div>
+                        <div class="form-group">
+                            <label>Are you interested in attending the teacher meetup?</label>
+                            <select id="tInterest" required>
+                                <option value="">Select</option>
+                                <option value="yes">Yes, I'd love to come!</option>
+                                <option value="maybe">Maybe — depends on the date</option>
+                                <option value="no">Not this time</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Preferred availability <span style="font-weight:400;color:var(--text-muted);">(optional)</span></label>
+                            <input type="text" id="tAvailability" placeholder="e.g. Weekday evenings, Saturday mornings">
+                        </div>
+                        <div class="form-group">
+                            <label>Message to the Class of 2011 <span style="font-weight:400;color:var(--text-muted);">(optional)</span></label>
+                            <textarea id="tMessage" rows="3" placeholder="Anything you'd like your former students to know..."></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-gold btn-block">
+                            <i class="fas fa-paper-plane"></i> Submit
+                        </button>
+                        <div class="form-message" id="teacherFormMsg" style="display:none;"></div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- FOR STUDENTS: See which teachers are coming -->
+            <div>
+                <span class="badge badge-green" style="margin-bottom:0.75rem;display:inline-block;">For Classmates</span>
+                <h2 class="section-title" style="margin-bottom:0.75rem;">Teachers Coming</h2>
+                <p style="font-size:0.875rem;color:var(--text-muted);margin-bottom:1.5rem;">
+                    These are the teachers who've expressed interest in reconnecting with the Class of 2011.
+                </p>
+
+                <div id="teachersList">
+                    <div style="text-align:center;color:var(--text-muted);padding:2rem 0;">
+                        <i class="fas fa-chalkboard-teacher" style="font-size:2rem;display:block;margin-bottom:0.5rem;"></i>
+                        <p style="font-size:0.875rem;">No teachers have logged in yet — share this page with your favorite Mayfield teacher!</p>
+                    </div>
+                </div>
+
+                <hr class="divider">
+
+                <h3 style="font-size:0.95rem;font-weight:700;margin-bottom:0.75rem;">Know a teacher who should be here?</h3>
+                <p style="font-size:0.82rem;color:var(--text-muted);margin-bottom:0.75rem;">Send them the link to this page, or email Rob and he'll reach out directly.</p>
+                <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
+                    <button class="btn btn-outline btn-sm" onclick="copyLink()"><i class="fas fa-link"></i> Copy Page Link</button>
+                    <a href="mailto:rob.razzante@gmail.com?subject=Teacher suggestion for Class of 2011 reunion" class="btn btn-primary btn-sm"><i class="fas fa-envelope"></i> Suggest a Teacher</a>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+</main>
+
+<footer>
+    <div class="container">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h4><i class="fas fa-paw"></i> Mayfield Wildcats — Class of 2011</h4>
+                <p>Connecting classmates for our 15-year reunion and beyond.</p>
+            </div>
+            <div class="footer-section">
+                <h4>Pages</h4>
+                <a href="events.html">Events</a>
+                <a href="classmates.html">Classmates</a>
+                <a href="network.html">Business Network</a>
+                <a href="class-pride.html">Class Pride</a>
+                <a href="memoriam.html">In Memoriam</a>
+            </div>
+            <div class="footer-section">
+                <h4>More</h4>
+                <a href="yearbook.html">Digital Yearbook</a>
+                <a href="leadership.html">Leadership</a>
+                <a href="teacher.html">Teacher Portal</a>
+                <a href="profile.html">My Profile</a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 Mayfield High School Class of 2011. All rights reserved.</p>
+            <p>Wildcats Forever &mdash; Est. 1899</p>
+        </div>
+    </div>
+</footer>
+
+<script src="js/firebase-config.js"></script>
+<script src="js/main.js"></script>
+<script>
+async function loadTeachers() {
+    const snap = await db.collection('teachers').where('interest','in',['yes','maybe']).orderBy('createdAt','desc').get();
+    const list = document.getElementById('teachersList');
+    if (!list || snap.empty) return;
+    list.innerHTML = snap.docs.map(doc => {
+        const d = doc.data();
+        const badge = d.interest === 'yes'
+            ? '<span class="badge badge-green">Attending</span>'
+            : '<span class="badge badge-gold">Maybe</span>';
+        return `
+        <div class="card no-hover" style="margin-bottom:0.75rem;padding:1rem;">
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:0.75rem;flex-wrap:wrap;">
+                <div>
+                    <div style="font-weight:700;font-size:0.9rem;">${d.prefix || ''}${d.firstName} ${d.lastName}</div>
+                    ${d.subject ? `<div style="font-size:0.78rem;color:var(--text-muted);">${d.subject}</div>` : ''}
+                    ${d.years ? `<div style="font-size:0.75rem;color:var(--text-muted);">MHS ${d.years}</div>` : ''}
+                    ${d.message ? `<div style="font-size:0.82rem;color:var(--text);margin-top:0.35rem;font-style:italic;">"${d.message}"</div>` : ''}
+                </div>
+                ${badge}
+            </div>
+        </div>`;
+    }).join('');
+}
+
+async function submitTeacher(e) {
+    e.preventDefault();
+    const msg = document.getElementById('teacherFormMsg');
+    const btn = e.target.querySelector('[type=submit]');
+    btn.disabled = true; btn.textContent = 'Submitting...';
+    try {
+        await db.collection('teachers').add({
+            firstName: document.getElementById('tFirstName').value,
+            lastName: document.getElementById('tLastName').value,
+            email: document.getElementById('tEmail').value,
+            subject: document.getElementById('tSubject').value,
+            years: document.getElementById('tYears').value,
+            interest: document.getElementById('tInterest').value,
+            availability: document.getElementById('tAvailability').value,
+            message: document.getElementById('tMessage').value,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        msg.textContent = 'Thank you! We\'ll be in touch as the date gets confirmed.';
+        msg.className = 'form-message success'; msg.style.display = 'block';
+        document.getElementById('teacherForm').reset();
+        loadTeachers();
+    } catch(err) {
+        msg.textContent = 'Something went wrong. Please try again.';
+        msg.className = 'form-message error'; msg.style.display = 'block';
+        btn.disabled = false; btn.textContent = 'Submit';
+    }
+}
+
+function copyLink() {
+    navigator.clipboard.writeText(window.location.href).then(() => alert('Link copied!'));
+}
+window.copyLink = copyLink;
+
+auth.onAuthStateChanged(() => loadTeachers());
+</script>
+</body>
+</html>
