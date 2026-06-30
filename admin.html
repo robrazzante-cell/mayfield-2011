@@ -69,6 +69,17 @@
 
     <div class="container" id="adminContent" style="display:none;">
 
+        <!-- TEACHER PORTAL LINK -->
+        <div class="admin-card">
+            <h3><i class="fas fa-chalkboard-teacher" style="color:var(--green);"></i> Teacher Portal Link</h3>
+            <p style="font-size:0.82rem;color:var(--text-muted);margin-bottom:0.75rem;">Share this link directly with teachers — it's not in the public nav.</p>
+            <div style="display:flex;gap:0.5rem;align-items:center;">
+                <code id="teacherPortalUrl" style="flex:1;background:var(--bg-light);border:1px solid var(--border);border-radius:var(--radius);padding:0.5rem 0.75rem;font-size:0.82rem;color:var(--text);">https://mayfield-2011.vercel.app/teacher.html</code>
+                <button class="btn btn-outline btn-sm copy-btn" onclick="copyTeacherLink()"><i class="fas fa-copy"></i> Copy</button>
+            </div>
+            <p id="teacherLinkMsg" style="font-size:0.75rem;color:var(--green);margin-top:0.4rem;display:none;">Copied to clipboard!</p>
+        </div>
+
         <!-- PENDING APPROVALS -->
         <div class="admin-card" id="pendingCard">
             <h3><i class="fas fa-user-clock" style="color:var(--green);"></i> Pending Approvals</h3>
@@ -282,6 +293,14 @@ function copyHeadcount() {
     navigator.clipboard.writeText(lines.join('\n')).then(() => alert('Headcount copied to clipboard!'));
 }
 window.copyHeadcount = copyHeadcount;
+
+function copyTeacherLink() {
+    navigator.clipboard.writeText('https://mayfield-2011.vercel.app/teacher.html').then(() => {
+        const msg = document.getElementById('teacherLinkMsg');
+        if (msg) { msg.style.display = 'block'; setTimeout(() => msg.style.display = 'none', 2500); }
+    });
+}
+window.copyTeacherLink = copyTeacherLink;
 
 async function loadPending() {
     const snap = await db.collection('users').where('status', '==', 'pending').get();
