@@ -608,7 +608,13 @@ footer {
 }
 
 /* ── Responsive ── */
+.event-two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; align-items: start; }
+
 @media (max-width: 768px) {
+    .event-two-col { grid-template-columns: 1fr; }
+    .countdown-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem 2rem; justify-items: center; }
+    .countdown-heading { font-size: 0.78rem; }
+
     .nav-toggle { display: flex; }
     .nav-menu {
         display: none; position: absolute; top: 64px; left: 0; right: 0;
