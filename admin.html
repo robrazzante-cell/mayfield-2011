@@ -349,6 +349,9 @@ async function loadAdmin() {
         loadClassmates(),
     ]);
     updateSummary();
+    // Keep public connected count in sync
+    const approvedSnap = await db.collection('users').where('status', '==', 'approved').get();
+    db.collection('stats').doc('classmates').set({ count: approvedSnap.size }).catch(() => {});
 }
 
 auth.onAuthStateChanged(user => {
