@@ -162,10 +162,19 @@ async function deleteTeacher(docId) {
     loadTeachers();
 }
 
-async function deleteClassmate(docId) {
-    if (!confirm('Remove this classmate\'s access? This deletes their account from the site.')) return;
-    await db.collection('users').doc(docId).delete();
+async function deleteClassmate(uid) {
+    if (!confirm('Remove this classmate\'s access? This deletes their account and all RSVPs from the site.')) return;
+    // Delete all RSVPs for this user
+    const rsvpSnap = await db.collection('rsvps').where('userId', '==', uid).get();
+    await Promise.all(rsvpSnap.docs.map(d => d.ref.delete()));
+    // Delete the user doc
+    await db.collection('users').doc(uid).delete();
+    // Reload everything
     loadClassmates();
+    loadEvent('tailgate', 'tailgateStats', 'tailgateList');
+    loadEvent('campus-tour', 'tourStats', 'tourList');
+    loadEvent('teacher-meetup', 'lunchStats', 'lunchList');
+    setTimeout(updateSummary, 1500);
 }
 
 let summaryData = {};
