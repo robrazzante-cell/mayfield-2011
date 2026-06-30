@@ -8,26 +8,28 @@ if (navToggle && navMenu) {
     });
 }
 
-// Auth state handling
-auth.getRedirectResult().catch(err => console.error('Redirect sign-in error:', err));
+// Auth state handling — handle any pending redirect result (fallback path only)
+auth.getRedirectResult().then(result => {
+    if (result && result.user) console.log('Signed in via redirect:', result.user.email);
+}).catch(err => console.error('Redirect sign-in error:', err));
 
-function handleAuth() {
+async function handleAuth() {
     const user = auth.currentUser;
     if (user) {
         if (confirm('Sign out?')) auth.signOut();
         return;
     }
-    const isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-    if (isMobile) {
-        auth.signInWithRedirect(googleProvider);
-    } else {
-        auth.signInWithPopup(googleProvider).catch(err => {
-            if (err.code === 'auth/popup-blocked' || err.code === 'auth/popup-closed-by-user') {
-                auth.signInWithRedirect(googleProvider);
-            } else {
-                console.error('Sign-in error:', err);
-            }
-        });
+    // Use popup for all devices — it works on iOS Safari when triggered by tap
+    // and doesn't depend on cross-origin storage (which VPNs/private browsing block).
+    // Only fall back to redirect if the popup itself is explicitly blocked.
+    try {
+        await auth.signInWithPopup(googleProvider);
+    } catch (err) {
+        if (err.code === 'auth/popup-blocked') {
+            auth.signInWithRedirect(googleProvider);
+        } else if (err.code !== 'auth/popup-closed-by-user') {
+            console.error('Sign-in error:', err);
+        }
     }
 }
 
