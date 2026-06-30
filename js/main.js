@@ -155,7 +155,7 @@ function showPendingBanner(status) {
             <div style="background:var(--green-light);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.5rem;text-align:center;">
                 <i class="fas fa-clock" style="color:var(--green);font-size:1.5rem;margin-bottom:0.5rem;display:block;"></i>
                 <strong>Access Pending Approval</strong>
-                <p style="color:var(--text-muted);font-size:0.875rem;margin-top:0.5rem;">Welcome! Rob has been notified and will verify your access shortly. Refresh this page once approved to explore the full site.</p>
+                <p style="color:var(--text-muted);font-size:0.875rem;margin-top:0.5rem;">Welcome! Rob Razzante has been notified and will verify your access shortly. Refresh this page once approved to explore the full site.</p>
             </div>`;
     }
     banner.style.display = 'block';
