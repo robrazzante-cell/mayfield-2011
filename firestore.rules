@@ -1,0 +1,82 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isSignedIn() && request.auth.token.email == 'rob.razzante@gmail.com';
+    }
+
+    function userStatus() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('status', 'pending');
+    }
+
+    function isApproved() {
+      return isSignedIn() && (isAdmin() || userStatus() == 'approved');
+    }
+
+    // Users — own doc readable by anyone signed in (to check status);
+    // full directory only for approved users
+    match /users/{userId} {
+      allow read: if isSignedIn() && (request.auth.uid == userId || isApproved());
+      allow create: if isSignedIn() && request.auth.uid == userId;
+      // Users can update their own profile but cannot change their own status
+      allow update: if isAdmin()
+                    || (isSignedIn() && request.auth.uid == userId
+                        && request.resource.data.status == resource.data.status);
+      allow delete: if isAdmin();
+    }
+
+    // RSVPs
+    match /rsvps/{docId} {
+      allow read: if isApproved();
+      allow create: if isApproved() && request.resource.data.userId == request.auth.uid;
+      allow delete: if isAdmin() || (isApproved() && resource.data.userId == request.auth.uid);
+      allow update: if isAdmin();
+    }
+
+    // Memory Wall
+    match /memories/{docId} {
+      allow read: if isApproved();
+      allow create: if isApproved() && request.resource.data.userId == request.auth.uid;
+      allow update: if isApproved(); // needed for flag updates
+      allow delete: if isAdmin();
+    }
+
+    // In Memoriam comments
+    match /memoriam_comments/{docId} {
+      allow read: if isApproved();
+      allow create: if isApproved() && request.resource.data.userId == request.auth.uid;
+      allow update: if isApproved(); // needed for flag updates
+      allow delete: if isAdmin();
+    }
+
+    // Teacher portal — any signed-in user can create; admin manages
+    match /teachers/{docId} {
+      allow create: if isSignedIn();
+      allow read, update, delete: if isAdmin();
+    }
+
+    // Reunion suggestions
+    match /reunion_suggestions/{docId} {
+      allow read: if isApproved();
+      allow create: if isApproved();
+      allow update, delete: if isAdmin();
+    }
+
+    // Alumni membership
+    match /alumni_membership/{docId} {
+      allow read: if isApproved();
+      allow create: if isApproved() && request.resource.data.userId == request.auth.uid;
+      allow update, delete: if isAdmin();
+    }
+
+    // Block everything else
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

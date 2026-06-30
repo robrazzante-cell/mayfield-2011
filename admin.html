@@ -69,6 +69,13 @@
 
     <div class="container" id="adminContent" style="display:none;">
 
+        <!-- PENDING APPROVALS -->
+        <div class="admin-card" id="pendingCard">
+            <h3><i class="fas fa-user-clock" style="color:var(--green);"></i> Pending Approvals</h3>
+            <p style="font-size:0.82rem;color:var(--text-muted);margin-bottom:1rem;">Classmates who signed in and are waiting for access.</p>
+            <div id="pendingList"><div style="color:var(--text-muted);font-size:0.875rem;"><i class="fas fa-spinner fa-spin"></i> Loading...</div></div>
+        </div>
+
         <!-- SUMMARY ROW -->
         <div class="admin-card">
             <h3><i class="fas fa-users" style="color:var(--green);"></i> Reunion Weekend Headcount</h3>
@@ -250,6 +257,41 @@ function copyHeadcount() {
 }
 window.copyHeadcount = copyHeadcount;
 
+async function loadPending() {
+    const snap = await db.collection('users').where('status', '==', 'pending').get();
+    const el = document.getElementById('pendingList');
+    if (snap.empty) {
+        el.innerHTML = '<p style="font-size:0.82rem;color:var(--text-muted);">No pending approvals.</p>';
+        return;
+    }
+    el.innerHTML = snap.docs.map(doc => {
+        const d = doc.data();
+        const avatar = d.photoURL
+            ? `<img src="${d.photoURL}" style="width:40px;height:40px;border-radius:50%;object-fit:cover;flex-shrink:0;">`
+            : `<div style="width:40px;height:40px;border-radius:50%;background:var(--green-light);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-weight:700;color:var(--green);font-size:1rem;">${(d.displayName||'?')[0].toUpperCase()}</div>`;
+        return `<div style="display:flex;align-items:center;gap:1rem;padding:0.75rem 0;border-bottom:1px solid var(--border);">
+            ${avatar}
+            <div style="flex:1;min-width:0;">
+                <div style="font-weight:700;font-size:0.9rem;">${d.displayName || 'Unknown'}</div>
+                <div style="font-size:0.8rem;color:var(--text-muted);">${d.email || ''}</div>
+            </div>
+            <div style="display:flex;gap:0.5rem;flex-shrink:0;">
+                <button onclick="approveUser('${doc.id}')" class="btn btn-primary btn-sm">Approve</button>
+                <button onclick="rejectUser('${doc.id}')" class="btn btn-outline btn-sm" style="color:#dc3545;border-color:#dc3545;">Reject</button>
+            </div>
+        </div>`;
+    }).join('');
+}
+window.approveUser = async function(uid) {
+    await db.collection('users').doc(uid).update({ status: 'approved' });
+    loadPending();
+};
+window.rejectUser = async function(uid) {
+    if (!confirm('Reject this user? They will see a "not approved" message.')) return;
+    await db.collection('users').doc(uid).update({ status: 'rejected' });
+    loadPending();
+};
+
 async function loadAdmin() {
     await Promise.all([
         loadEvent('tailgate', 'tailgateStats', 'tailgateList'),
@@ -287,6 +329,7 @@ auth.onAuthStateChanged(user => {
     if (nameEl) nameEl.textContent = user.displayName || '';
     if (btnText) btnText.textContent = 'Sign Out';
     if (btn) btn.querySelector('i').className = 'fas fa-sign-out-alt';
+    loadPending();
     loadAdmin();
 });
 </script>

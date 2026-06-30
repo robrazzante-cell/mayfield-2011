@@ -3,6 +3,11 @@ export default async function handler(req, res) {
     const { firstName, lastName, email, subject, years, message } = req.body;
     if (!firstName || !lastName || !email) return res.status(400).json({ error: 'Missing fields' });
 
+    // Server-side validation: must be a Mayfield Schools email
+    if (!email.toLowerCase().endsWith('@mayfieldschools.org')) {
+        return res.status(403).json({ error: 'A Mayfield Schools email address is required.' });
+    }
+
     const html = `
         <p>A teacher submitted an RSVP for the Mayfield Class of 2011 lunch. Details below — hit <strong>Reply</strong> to send your thank-you directly to them.</p>
         <table style="border-collapse:collapse;font-family:sans-serif;font-size:14px;margin-top:12px;">
@@ -18,12 +23,9 @@ export default async function handler(req, res) {
     try {
         const response = await fetch('https://api.brevo.com/v3/smtp/email', {
             method: 'POST',
-            headers: {
-                'api-key': process.env.BREVO_API_KEY,
-                'Content-Type': 'application/json'
-            },
+            headers: { 'api-key': process.env.BREVO_API_KEY, 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                sender: { name: 'Mayfield Class of 2011', email: process.env.SENDER_EMAIL || 'noreply@mayfieldwildcats2011.com' },
+                sender: { name: 'Mayfield Class of 2011', email: process.env.SENDER_EMAIL },
                 to: [{ email: 'rob.razzante@gmail.com', name: 'Rob Razzante' }],
                 replyTo: { email, name: `${firstName} ${lastName}` },
                 subject: `Teacher RSVP — ${firstName} ${lastName} — Lunch Sep 19`,

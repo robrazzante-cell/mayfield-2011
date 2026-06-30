@@ -1,3 +1,5 @@
+const ADMIN_EMAIL = 'rob.razzante@gmail.com';
+
 // Mobile nav toggle
 const navToggle = document.getElementById('navToggle');
 const navMenu = document.getElementById('navMenu');
@@ -8,7 +10,6 @@ if (navToggle && navMenu) {
     });
 }
 
-// Process the result when Google redirects back after sign-in
 auth.getRedirectResult().then(result => {
     if (result && result.user) console.log('Signed in via redirect:', result.user.email);
 }).catch(err => console.error('Redirect sign-in error:', err));
@@ -22,7 +23,7 @@ function handleAuth() {
     auth.signInWithRedirect(googleProvider);
 }
 
-auth.onAuthStateChanged(user => {
+auth.onAuthStateChanged(async user => {
     const authBtn = document.getElementById('authBtn');
     const authBtnText = document.getElementById('authBtnText');
     const userAvatar = document.getElementById('userAvatar');
@@ -39,8 +40,11 @@ auth.onAuthStateChanged(user => {
             if (userNameEl) userNameEl.textContent = user.displayName ? user.displayName.split(' ')[0] : '';
         }
         if (signinPrompt) signinPrompt.style.display = 'none';
-        ensureUserDoc(user);
-        if (!localStorage.getItem('welcomed_' + user.uid)) {
+
+        const status = await ensureUserDoc(user);
+        applyAccessControl(user, status);
+
+        if (status === 'approved' && !localStorage.getItem('welcomed_' + user.uid)) {
             localStorage.setItem('welcomed_' + user.uid, '1');
             setTimeout(() => showWelcomeTour(user), 600);
         }
@@ -53,9 +57,12 @@ auth.onAuthStateChanged(user => {
 });
 
 async function ensureUserDoc(user) {
+    const isAdmin = user.email === ADMIN_EMAIL;
     const ref = db.collection('users').doc(user.uid);
     const snap = await ref.get();
+
     if (!snap.exists) {
+        const status = isAdmin ? 'approved' : 'pending';
         await ref.set({
             uid: user.uid,
             displayName: user.displayName || '',
@@ -72,19 +79,102 @@ async function ensureUserDoc(user) {
             businessName: '',
             businessCategory: '',
             businessDesc: '',
+            status,
             createdAt: firebase.firestore.FieldValue.serverTimestamp()
         });
-        fetch('/api/classmate-joined', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ name: user.displayName || 'Unknown', email: user.email || '' })
-        }).catch(() => {});
+        if (!isAdmin) {
+            try {
+                const idToken = await user.getIdToken();
+                fetch('/api/classmate-joined', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${idToken}` },
+                    body: JSON.stringify({ name: user.displayName || 'Unknown', email: user.email || '' })
+                }).catch(() => {});
+            } catch (e) { /* non-blocking */ }
+        }
+        return status;
     }
+
+    const data = snap.data();
+    // Grandfather existing users without a status field as approved
+    if (!data.status) {
+        await ref.update({ status: 'approved' });
+        return 'approved';
+    }
+    return data.status;
+}
+
+function applyAccessControl(user, status) {
+    const isAdmin = user.email === ADMIN_EMAIL;
+
+    if (isAdmin) {
+        injectAdminLink();
+        return;
+    }
+
+    if (status === 'approved') return;
+
+    // Pending or rejected — only allow home, admin, and teacher pages
+    const page = window.location.pathname.split('/').pop() || 'index.html';
+    const exempt = ['index.html', '', 'admin.html', 'teacher.html'];
+    if (!exempt.includes(page)) {
+        window.location.replace('index.html');
+        return;
+    }
+
+    // Lock nav to Home only
+    document.querySelectorAll('.nav-menu > li:not(:first-child)').forEach(li => li.style.display = 'none');
+
+    // Show pending banner and hide gated sections on home page
+    showPendingBanner(status);
+    document.querySelectorAll('.gated-section').forEach(el => el.style.display = 'none');
+}
+
+function injectAdminLink() {
+    const dropdown = document.querySelector('.dropdown-menu');
+    if (!dropdown || dropdown.querySelector('[href="admin.html"]')) return;
+    const li = document.createElement('li');
+    li.innerHTML = '<a href="admin.html"><i class="fas fa-shield-alt"></i> Admin</a>';
+    dropdown.appendChild(li);
+}
+
+function showPendingBanner(status) {
+    const banner = document.getElementById('pendingBanner');
+    if (!banner) return;
+    if (status === 'rejected') {
+        banner.innerHTML = `
+            <div style="background:#fff3f3;border:1px solid #f5c6cb;border-radius:var(--radius-lg);padding:1.5rem;text-align:center;">
+                <i class="fas fa-lock" style="color:#dc3545;font-size:1.5rem;margin-bottom:0.5rem;display:block;"></i>
+                <strong>Access Not Granted</strong>
+                <p style="color:var(--text-muted);font-size:0.875rem;margin-top:0.5rem;">Your request was not approved. <a href="mailto:rob.razzante@gmail.com" style="color:var(--green);">Contact Rob</a> if you believe this is an error.</p>
+            </div>`;
+    } else {
+        banner.innerHTML = `
+            <div style="background:var(--green-light);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.5rem;text-align:center;">
+                <i class="fas fa-clock" style="color:var(--green);font-size:1.5rem;margin-bottom:0.5rem;display:block;"></i>
+                <strong>Access Pending Approval</strong>
+                <p style="color:var(--text-muted);font-size:0.875rem;margin-top:0.5rem;">Welcome! Rob has been notified and will verify your access shortly. Refresh this page once approved to explore the full site.</p>
+            </div>`;
+    }
+    banner.style.display = 'block';
 }
 
 // Post a comment (shared across pages)
 async function postComment(collection, parentId, text, user) {
     if (!text.trim()) return;
+
+    // Rate-limit memory wall posts: one per 5 minutes per user
+    if (collection === 'memories') {
+        const key = `lastMemoryPost_${user.uid}`;
+        const last = parseInt(localStorage.getItem(key) || '0');
+        const wait = 5 * 60 * 1000 - (Date.now() - last);
+        if (wait > 0) {
+            alert(`Please wait ${Math.ceil(wait / 60000)} minute(s) before sharing another memory.`);
+            return null;
+        }
+        localStorage.setItem(key, Date.now().toString());
+    }
+
     const flagged = containsProfanity(text);
     const doc = await db.collection(collection).add({
         parentId,
@@ -107,7 +197,7 @@ async function flagComment(collection, commentId, userId) {
     const snap = await ref.get();
     if (!snap.exists) return;
     const data = snap.data();
-    if (data.flaggedBy && data.flaggedBy.includes(userId)) return; // already flagged by this user
+    if (data.flaggedBy && data.flaggedBy.includes(userId)) return;
     await ref.update({
         flagCount: firebase.firestore.FieldValue.increment(1),
         flaggedBy: firebase.firestore.FieldValue.arrayUnion(userId),
@@ -126,7 +216,6 @@ async function notifyFlag(info) {
     } catch (e) { /* non-blocking */ }
 }
 
-// Basic profanity filter (extend as needed)
 const BAD_WORDS = ['fuck', 'shit', 'bitch', 'asshole', 'nigger', 'faggot'];
 function containsProfanity(text) {
     const lower = text.toLowerCase();
@@ -195,7 +284,6 @@ function showWelcomeTour(user) {
     overlay.addEventListener('click', e => { if (e.target === overlay) overlay.remove(); });
 }
 
-// Attach to window for inline handlers
 window.handleAuth = handleAuth;
 window.flagComment = flagComment;
 window.postComment = postComment;
