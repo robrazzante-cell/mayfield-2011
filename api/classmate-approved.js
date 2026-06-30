@@ -26,7 +26,7 @@ export default async function handler(req, res) {
                 Explore the Site
             </a>
         </p>
-        <p style="margin-top:24px;color:#888;font-size:13px;">Go Wildcats! — Rob Razzante, Class of 2011<br>Mayfield Class of 2011 Reunion</p>
+        <p style="margin-top:24px;color:#888;font-size:13px;">Go Wildcats! — Rob Razzante, Class of 2011</p>
     `;
 
     try {
