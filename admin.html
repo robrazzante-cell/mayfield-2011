@@ -126,21 +126,29 @@ function statBlock(number, label) {
     return `<div class="stat-item"><div class="admin-stat">${number}</div><div class="stat-label">${label}</div></div>`;
 }
 
-function rsvpTable(docs) {
+function rsvpTable(docs, eventId, statsElId, listElId) {
     if (!docs.length) return '<p style="font-size:0.82rem;color:var(--text-muted);">No RSVPs yet.</p>';
     return `<table class="rsvp-table">
-        <thead><tr><th>#</th><th>Name</th><th>+1 Guest</th><th>Total</th></tr></thead>
+        <thead><tr><th>#</th><th>Name</th><th>+1 Guest</th><th>Total</th><th></th></tr></thead>
         <tbody>${docs.map((d, i) => {
             const data = d.data ? d.data() : d;
             const plus = data.plusOne;
+            const docId = d.id;
             return `<tr>
                 <td style="color:var(--text-muted);">${i+1}</td>
                 <td><strong>${data.userName || data.firstName + ' ' + data.lastName || '—'}</strong></td>
                 <td><span class="badge-sm ${plus ? 'badge-yes' : 'badge-no'}">${plus ? 'Yes' : 'No'}</span></td>
                 <td>${plus ? 2 : 1}</td>
+                <td><button onclick="deleteRsvp('${docId}','${eventId}','${statsElId}','${listElId}')" style="background:none;border:none;cursor:pointer;color:#ccc;font-size:0.8rem;" title="Remove"><i class="fas fa-trash"></i></button></td>
             </tr>`;
         }).join('')}</tbody>
     </table>`;
+}
+
+async function deleteRsvp(docId, eventId, statsElId, listElId) {
+    if (!confirm('Remove this RSVP?')) return;
+    await db.collection('rsvps').doc(docId).delete();
+    loadEvent(eventId, statsElId, listElId).then(updateSummary);
 }
 
 let summaryData = {};
@@ -155,7 +163,7 @@ async function loadEvent(eventId, statsElId, listElId) {
         statBlock(classmates, 'Classmates') +
         statBlock(guests, 'Bringing +1') +
         statBlock(total, 'Total Attending');
-    document.getElementById(listElId).innerHTML = rsvpTable(snap.docs);
+    document.getElementById(listElId).innerHTML = rsvpTable(snap.docs, eventId, statsElId, listElId);
     return { classmates, guests, total };
 }
 
