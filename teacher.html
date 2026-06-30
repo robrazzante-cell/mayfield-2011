@@ -223,23 +223,10 @@ async function submitTeacher(e) {
         });
 
         if (interest === 'yes') {
-            await db.collection('mail').add({
-                to: 'rob.razzante@gmail.com',
-                replyTo: email,
-                message: {
-                    subject: `Teacher RSVP — ${firstName} ${lastName} — Lunch Sep 19`,
-                    html: `
-                        <p>A teacher submitted an RSVP for the Mayfield Class of 2011 lunch. Details below — reply to this email to send your thank-you directly to them.</p>
-                        <table style="border-collapse:collapse;font-family:sans-serif;font-size:14px;">
-                            <tr><td style="padding:4px 12px 4px 0;color:#666;">Name</td><td><strong>${firstName} ${lastName}</strong></td></tr>
-                            <tr><td style="padding:4px 12px 4px 0;color:#666;">Email</td><td>${email}</td></tr>
-                            ${subject ? `<tr><td style="padding:4px 12px 4px 0;color:#666;">Subject(s)</td><td>${subject}</td></tr>` : ''}
-                            ${years   ? `<tr><td style="padding:4px 12px 4px 0;color:#666;">Years at MHS</td><td>${years}</td></tr>` : ''}
-                            ${message ? `<tr><td style="padding:4px 12px 4px 0;color:#666;">Message</td><td><em>${message}</em></td></tr>` : ''}
-                        </table>
-                        <p style="margin-top:16px;color:#666;font-size:13px;">Hit Reply to thank ${firstName} for their time.</p>
-                    `
-                }
+            await fetch('/api/teacher-rsvp', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ firstName, lastName, email, subject, years, message })
             });
         }
 
