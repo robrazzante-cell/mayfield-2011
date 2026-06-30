@@ -54,10 +54,11 @@ service cloud.firestore {
       allow delete: if isAdmin();
     }
 
-    // Teacher portal — any signed-in user can create; admin manages
+    // Teacher portal — open create (external RSVP form); approved classmates can see the list
     match /teachers/{docId} {
-      allow create: if isSignedIn();
-      allow read, update, delete: if isAdmin();
+      allow create: if true;
+      allow read: if isApproved();
+      allow update, delete: if isAdmin();
     }
 
     // Reunion suggestions

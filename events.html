@@ -31,7 +31,6 @@
                     <a href="#" class="dropdown-toggle">More <i class="fas fa-chevron-down"></i></a>
                     <ul class="dropdown-menu">
                         <li><a href="leadership.html"><i class="fas fa-star"></i> Leadership</a></li>
-                        <li><a href="teacher.html"><i class="fas fa-chalkboard-teacher"></i> Teacher Portal</a></li>
                     </ul>
                 </li>
             </ul>
@@ -161,7 +160,7 @@
                     <div class="event-meta"><i class="fas fa-utensils" style="color:var(--green);width:16px;"></i> Lunch provided</div>
                 </div>
                 <p style="font-size:0.875rem;line-height:1.7;color:var(--text-muted);margin-bottom:1.25rem;">
-                    Sit down for lunch with the teachers who shaped your Mayfield experience. Following the School Tour, this is a chance to reconnect, share where life has taken you, and say thank you. Teachers can register through the <a href="teacher.html" style="color:var(--green);">Teacher Portal</a>.
+                    Sit down for lunch with the teachers who shaped your Mayfield experience. Following the School Tour, this is a chance to reconnect, share where life has taken you, and say thank you. Teachers receive a direct link to register — their names appear below once they sign up.
                 </p>
                 <div id="rsvpContainer-teacher">
                     <button class="btn btn-primary" onclick="rsvp('teacher-meetup')" id="rsvpBtn-teacher-meetup">
@@ -173,17 +172,11 @@
             </div>
             <div>
                 <div class="card no-hover" style="background:var(--bg-light);">
-                    <h4 style="margin-bottom:0.75rem;font-size:0.875rem;"><i class="fas fa-utensils" style="color:var(--green);"></i> How it works</h4>
-                    <ol style="padding-left:1.25rem;font-size:0.82rem;color:var(--text-muted);line-height:2;">
-                        <li>We reach out to former Mayfield teachers</li>
-                        <li>Teachers register on the <a href="teacher.html" style="color:var(--green);">Teacher Portal</a></li>
-                        <li>Classmates RSVP and see which teachers are attending</li>
-                        <li>Lunch is served at 12:30 PM</li>
-                    </ol>
+                    <h4 style="margin-bottom:0.85rem;font-size:0.875rem;"><i class="fas fa-chalkboard-teacher" style="color:var(--green);"></i> Teachers Joining Lunch</h4>
+                    <div id="teacherRsvpList">
+                        <p style="font-size:0.82rem;color:var(--text-muted);font-style:italic;">Loading...</p>
+                    </div>
                 </div>
-                <a href="teacher.html" class="btn btn-outline btn-sm" style="margin-top:1rem;display:inline-flex;">
-                    <i class="fas fa-chalkboard-teacher"></i> Go to Teacher Portal
-                </a>
             </div>
         </div>
     </div>
@@ -280,7 +273,6 @@
             </div>
             <div class="footer-section">
                 <h4>More</h4>                <a href="leadership.html">Leadership</a>
-                <a href="teacher.html">Teacher Portal</a>
                 <a href="profile.html">My Profile</a>
             </div>
         </div>
@@ -413,7 +405,32 @@ window.showRsvpList = showRsvpList;
 function closeRsvpList() { document.getElementById('rsvpListModal').style.display = 'none'; }
 window.closeRsvpList = closeRsvpList;
 
-auth.onAuthStateChanged(() => loadRSVPs());
+async function loadTeacherRsvps() {
+    const el = document.getElementById('teacherRsvpList');
+    if (!el) return;
+    try {
+        const snap = await db.collection('teachers').where('interest', '==', 'yes').get();
+        if (snap.empty) {
+            el.innerHTML = '<p style="font-size:0.82rem;color:var(--text-muted);font-style:italic;">No teacher RSVPs yet — check back soon.</p>';
+            return;
+        }
+        const teachers = snap.docs.map(d => d.data()).sort((a, b) => (a.lastName || '').localeCompare(b.lastName || ''));
+        el.innerHTML = teachers.map(t => `
+            <div style="display:flex;align-items:center;gap:0.65rem;padding:0.45rem 0;border-bottom:1px solid var(--border);">
+                <div style="width:32px;height:32px;border-radius:50%;background:var(--green-light);color:var(--green);font-size:0.65rem;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;border:1px solid var(--border);">
+                    ${(t.firstName || '?')[0]}${(t.lastName || '?')[0]}
+                </div>
+                <div>
+                    <div style="font-weight:600;font-size:0.875rem;color:var(--text);">${t.firstName} ${t.lastName}</div>
+                    ${t.subject ? `<div style="font-size:0.75rem;color:var(--text-muted);">${t.subject}</div>` : ''}
+                </div>
+            </div>`).join('');
+    } catch(e) {
+        el.innerHTML = '<p style="font-size:0.82rem;color:var(--text-muted);font-style:italic;">Sign in to see who\'s joining.</p>';
+    }
+}
+
+auth.onAuthStateChanged(() => { loadRSVPs(); loadTeacherRsvps(); });
 
 let _suggestYear = null;
 

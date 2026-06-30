@@ -3,11 +3,6 @@ export default async function handler(req, res) {
     const { firstName, lastName, email, subject, years, message } = req.body;
     if (!firstName || !lastName || !email) return res.status(400).json({ error: 'Missing fields' });
 
-    // Server-side validation: must be a Mayfield Schools email
-    if (!email.toLowerCase().endsWith('@mayfieldschools.org')) {
-        return res.status(403).json({ error: 'A Mayfield Schools email address is required.' });
-    }
-
     const html = `
         <p>A teacher submitted an RSVP for the Mayfield Class of 2011 lunch. Details below — hit <strong>Reply</strong> to send your thank-you directly to them.</p>
         <table style="border-collapse:collapse;font-family:sans-serif;font-size:14px;margin-top:12px;">
