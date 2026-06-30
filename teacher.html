@@ -233,6 +233,8 @@ async function submitTeacher(e) {
         msg.textContent = 'You\'re on the list! We\'ll follow up closer to September 19 with details.';
         msg.className = 'form-message success'; msg.style.display = 'block';
         document.getElementById('teacherForm').reset();
+        btn.disabled = false; btn.textContent = 'Submit RSVP';
+        btn.innerHTML = '<i class="fas fa-paper-plane"></i> Submit RSVP';
         loadTeachers();
     } catch(err) {
         msg.textContent = 'Something went wrong. Please try again.';
