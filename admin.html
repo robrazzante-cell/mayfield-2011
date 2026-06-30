@@ -165,7 +165,7 @@ async function deleteTeacher(docId) {
 let summaryData = {};
 
 async function loadEvent(eventId, statsElId, listElId) {
-    const snap = await db.collection('rsvps').where('eventId','==',eventId).orderBy('timestamp','asc').get();
+    const snap = await db.collection('rsvps').where('eventId','==',eventId).get();
     const classmates = snap.size;
     const guests = snap.docs.filter(d => d.data().plusOne).length;
     const total = classmates + guests;
@@ -179,7 +179,7 @@ async function loadEvent(eventId, statsElId, listElId) {
 }
 
 async function loadTeachers() {
-    const snap = await db.collection('teachers').where('interest','==','yes').orderBy('createdAt','asc').get();
+    const snap = await db.collection('teachers').where('interest','==','yes').get();
     const el = document.getElementById('teacherList');
     if (snap.empty) { el.innerHTML = '<p style="font-size:0.82rem;color:var(--text-muted);">No teacher RSVPs yet.</p>'; return; }
     el.innerHTML = `<table class="rsvp-table">
