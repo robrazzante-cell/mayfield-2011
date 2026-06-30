@@ -86,6 +86,7 @@
                     </button>
                 </div>
                 <p style="font-size:0.78rem;color:var(--text-muted);margin-top:0.5rem;" id="rsvpCount-tailgate"></p>
+                <div id="rsvpAvatars-tailgate"></div>
             </div>
             <div>
                 <div class="card no-hover" style="background:var(--bg-light);">
@@ -139,6 +140,7 @@
                     </button>
                 </div>
                 <p style="font-size:0.78rem;color:var(--text-muted);margin-top:0.5rem;" id="rsvpCount-campus-tour"></p>
+                <div id="rsvpAvatars-campus-tour"></div>
             </div>
         </div>
     </div>
@@ -167,6 +169,7 @@
                     </button>
                 </div>
                 <p style="font-size:0.78rem;color:var(--text-muted);margin-top:0.5rem;" id="rsvpCount-teacher-meetup"></p>
+                <div id="rsvpAvatars-teacher-meetup"></div>
             </div>
             <div>
                 <div class="card no-hover" style="background:var(--bg-light);">
@@ -241,6 +244,15 @@
     </div>
 </section>
 
+<!-- WHO'S GOING MODAL -->
+<div class="modal-overlay" id="rsvpListModal" style="display:none;" onclick="if(event.target===this)closeRsvpList()">
+    <div class="modal" style="max-width:420px;">
+        <button class="modal-close" onclick="closeRsvpList()">&times;</button>
+        <h3 class="modal-title" id="rsvpListTitle">Who's Going</h3>
+        <div id="rsvpListContent" style="max-height:400px;overflow-y:auto;"></div>
+    </div>
+</div>
+
 <!-- SIGN-IN PROMPT -->
 <section class="signin-prompt" id="signinPrompt">
     <div class="container">
@@ -293,23 +305,49 @@ function rsvpContainerId(eventId) {
     return 'rsvpContainer-' + eventId;
 }
 
+function buildAvatarStack(docs) {
+    const max = 4;
+    const shown = docs.slice(0, max);
+    const extra = docs.length - max;
+    const avatars = shown.map(d => {
+        const initials = (d.userName || 'W').split(' ').map(n => n[0]).join('').slice(0,2).toUpperCase();
+        return d.userPhoto
+            ? `<img src="${d.userPhoto}" title="${d.userName||''}" style="width:28px;height:28px;border-radius:50%;border:2px solid #fff;object-fit:cover;margin-left:-6px;flex-shrink:0;">`
+            : `<div title="${d.userName||''}" style="width:28px;height:28px;border-radius:50%;border:2px solid #fff;background:var(--green-light);color:var(--green);font-size:0.6rem;font-weight:700;display:flex;align-items:center;justify-content:center;margin-left:-6px;flex-shrink:0;">${initials}</div>`;
+    });
+    if (extra > 0) avatars.push(`<div style="width:28px;height:28px;border-radius:50%;border:2px solid #fff;background:#f3f4f6;color:var(--text-muted);font-size:0.6rem;font-weight:700;display:flex;align-items:center;justify-content:center;margin-left:-6px;flex-shrink:0;">+${extra}</div>`);
+    return avatars.join('');
+}
+
 async function loadRSVPs() {
     const user = auth.currentUser;
     for (const eventId of EVENTS) {
         const snap = await db.collection('rsvps').where('eventId','==',eventId).get();
-        const classmates = snap.size;
-        const totalGuests = snap.docs.filter(d => d.data().plusOne).length;
+        const docs = snap.docs.map(d => d.data());
+        const classmates = docs.length;
+        const totalGuests = docs.filter(d => d.plusOne).length;
         const total = classmates + totalGuests;
+
         const countEl = document.getElementById('rsvpCount-' + eventId);
         if (countEl) {
             countEl.textContent = classmates + ' classmate' + (classmates !== 1 ? 's' : '') + ' going'
                 + (totalGuests > 0 ? ' · ' + total + ' total with guests' : '');
         }
+
+        const avatarEl = document.getElementById('rsvpAvatars-' + eventId);
+        if (avatarEl) {
+            avatarEl.innerHTML = classmates > 0 ? `
+                <div style="display:flex;align-items:center;gap:0.6rem;margin-top:0.6rem;flex-wrap:wrap;">
+                    <div style="display:flex;align-items:center;padding-left:6px;">${buildAvatarStack(docs)}</div>
+                    <a href="#" onclick="showRsvpList('${eventId}');return false;" style="font-size:0.78rem;color:var(--green);font-weight:600;">See who's going &rarr;</a>
+                </div>` : '';
+        }
+
         if (user) {
-            const userRsvp = snap.docs.find(d => d.data().userId === user.uid);
+            const userRsvp = docs.find(d => d.userId === user.uid);
             const btn = document.getElementById('rsvpBtn-' + eventId);
             if (btn && userRsvp) {
-                const label = userRsvp.data().plusOne ? 'You\'re Going (+ 1 guest)!' : 'You\'re Going!';
+                const label = userRsvp.plusOne ? 'You\'re Going (+ 1 guest)!' : 'You\'re Going!';
                 btn.innerHTML = '<i class="fas fa-check-circle"></i> ' + label;
                 btn.disabled = true;
                 btn.style.opacity = '0.7';
@@ -343,12 +381,41 @@ async function confirmRsvp(eventId, plusOne) {
         eventId,
         userId: user.uid,
         userName: user.displayName,
+        userPhoto: user.photoURL || '',
         plusOne: plusOne,
         timestamp: firebase.firestore.FieldValue.serverTimestamp()
     });
     loadRSVPs();
 }
 window.confirmRsvp = confirmRsvp;
+
+const EVENT_LABELS = { tailgate: 'Homecoming Tailgate', 'campus-tour': 'School Tour', 'teacher-meetup': 'Lunch with Teachers' };
+
+async function showRsvpList(eventId) {
+    document.getElementById('rsvpListTitle').textContent = (EVENT_LABELS[eventId] || eventId) + ' — Who\'s Going';
+    document.getElementById('rsvpListModal').style.display = 'flex';
+    const content = document.getElementById('rsvpListContent');
+    content.innerHTML = '<p style="color:var(--text-muted);font-size:0.875rem;text-align:center;padding:1rem 0;"><i class="fas fa-spinner fa-spin"></i></p>';
+    const snap = await db.collection('rsvps').where('eventId','==',eventId).get();
+    const docs = snap.docs.map(d => d.data()).sort((a,b) => (a.userName||'').localeCompare(b.userName||''));
+    if (!docs.length) { content.innerHTML = '<p style="color:var(--text-muted);font-size:0.875rem;">No RSVPs yet.</p>'; return; }
+    content.innerHTML = docs.map(d => {
+        const initials = (d.userName||'W').split(' ').map(n=>n[0]).join('').slice(0,2).toUpperCase();
+        return `<div style="display:flex;align-items:center;gap:0.75rem;padding:0.6rem 0;border-bottom:1px solid var(--border);">
+            ${d.userPhoto
+                ? `<img src="${d.userPhoto}" style="width:36px;height:36px;border-radius:50%;object-fit:cover;border:2px solid var(--border);flex-shrink:0;">`
+                : `<div style="width:36px;height:36px;border-radius:50%;background:var(--green-light);color:var(--green);font-size:0.65rem;font-weight:700;display:flex;align-items:center;justify-content:center;border:2px solid var(--border);flex-shrink:0;">${initials}</div>`}
+            <div>
+                <div style="font-size:0.875rem;font-weight:600;">${d.userName||'Classmate'}</div>
+                ${d.plusOne ? '<div style="font-size:0.75rem;color:var(--text-muted);">+ 1 guest</div>' : ''}
+            </div>
+        </div>`;
+    }).join('');
+}
+window.showRsvpList = showRsvpList;
+
+function closeRsvpList() { document.getElementById('rsvpListModal').style.display = 'none'; }
+window.closeRsvpList = closeRsvpList;
 
 auth.onAuthStateChanged(() => loadRSVPs());
 
