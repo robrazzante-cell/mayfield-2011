@@ -206,19 +206,21 @@
 <script src="js/firebase-config.js"></script>
 <script src="js/main.js"></script>
 <script>
-    // Load classmate count from public stats doc
+    // Load classmate count
     auth.onAuthStateChanged(async user => {
         const el = document.getElementById('statClassmates');
         if (!el) return;
         try {
-            const statsSnap = await db.collection('stats').doc('classmates').get();
-            if (statsSnap.exists) {
-                el.textContent = statsSnap.data().count || 0;
-            } else if (user) {
-                // First-time init: count approved users and save
+            if (user) {
+                // Signed in: compute from approved users and keep stats doc in sync
                 const snap = await db.collection('users').where('status', '==', 'approved').get();
-                await db.collection('stats').doc('classmates').set({ count: snap.size });
-                el.textContent = snap.size;
+                const count = snap.size;
+                db.collection('stats').doc('classmates').set({ count }).catch(() => {});
+                el.textContent = count;
+            } else {
+                // Signed out: read public stats doc
+                const statsSnap = await db.collection('stats').doc('classmates').get();
+                el.textContent = statsSnap.exists ? (statsSnap.data().count || 0) : '—';
             }
         } catch(e) {}
     });

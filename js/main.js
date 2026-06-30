@@ -65,8 +65,6 @@ auth.onAuthStateChanged(async user => {
         document.querySelectorAll('.nav-menu > li:not(:first-child)').forEach(li => li.style.display = 'none');
         document.querySelectorAll('.gated-section').forEach(el => el.style.display = 'none');
         document.querySelectorAll('.footer-nav-gated').forEach(el => el.style.display = 'none');
-        const connectedBox = document.getElementById('connectedStatBox');
-        if (connectedBox) connectedBox.style.display = 'none';
     }
 });
 
