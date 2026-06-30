@@ -220,7 +220,7 @@
             } else {
                 // Signed out: read public stats doc
                 const statsSnap = await db.collection('stats').doc('classmates').get();
-                el.textContent = statsSnap.exists ? (statsSnap.data().count || 0) : '—';
+                el.textContent = statsSnap.exists ? (statsSnap.data().count || 0) : 0;
             }
         } catch(e) {}
     });
