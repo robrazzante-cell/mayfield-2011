@@ -73,6 +73,10 @@
                     The Mayfield Class of 2011 is coming back for our 15-year reunion — and we'd love to see the teachers who helped shape who we became. Join us for a catered lunch on <strong>Saturday, September 19</strong>. We'll have great food, great stories, and a chance to catch up with some familiar faces. Lunch is on us.
                 </p>
 
+                <a href="class-pride.html" onclick="localStorage.setItem('teacherClassPride','1')" class="btn btn-primary" style="margin-bottom:1.5rem;display:inline-flex;">
+                    <i class="fas fa-trophy"></i> View Class Pride
+                </a>
+
                 <div class="card no-hover" id="teacherFormCard">
                     <form id="teacherForm" onsubmit="submitTeacher(event)">
                         <div class="form-row">
@@ -144,32 +148,6 @@
     </div>
 </section>
 </main>
-
-<footer>
-    <div class="container">
-        <div class="footer-content">
-            <div class="footer-section">
-                <h4><i class="fas fa-paw"></i> Mayfield Wildcats — Class of 2011</h4>
-                <p>Connecting classmates for our 15-year reunion and beyond.</p>
-            </div>
-            <div class="footer-section">
-                <h4>Pages</h4>
-                <a href="events.html">Events</a>
-                <a href="classmates.html">Classmates</a>
-                <a href="network.html">Business Network</a>
-                <a href="class-pride.html">Class Pride</a>
-                <a href="memoriam.html">In Memoriam</a>
-            </div>
-            <div class="footer-section">
-                <h4>More</h4>                <a href="leadership.html">Mayfield Alumni Association</a>
-                <a href="privacy.html">Your Privacy</a>
-                <a href="profile.html">My Profile</a>
-            </div>
-        </div>
-        <div class="footer-bottom">
-            <p>&copy; 2026 Mayfield High School Class of 2011. All rights reserved.</p>        </div>
-    </div>
-</footer>
 
 <script src="js/firebase-config.js"></script>
 <script src="js/main.js"></script>

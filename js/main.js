@@ -57,14 +57,18 @@ auth.onAuthStateChanged(async user => {
         // Redirect off protected pages
         const page = window.location.pathname.split('/').pop() || 'index.html';
         const exempt = ['index.html', '', 'teacher.html', 'privacy.html'];
+        if (localStorage.getItem('teacherClassPride')) exempt.push('class-pride.html');
         if (!exempt.includes(page)) {
             window.location.replace('index.html');
             return;
         }
-        // Lock down home page the same as a pending user
-        document.querySelectorAll('.nav-menu > li:not(:first-child)').forEach(li => li.style.display = 'none');
-        document.querySelectorAll('.gated-section').forEach(el => el.style.display = 'none');
-        document.querySelectorAll('.footer-nav-gated').forEach(el => el.style.display = 'none');
+        // Lock down nav and gated content (but not on class-pride when accessed via teacher portal)
+        const isTeacherOnClassPride = page === 'class-pride.html' && localStorage.getItem('teacherClassPride');
+        if (!isTeacherOnClassPride) {
+            document.querySelectorAll('.nav-menu > li:not(:first-child)').forEach(li => li.style.display = 'none');
+            document.querySelectorAll('.gated-section').forEach(el => el.style.display = 'none');
+            document.querySelectorAll('.footer-nav-gated').forEach(el => el.style.display = 'none');
+        }
     }
 });
 
