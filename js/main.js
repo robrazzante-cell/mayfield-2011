@@ -141,8 +141,6 @@ function applyAccessControl(user, status) {
     showPendingBanner(status);
     document.querySelectorAll('.gated-section').forEach(el => el.style.display = 'none');
     document.querySelectorAll('.footer-nav-gated').forEach(el => el.style.display = 'none');
-    const connectedBox = document.getElementById('connectedStatBox');
-    if (connectedBox) connectedBox.style.display = 'none';
 }
 
 function injectAdminLink() {
