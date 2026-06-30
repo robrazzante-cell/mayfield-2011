@@ -79,31 +79,13 @@
                 <h2 class="section-title" style="margin-bottom:0.15rem;">Classmate Map</h2>
                 <p style="font-size:0.82rem;color:var(--text-muted);"><i class="fas fa-lock" style="color:var(--green);"></i> Pins show city-level location only — exact address is never shared</p>
             </div>
-            <button class="btn btn-primary btn-sm" id="addPinBtn" onclick="showPinForm()" style="display:none;">
+            <a href="profile.html" class="btn btn-primary btn-sm" id="addPinBtn" style="display:none;">
                 <i class="fas fa-map-marker-alt"></i> Add My Location
-            </button>
+            </a>
         </div>
 
         <div id="classmate-map"></div>
 
-        <!-- Add location form (signed in only) -->
-        <div id="pinFormBox" style="display:none;margin-top:1.25rem;" class="card no-hover" style="background:var(--bg-light);">
-            <h4 style="margin-bottom:0.75rem;font-size:0.9rem;"><i class="fas fa-map-pin" style="color:var(--green);"></i> Pin Your Location</h4>
-            <div class="location-form">
-                <div class="form-group" style="margin-bottom:0;">
-                    <label>City</label>
-                    <input type="text" id="pinCity" placeholder="e.g. Chicago">
-                </div>
-                <div class="form-group" style="margin-bottom:0;">
-                    <label>State / Country</label>
-                    <input type="text" id="pinState" placeholder="e.g. IL or Germany">
-                </div>
-                <button class="btn btn-primary" onclick="saveLocation()" style="white-space:nowrap;">
-                    <i class="fas fa-check"></i> Save
-                </button>
-            </div>
-            <p style="font-size:0.75rem;color:var(--text-muted);margin-top:0.5rem;">Your pin will show the city area — not your exact street or address.</p>
-        </div>
 
         <hr class="divider">
 
