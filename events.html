@@ -336,8 +336,9 @@ window.rsvp = rsvp;
 async function confirmRsvp(eventId, plusOne) {
     const user = auth.currentUser;
     if (!user) return;
-    const existing = await db.collection('rsvps').where('eventId','==',eventId).where('userId','==',user.uid).get();
-    if (!existing.empty) { loadRSVPs(); return; }
+    const snap = await db.collection('rsvps').where('eventId','==',eventId).get();
+    const existing = snap.docs.find(d => d.data().userId === user.uid);
+    if (existing) { loadRSVPs(); return; }
     await db.collection('rsvps').add({
         eventId,
         userId: user.uid,
@@ -374,12 +375,17 @@ window.closeSuggest = closeSuggest;
 async function loadSuggestions(year) {
     const list = document.getElementById('suggestList');
     list.innerHTML = '<p style="font-size:0.8rem;color:var(--text-muted);">Loading...</p>';
-    const snap = await db.collection('reunion_suggestions').where('year','==',year).orderBy('timestamp','asc').get();
+    const snap = await db.collection('reunion_suggestions').where('year','==',year).get();
     if (snap.empty) {
         list.innerHTML = '<p style="font-size:0.8rem;color:var(--text-muted);font-style:italic;">No ideas yet — be the first!</p>';
         return;
     }
-    list.innerHTML = snap.docs.map(doc => {
+    const docs = snap.docs.sort((a, b) => {
+        const ta = a.data().timestamp?.toMillis?.() || 0;
+        const tb = b.data().timestamp?.toMillis?.() || 0;
+        return ta - tb;
+    });
+    list.innerHTML = docs.map(doc => {
         const d = doc.data();
         return `<div style="background:var(--bg-light);border:1px solid var(--border);border-radius:var(--radius);padding:0.6rem 0.75rem;">
             <div style="font-size:0.8rem;font-weight:600;">${d.userName || 'Classmate'}</div>
