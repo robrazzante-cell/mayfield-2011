@@ -171,7 +171,7 @@ function showPendingBanner(status) {
                 <div style="margin-top:1rem;max-width:380px;margin-left:auto;margin-right:auto;text-align:left;">
                     <p style="font-size:0.8rem;color:var(--text-muted);margin-bottom:0.5rem;text-align:center;">If your last name has changed since high school, add your maiden name so Rob can find you on the class roster.</p>
                     <div style="display:flex;gap:0.5rem;">
-                        <input type="text" id="bannerMaidenName" placeholder="Maiden name (optional)" style="flex:1;border:1px solid var(--border);border-radius:var(--radius);padding:0.5rem 0.75rem;font-size:0.875rem;font-family:inherit;background:#fff;">
+                        <input type="text" id="bannerMaidenName" placeholder="Maiden name" style="flex:1;border:1px solid var(--border);border-radius:var(--radius);padding:0.5rem 0.75rem;font-size:0.875rem;font-family:inherit;background:#fff;">
                         <button onclick="saveBannerMaidenName()" class="btn btn-primary btn-sm"><i class="fas fa-save"></i> Save</button>
                     </div>
                     <p id="bannerMaidenMsg" style="font-size:0.75rem;color:var(--green);margin-top:0.4rem;display:none;">Saved!</p>
