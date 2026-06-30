@@ -336,7 +336,7 @@ h1 i, h2 i, h3 i, h4 i, .section-title i { color: var(--green); }
 }
 .event-card h3 { font-size: 1rem; font-weight: 700; margin: 0.4rem 0 0.25rem; }
 .event-meta { font-size: 0.8rem; color: var(--text-muted); display: flex; align-items: center; gap: 0.4rem; margin-top: 0.25rem; }
-.event-card > .btn { margin-top: auto; padding-top: 0.75rem; }
+.event-card > .btn { margin-top: 1.75rem; }
 
 /* ── Sign-in prompt ── */
 .signin-prompt {
