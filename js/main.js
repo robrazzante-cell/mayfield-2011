@@ -8,37 +8,18 @@ if (navToggle && navMenu) {
     });
 }
 
-// Auth state handling — handle any pending redirect result (Safari path)
+// Process the result when Google redirects back after sign-in
 auth.getRedirectResult().then(result => {
     if (result && result.user) console.log('Signed in via redirect:', result.user.email);
 }).catch(err => console.error('Redirect sign-in error:', err));
 
-function isSafari() {
-    const ua = navigator.userAgent;
-    return /Safari/.test(ua) && !/Chrome/.test(ua) && !/Chromium/.test(ua);
-}
-
-async function handleAuth() {
+function handleAuth() {
     const user = auth.currentUser;
     if (user) {
         if (confirm('Sign out?')) auth.signOut();
         return;
     }
-    // Safari (desktop + mobile) blocks cross-origin popup communication via ITP,
-    // so use redirect there. Chrome/Firefox handle popups cleanly.
-    if (isSafari()) {
-        auth.signInWithRedirect(googleProvider);
-        return;
-    }
-    try {
-        await auth.signInWithPopup(googleProvider);
-    } catch (err) {
-        if (err.code === 'auth/popup-blocked') {
-            auth.signInWithRedirect(googleProvider);
-        } else if (err.code !== 'auth/popup-closed-by-user') {
-            console.error('Sign-in error:', err);
-        }
-    }
+    auth.signInWithRedirect(googleProvider);
 }
 
 auth.onAuthStateChanged(user => {
