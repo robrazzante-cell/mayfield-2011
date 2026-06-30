@@ -53,6 +53,19 @@ auth.onAuthStateChanged(async user => {
         if (authBtn) authBtn.querySelector('i').className = 'fab fa-google';
         if (userAvatar) userAvatar.style.display = 'none';
         if (signinPrompt) signinPrompt.style.display = '';
+
+        // Redirect off protected pages
+        const page = window.location.pathname.split('/').pop() || 'index.html';
+        const exempt = ['index.html', '', 'teacher.html', 'privacy.html'];
+        if (!exempt.includes(page)) {
+            window.location.replace('index.html');
+            return;
+        }
+        // Lock down home page the same as a pending user
+        document.querySelectorAll('.nav-menu > li:not(:first-child)').forEach(li => li.style.display = 'none');
+        document.querySelectorAll('.gated-section').forEach(el => el.style.display = 'none');
+        const connectedBox = document.getElementById('connectedStatBox');
+        if (connectedBox) connectedBox.style.display = 'none';
     }
 });
 
