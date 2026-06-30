@@ -151,6 +151,12 @@ async function deleteRsvp(docId, eventId, statsElId, listElId) {
     loadEvent(eventId, statsElId, listElId).then(updateSummary);
 }
 
+async function deleteTeacher(docId) {
+    if (!confirm('Remove this teacher RSVP?')) return;
+    await db.collection('teachers').doc(docId).delete();
+    loadTeachers();
+}
+
 let summaryData = {};
 
 async function loadEvent(eventId, statsElId, listElId) {
@@ -172,7 +178,7 @@ async function loadTeachers() {
     const el = document.getElementById('teacherList');
     if (snap.empty) { el.innerHTML = '<p style="font-size:0.82rem;color:var(--text-muted);">No teacher RSVPs yet.</p>'; return; }
     el.innerHTML = `<table class="rsvp-table">
-        <thead><tr><th>#</th><th>Name</th><th>Subject</th><th>Years at MHS</th><th>Email</th></tr></thead>
+        <thead><tr><th>#</th><th>Name</th><th>Subject</th><th>Years at MHS</th><th>Email</th><th></th></tr></thead>
         <tbody>${snap.docs.map((doc, i) => {
             const d = doc.data();
             return `<tr>
@@ -181,6 +187,7 @@ async function loadTeachers() {
                 <td>${d.subject || '—'}</td>
                 <td>${d.years || '—'}</td>
                 <td><a href="mailto:${d.email}" style="color:var(--green);">${d.email}</a></td>
+                <td><button onclick="deleteTeacher('${doc.id}')" style="background:none;border:none;cursor:pointer;color:#ccc;font-size:0.8rem;" title="Remove"><i class="fas fa-trash"></i></button></td>
             </tr>`;
         }).join('')}</tbody>
     </table>`;
