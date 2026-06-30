@@ -95,7 +95,12 @@ async function ensureUserDoc(user) {
             status,
             createdAt: firebase.firestore.FieldValue.serverTimestamp()
         });
-        if (!isAdmin) {
+        if (isAdmin) {
+            // Seed the public stats doc for the admin account
+            db.collection('users').where('status', '==', 'approved').get()
+                .then(snap => db.collection('stats').doc('classmates').set({ count: snap.size }))
+                .catch(() => {});
+        } else {
             try {
                 const idToken = await user.getIdToken();
                 fetch('/api/classmate-joined', {
