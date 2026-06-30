@@ -162,6 +162,12 @@ async function deleteTeacher(docId) {
     loadTeachers();
 }
 
+async function deleteClassmate(docId) {
+    if (!confirm('Remove this classmate\'s access? This deletes their account from the site.')) return;
+    await db.collection('users').doc(docId).delete();
+    loadClassmates();
+}
+
 let summaryData = {};
 
 async function loadEvent(eventId, statsElId, listElId) {
@@ -205,15 +211,19 @@ async function loadClassmates() {
     const listEl = document.getElementById('classmateList');
     if (snap.empty) { listEl.innerHTML = '<p style="font-size:0.82rem;color:var(--text-muted);">No classmates yet.</p>'; return; }
     listEl.innerHTML = `<table class="rsvp-table">
-        <thead><tr><th>#</th><th>Name</th><th>Location</th><th>Employer</th></tr></thead>
+        <thead><tr><th>#</th><th>Name</th><th>Email</th><th>Status</th><th>Location</th><th>Employer</th><th></th></tr></thead>
         <tbody>${snap.docs.map((doc, i) => {
             const d = doc.data();
             const loc = [d.city, d.state].filter(Boolean).join(', ') || '—';
+            const status = d.status || 'approved';
             return `<tr>
                 <td style="color:var(--text-muted);">${i+1}</td>
                 <td><strong>${d.displayName || '—'}</strong></td>
+                <td style="font-size:0.78rem;color:var(--text-muted);">${d.email || '—'}</td>
+                <td><span class="badge-sm ${status === 'approved' ? 'badge-yes' : 'badge-no'}">${status}</span></td>
                 <td>${loc}</td>
                 <td>${d.employer || '—'}</td>
+                <td><button onclick="deleteClassmate('${doc.id}')" style="background:none;border:none;cursor:pointer;color:#ccc;font-size:0.8rem;" title="Remove access"><i class="fas fa-trash"></i></button></td>
             </tr>`;
         }).join('')}</tbody>
     </table>`;
