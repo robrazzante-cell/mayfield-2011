@@ -297,7 +297,7 @@ async function loadPending() {
         return `<div style="display:flex;align-items:center;gap:1rem;padding:0.75rem 0;border-bottom:1px solid var(--border);">
             ${avatar}
             <div style="flex:1;min-width:0;">
-                <div style="font-weight:700;font-size:0.9rem;">${d.displayName || 'Unknown'}</div>
+                <div style="font-weight:700;font-size:0.9rem;">${d.displayName || 'Unknown'}${d.maidenName ? ` <span style="font-weight:400;color:var(--text-muted);font-size:0.8rem;">(née ${d.maidenName})</span>` : ''}</div>
                 <div style="font-size:0.8rem;color:var(--text-muted);">${d.email || ''}</div>
             </div>
             <div style="display:flex;gap:0.5rem;flex-shrink:0;">

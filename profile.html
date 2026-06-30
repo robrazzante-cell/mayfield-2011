@@ -116,6 +116,10 @@
                         <input type="text" id="profileName" placeholder="Your full name">
                     </div>
                     <div class="form-group">
+                        <label>Maiden Name <span style="font-weight:400;color:var(--text-muted);font-size:0.82rem;">(optional — helps us verify you on the class roster)</span></label>
+                        <input type="text" id="profileMaidenName" placeholder="e.g. Smith">
+                    </div>
+                    <div class="form-group">
                         <label>Employer / Occupation</label>
                         <input type="text" id="profileEmployer" placeholder="e.g. Deloitte — Senior Consultant">
                     </div>
@@ -260,6 +264,7 @@ async function loadProfile(user) {
     currentUserData = data;
 
     document.getElementById('profileName').value = data.displayName || user.displayName || '';
+    document.getElementById('profileMaidenName').value = data.maidenName || '';
     document.getElementById('profileEmployer').value = data.employer || '';
     document.getElementById('profileLinkedin').value = data.linkedin || '';
     document.getElementById('profileWebsite').value = data.website || '';
@@ -294,6 +299,7 @@ async function saveProfile(e) {
     }
     const update = {
         displayName: document.getElementById('profileName').value,
+        maidenName: document.getElementById('profileMaidenName').value.trim(),
         employer: document.getElementById('profileEmployer').value,
         linkedin: document.getElementById('profileLinkedin').value,
         website: document.getElementById('profileWebsite').value,

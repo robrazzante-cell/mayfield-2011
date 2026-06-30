@@ -78,6 +78,7 @@ async function ensureUserDoc(user) {
         await ref.set({
             uid: user.uid,
             displayName: user.displayName || '',
+            maidenName: '',
             email: user.email || '',
             photoURL: user.photoURL || '',
             employer: '',
