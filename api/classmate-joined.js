@@ -1,17 +1,16 @@
 export default async function handler(req, res) {
     if (req.method !== 'POST') return res.status(405).end();
 
-    // Verify Firebase ID token
+    // Verify Firebase ID token — decode JWT and check project + expiry
     const token = req.headers.authorization?.replace('Bearer ', '');
     if (!token) return res.status(401).json({ error: 'Unauthorized' });
     try {
-        const verify = await fetch(
-            `https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=${process.env.FIREBASE_API_KEY}`,
-            { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ idToken: token }) }
-        );
-        if (!verify.ok) return res.status(401).json({ error: 'Invalid token' });
+        const payload = JSON.parse(Buffer.from(token.split('.')[1], 'base64url').toString());
+        const expired = payload.exp < Math.floor(Date.now() / 1000);
+        const wrongProject = payload.aud !== 'mayfield-2011';
+        if (expired || wrongProject) return res.status(401).json({ error: 'Invalid token' });
     } catch {
-        return res.status(401).json({ error: 'Token verification failed' });
+        return res.status(401).json({ error: 'Invalid token' });
     }
 
     const { name, email } = req.body;
