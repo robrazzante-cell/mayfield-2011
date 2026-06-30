@@ -8,10 +8,15 @@ if (navToggle && navMenu) {
     });
 }
 
-// Auth state handling — handle any pending redirect result (fallback path only)
+// Auth state handling — handle any pending redirect result (Safari path)
 auth.getRedirectResult().then(result => {
     if (result && result.user) console.log('Signed in via redirect:', result.user.email);
 }).catch(err => console.error('Redirect sign-in error:', err));
+
+function isSafari() {
+    const ua = navigator.userAgent;
+    return /Safari/.test(ua) && !/Chrome/.test(ua) && !/Chromium/.test(ua);
+}
 
 async function handleAuth() {
     const user = auth.currentUser;
@@ -19,9 +24,12 @@ async function handleAuth() {
         if (confirm('Sign out?')) auth.signOut();
         return;
     }
-    // Use popup for all devices — it works on iOS Safari when triggered by tap
-    // and doesn't depend on cross-origin storage (which VPNs/private browsing block).
-    // Only fall back to redirect if the popup itself is explicitly blocked.
+    // Safari (desktop + mobile) blocks cross-origin popup communication via ITP,
+    // so use redirect there. Chrome/Firefox handle popups cleanly.
+    if (isSafari()) {
+        auth.signInWithRedirect(googleProvider);
+        return;
+    }
     try {
         await auth.signInWithPopup(googleProvider);
     } catch (err) {
