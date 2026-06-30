@@ -85,6 +85,11 @@ async function ensureUserDoc(user) {
             businessDesc: '',
             createdAt: firebase.firestore.FieldValue.serverTimestamp()
         });
+        fetch('/api/classmate-joined', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name: user.displayName || 'Unknown', email: user.email || '' })
+        }).catch(() => {});
     }
 }
 
