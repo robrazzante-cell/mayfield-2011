@@ -178,7 +178,7 @@
 <script src="js/main.js"></script>
 <script>
 async function loadTeachers() {
-    const snap = await db.collection('teachers').where('interest','in',['yes','maybe']).orderBy('createdAt','desc').get();
+    const snap = await db.collection('teachers').where('interest','==','yes').orderBy('createdAt','desc').get();
     const list = document.getElementById('teachersList');
     if (!list || snap.empty) return;
     list.innerHTML = snap.docs.map(doc => {
