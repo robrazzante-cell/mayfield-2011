@@ -51,8 +51,8 @@
 
 <div class="page-header">
     <div class="container">
-        <h1><i class="fas fa-utensils"></i> Lunch with Teachers</h1>
-        <p>Saturday, September 19, 2026 &middot; 12:30 PM &middot; Mayfield High School</p>
+        <h1><i class="fas fa-utensils"></i> Lunch with 2011</h1>
+        <p>Saturday, September 19, 2026 &middot; 12:30 PM &middot; Location TBD</p>
     </div>
 </div>
 <div class="breadcrumb">
@@ -66,12 +66,11 @@
     <div class="container">
         <div class="grid-2" style="gap:2.5rem;align-items:start;">
 
-            <!-- FOR TEACHERS: RSVP -->
+            <!-- RSVP FORM -->
             <div>
-                <span class="badge badge-green" style="margin-bottom:0.75rem;display:inline-block;">For Teachers</span>
-                <h2 class="section-title" style="margin-bottom:0.75rem;">RSVP for Lunch</h2>
+                <h2 class="section-title" style="margin-bottom:0.75rem;">You're invited</h2>
                 <p style="font-size:0.875rem;color:var(--text-muted);margin-bottom:1.5rem;">
-                    The Mayfield Class of 2011 is hosting a lunch on <strong>Saturday, September 19 at 12:30 PM</strong> at Mayfield High School — right after our homecoming School Tour. If you taught at Mayfield between 2007–2011, we'd love to have you. Lunch is on us.
+                    The Mayfield Class of 2011 is coming back for our 15-year reunion — and we'd love to see the teachers who helped shape who we became. Join us for a catered lunch on <strong>Saturday, September 19</strong>. We'll have great food, great stories, and a chance to catch up with some familiar faces. Lunch is on us.
                 </p>
 
                 <div class="card no-hover" id="teacherFormCard">
@@ -118,14 +117,10 @@
                 </div>
             </div>
 
-            <!-- FOR STUDENTS: See which teachers are coming -->
+            <!-- ATTENDEE LISTS -->
             <div>
-                <span class="badge badge-green" style="margin-bottom:0.75rem;display:inline-block;">For Classmates</span>
                 <h2 class="section-title" style="margin-bottom:0.75rem;">Teachers Joining Lunch</h2>
-                <p style="font-size:0.875rem;color:var(--text-muted);margin-bottom:1.5rem;">
-                    These are the teachers who've RSVP'd for the homecoming lunch on Saturday, September 19 at Mayfield High School.
-                </p>
-
+                <p style="font-size:0.875rem;color:var(--text-muted);margin-bottom:1.25rem;">Teachers who've RSVP'd so far.</p>
                 <div id="teachersList">
                     <div style="text-align:center;color:var(--text-muted);padding:2rem 0;">
                         <i class="fas fa-utensils" style="font-size:2rem;display:block;margin-bottom:0.5rem;"></i>
@@ -133,13 +128,15 @@
                     </div>
                 </div>
 
-                <hr class="divider">
+                <hr class="divider" style="margin:1.5rem 0;">
 
-                <h3 style="font-size:0.95rem;font-weight:700;margin-bottom:0.75rem;">Know a teacher who should be here?</h3>
-                <p style="font-size:0.82rem;color:var(--text-muted);margin-bottom:0.75rem;">Send them this page directly, or email Rob and he'll reach out personally.</p>
-                <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
-                    <button class="btn btn-outline btn-sm" onclick="copyLink()"><i class="fas fa-link"></i> Copy Page Link</button>
-                    <a href="mailto:rob.razzante@gmail.com?subject=Teacher suggestion for Class of 2011 reunion" class="btn btn-primary btn-sm"><i class="fas fa-envelope"></i> Suggest a Teacher</a>
+                <h2 class="section-title" style="margin-bottom:0.75rem;">Students Joining Lunch</h2>
+                <p style="font-size:0.875rem;color:var(--text-muted);margin-bottom:1.25rem;">Classmates who've RSVP'd so far.</p>
+                <div id="studentsList">
+                    <div style="text-align:center;color:var(--text-muted);padding:2rem 0;">
+                        <i class="fas fa-users" style="font-size:2rem;display:block;margin-bottom:0.5rem;"></i>
+                        <p style="font-size:0.875rem;">No RSVPs yet — check back soon.</p>
+                    </div>
                 </div>
             </div>
 
@@ -185,22 +182,29 @@ async function loadTeachers() {
     if (!attending.length) return;
     list.innerHTML = attending.map(doc => {
         const d = doc.data();
-        const badge = d.interest === 'yes'
-            ? '<span class="badge badge-green">Attending</span>'
-            : '<span class="badge badge-green">Maybe</span>';
         return `
         <div class="card no-hover" style="margin-bottom:0.75rem;padding:1rem;">
-            <div style="display:flex;align-items:center;justify-content:space-between;gap:0.75rem;flex-wrap:wrap;">
-                <div>
-                    <div style="font-weight:700;font-size:0.9rem;">${d.prefix || ''}${d.firstName} ${d.lastName}</div>
-                    ${d.subject ? `<div style="font-size:0.78rem;color:var(--text-muted);">${d.subject}</div>` : ''}
-                    ${d.years ? `<div style="font-size:0.75rem;color:var(--text-muted);">MHS ${d.years}</div>` : ''}
-                    ${d.message ? `<div style="font-size:0.82rem;color:var(--text);margin-top:0.35rem;font-style:italic;">"${d.message}"</div>` : ''}
-                </div>
-                ${badge}
-            </div>
+            <div style="font-weight:700;font-size:0.9rem;">${d.firstName} ${d.lastName}</div>
+            ${d.subject ? `<div style="font-size:0.78rem;color:var(--text-muted);">${d.subject}</div>` : ''}
+            ${d.years ? `<div style="font-size:0.75rem;color:var(--text-muted);">MHS ${d.years}</div>` : ''}
+            ${d.message ? `<div style="font-size:0.82rem;color:var(--text);margin-top:0.35rem;font-style:italic;">"${d.message}"</div>` : ''}
         </div>`;
     }).join('');
+}
+
+async function loadStudents() {
+    try {
+        const snap = await db.collection('rsvps').where('eventId', '==', 'teacher-meetup').get();
+        const list = document.getElementById('studentsList');
+        if (!list || snap.empty) return;
+        list.innerHTML = snap.docs.map(doc => {
+            const d = doc.data();
+            return `
+            <div class="card no-hover" style="margin-bottom:0.75rem;padding:1rem;">
+                <div style="font-weight:700;font-size:0.9rem;">${d.userName || '—'}</div>
+            </div>`;
+        }).join('');
+    } catch(e) { /* requires approved auth — silently skip for unauthenticated visitors */ }
 }
 
 async function submitTeacher(e) {
@@ -248,7 +252,10 @@ function copyLink() {
 }
 window.copyLink = copyLink;
 
-auth.onAuthStateChanged(() => loadTeachers());
+auth.onAuthStateChanged(() => {
+    loadTeachers();
+    loadStudents();
+});
 </script>
 </body>
 </html>
