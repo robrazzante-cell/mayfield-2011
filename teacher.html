@@ -178,10 +178,12 @@
 <script src="js/main.js"></script>
 <script>
 async function loadTeachers() {
-    const snap = await db.collection('teachers').where('interest','==','yes').orderBy('createdAt','desc').get();
+    const snap = await db.collection('teachers').orderBy('createdAt','desc').get();
     const list = document.getElementById('teachersList');
-    if (!list || snap.empty) return;
-    list.innerHTML = snap.docs.map(doc => {
+    if (!list) return;
+    const attending = snap.docs.filter(d => d.data().interest === 'yes');
+    if (!attending.length) return;
+    list.innerHTML = attending.map(doc => {
         const d = doc.data();
         const badge = d.interest === 'yes'
             ? '<span class="badge badge-green">Attending</span>'
