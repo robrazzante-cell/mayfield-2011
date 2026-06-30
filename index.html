@@ -184,7 +184,7 @@
                 <p>Connecting classmates for our 15-year reunion and beyond.</p>
                 <p style="margin-top:0.75rem;">Mayfield Village, OH</p>
             </div>
-            <div class="footer-section">
+            <div class="footer-section footer-nav-gated">
                 <h4>Pages</h4>
                 <a href="events.html">Events</a>
                 <a href="classmates.html">Classmates</a>
@@ -192,7 +192,7 @@
                 <a href="class-pride.html">Class Pride</a>
                 <a href="memoriam.html">In Memoriam</a>
             </div>
-            <div class="footer-section">
+            <div class="footer-section footer-nav-gated">
                 <h4>More</h4>                <a href="leadership.html">Leadership</a>
                 <a href="privacy.html">Your Privacy</a>
                 <a href="profile.html">My Profile</a>
@@ -206,12 +206,20 @@
 <script src="js/firebase-config.js"></script>
 <script src="js/main.js"></script>
 <script>
-    // Load class stats
-    auth.onAuthStateChanged(async () => {
+    // Load classmate count from public stats doc
+    auth.onAuthStateChanged(async user => {
+        const el = document.getElementById('statClassmates');
+        if (!el) return;
         try {
-            const usersSnap = await db.collection('users').get();
-            const el = document.getElementById('statClassmates');
-            if (el) el.textContent = usersSnap.size;
+            const statsSnap = await db.collection('stats').doc('classmates').get();
+            if (statsSnap.exists) {
+                el.textContent = statsSnap.data().count || 0;
+            } else if (user) {
+                // First-time init: count approved users and save
+                const snap = await db.collection('users').where('status', '==', 'approved').get();
+                await db.collection('stats').doc('classmates').set({ count: snap.size });
+                el.textContent = snap.size;
+            }
         } catch(e) {}
     });
 

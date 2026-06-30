@@ -164,11 +164,19 @@ async function deleteTeacher(docId) {
 
 async function deleteClassmate(uid) {
     if (!confirm('Remove this classmate\'s access? This deletes their account and all RSVPs from the site.')) return;
+    // Check status before deleting so we know whether to decrement counter
+    const userDoc = await db.collection('users').doc(uid).get();
+    const wasApproved = userDoc.exists && userDoc.data().status === 'approved';
     // Delete all RSVPs for this user
     const rsvpSnap = await db.collection('rsvps').where('userId', '==', uid).get();
     await Promise.all(rsvpSnap.docs.map(d => d.ref.delete()));
     // Delete the user doc
     await db.collection('users').doc(uid).delete();
+    if (wasApproved) {
+        await db.collection('stats').doc('classmates').set(
+            { count: firebase.firestore.FieldValue.increment(-1) }, { merge: true }
+        );
+    }
     // Reload everything
     loadClassmates();
     loadEvent('tailgate', 'tailgateStats', 'tailgateList');
@@ -301,6 +309,9 @@ async function loadPending() {
 }
 window.approveUser = async function(uid) {
     await db.collection('users').doc(uid).update({ status: 'approved' });
+    await db.collection('stats').doc('classmates').set(
+        { count: firebase.firestore.FieldValue.increment(1) }, { merge: true }
+    );
     loadPending();
 };
 window.rejectUser = async function(uid) {

@@ -64,6 +64,7 @@ auth.onAuthStateChanged(async user => {
         // Lock down home page the same as a pending user
         document.querySelectorAll('.nav-menu > li:not(:first-child)').forEach(li => li.style.display = 'none');
         document.querySelectorAll('.gated-section').forEach(el => el.style.display = 'none');
+        document.querySelectorAll('.footer-nav-gated').forEach(el => el.style.display = 'none');
         const connectedBox = document.getElementById('connectedStatBox');
         if (connectedBox) connectedBox.style.display = 'none';
     }
@@ -141,6 +142,7 @@ function applyAccessControl(user, status) {
     // Show pending banner and hide gated sections on home page
     showPendingBanner(status);
     document.querySelectorAll('.gated-section').forEach(el => el.style.display = 'none');
+    document.querySelectorAll('.footer-nav-gated').forEach(el => el.style.display = 'none');
     const connectedBox = document.getElementById('connectedStatBox');
     if (connectedBox) connectedBox.style.display = 'none';
 }
