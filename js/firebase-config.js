@@ -1,6 +1,6 @@
 const firebaseConfig = {
     apiKey: "AIzaSyAWaCRLNBhqK5S2KJXc3rHi3Dwai9IlLyI",
-    authDomain: "mayfield-2011.firebaseapp.com",
+    authDomain: "mayfield-2011.vercel.app",
     projectId: "mayfield-2011",
     storageBucket: "mayfield-2011.firebasestorage.app",
     messagingSenderId: "810896057198",
