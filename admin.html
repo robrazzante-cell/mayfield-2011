@@ -80,6 +80,26 @@
             <p id="teacherLinkMsg" style="font-size:0.75rem;color:var(--green);margin-top:0.4rem;display:none;">Copied to clipboard!</p>
         </div>
 
+        <!-- CLASS FUND BALANCE -->
+        <div class="admin-card">
+            <h3><i class="fas fa-hand-holding-usd" style="color:var(--green);"></i> 2011 Class Fund Balance</h3>
+            <p style="font-size:0.82rem;color:var(--text-muted);margin-bottom:1rem;">Update the balance manually after a donation is received. Reflected publicly on the Funds page.</p>
+            <div style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap;">
+                <div>
+                    <div style="font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;color:var(--text-muted);margin-bottom:0.25rem;">Current Balance</div>
+                    <div id="fundBalanceDisplay" class="admin-stat">—</div>
+                </div>
+                <div style="flex:1;min-width:180px;">
+                    <div style="font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;color:var(--text-muted);margin-bottom:0.25rem;">Set New Balance ($)</div>
+                    <div style="display:flex;gap:0.5rem;">
+                        <input type="number" id="fundBalanceInput" min="0" step="1" placeholder="e.g. 1250" style="flex:1;border:1px solid var(--border);border-radius:var(--radius);padding:0.45rem 0.65rem;font-size:0.875rem;outline:none;">
+                        <button onclick="saveFundBalance()" class="btn btn-primary btn-sm"><i class="fas fa-save"></i> Save</button>
+                    </div>
+                </div>
+            </div>
+            <p id="fundBalanceMsg" style="font-size:0.75rem;color:var(--green);margin-top:0.5rem;display:none;">Balance updated!</p>
+        </div>
+
         <!-- PENDING APPROVALS -->
         <div class="admin-card" id="pendingCard">
             <h3><i class="fas fa-user-clock" style="color:var(--green);"></i> Pending Approvals</h3>
@@ -357,6 +377,27 @@ window.rejectUser = async function(uid) {
     loadPending();
 };
 
+async function loadFundBalance() {
+    try {
+        const snap = await db.collection('stats').doc('funds').get();
+        const balance = snap.exists ? (snap.data().balance || 0) : 1100;
+        document.getElementById('fundBalanceDisplay').textContent = '$' + balance.toLocaleString();
+        document.getElementById('fundBalanceInput').value = balance;
+    } catch(e) {}
+}
+
+async function saveFundBalance() {
+    const input = document.getElementById('fundBalanceInput');
+    const val = parseInt(input.value, 10);
+    if (isNaN(val) || val < 0) { alert('Enter a valid dollar amount.'); return; }
+    await db.collection('stats').doc('funds').set({ balance: val }, { merge: true });
+    document.getElementById('fundBalanceDisplay').textContent = '$' + val.toLocaleString();
+    const msg = document.getElementById('fundBalanceMsg');
+    msg.style.display = 'block';
+    setTimeout(() => msg.style.display = 'none', 2500);
+}
+window.saveFundBalance = saveFundBalance;
+
 async function loadAdmin() {
     await Promise.all([
         loadEvent('tailgate', 'tailgateStats', 'tailgateList'),
@@ -364,6 +405,7 @@ async function loadAdmin() {
         loadEvent('teacher-meetup', 'lunchStats', 'lunchList'),
         loadTeachers(),
         loadClassmates(),
+        loadFundBalance(),
     ]);
     updateSummary();
     // Keep public connected count in sync

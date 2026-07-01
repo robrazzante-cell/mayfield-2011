@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="theme-color" content="#FFFFFF">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2011 Class Fund | Mayfield Class of 2011</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+</head>
+<body>
+
+<header>
+    <nav class="navbar">
+        <div class="container">
+            <a href="index.html" class="nav-brand">
+                <div class="brand-icon"><i class="fas fa-paw"></i></div>
+                <div class="brand-text"><h1>Mayfield Wildcats</h1><span>Class of 2011</span></div>
+            </a>
+            <ul class="nav-menu" id="navMenu">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="events.html">Events</a></li>
+                <li><a href="classmates.html">Classmates</a></li>
+                <li><a href="network.html">Network</a></li>
+                <li><a href="class-pride.html">Class Pride</a></li>
+                <li><a href="memoriam.html">In Memoriam</a></li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle">More <i class="fas fa-chevron-down"></i></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="funds.html" class="active"><i class="fas fa-hand-holding-usd"></i> 2011 Class Fund</a></li>
+                        <li><a href="leadership.html"><i class="fas fa-id-card"></i> Mayfield Alumni Association</a></li>
+                        <li><a href="privacy.html"><i class="fas fa-shield-alt"></i> Your Privacy</a></li>
+                    </ul>
+                </li>
+            </ul>
+            <div class="nav-auth">
+                <div id="userAvatar" style="display:none;align-items:center;gap:0.5rem;">
+                    <img id="userPhoto" src="" alt="" style="width:30px;height:30px;border-radius:50%;border:2px solid var(--green);">
+                    <a href="profile.html" style="color:rgba(255,255,255,0.85);font-size:0.8rem;text-decoration:none;" id="userName"></a>
+                </div>
+                <button class="btn-signin" id="authBtn" onclick="handleAuth()">
+                    <i class="fab fa-google"></i> <span id="authBtnText">Sign In</span>
+                </button>
+            </div>
+            <button class="nav-toggle" id="navToggle"><span></span><span></span><span></span></button>
+        </div>
+    </nav>
+</header>
+
+<div class="page-header">
+    <div class="container">
+        <h1><i class="fas fa-hand-holding-usd"></i> 2011 Class Fund</h1>
+        <p>Saved by the Class of 2011 — growing with your support</p>
+    </div>
+</div>
+<div class="breadcrumb">
+    <div class="container">
+        <a href="index.html">Home</a><span class="sep">/</span><span>2011 Class Fund</span>
+    </div>
+</div>
+
+<main>
+<section class="section">
+    <div class="container" style="max-width:680px;">
+
+        <div style="text-align:center;margin-bottom:2.5rem;">
+            <span class="badge badge-green" style="margin-bottom:0.75rem;display:inline-block;">Class Fund</span>
+            <h2 class="section-title centered">Our Class Fund</h2>
+            <p class="section-subtitle centered">Started during our high school years and kept alive by classmates like you.</p>
+        </div>
+
+        <!-- Balance display -->
+        <div class="card no-hover" style="text-align:center;padding:2.5rem 2rem;margin-bottom:1.5rem;background:var(--green-light);border:1.5px solid rgba(42,119,42,0.2);">
+            <div style="font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--green);margin-bottom:0.5rem;">Current Balance</div>
+            <div id="fundBalance" style="font-size:3.5rem;font-weight:900;color:var(--green);line-height:1;letter-spacing:-0.02em;">—</div>
+            <div style="font-size:0.8rem;color:var(--text-muted);margin-top:0.75rem;">Updated manually by class organizer</div>
+        </div>
+
+        <!-- What it's for -->
+        <div class="card no-hover" style="margin-bottom:1.5rem;">
+            <h4 style="font-size:0.9rem;font-weight:700;margin-bottom:0.75rem;"><i class="fas fa-info-circle" style="color:var(--green);"></i> What This Fund Supports</h4>
+            <ul style="padding-left:1.25rem;font-size:0.85rem;color:var(--text-muted);line-height:2.1;margin:0;">
+                <li>Reunion event costs — venues, catering, supplies</li>
+                <li>In-memory tributes for classmates we've lost</li>
+                <li>Class gifts and future reunion planning</li>
+                <li>Anything the class votes to put it toward</li>
+            </ul>
+        </div>
+
+        <!-- Donate -->
+        <div class="card no-hover" style="text-align:center;padding:2rem;">
+            <h3 style="font-size:1.1rem;font-weight:700;margin-bottom:0.5rem;">Support the Class</h3>
+            <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:1.5rem;line-height:1.7;">
+                Every contribution helps us put on an unforgettable reunion and keep the Wildcat spirit alive long after September. Donate any amount — no minimum.
+            </p>
+            <a href="https://donate.stripe.com/14A9AS45y5JZ5NCfzD57W00" target="_blank" rel="noopener" class="btn btn-primary" style="font-size:1rem;padding:0.9rem 2.5rem;display:inline-flex;gap:0.6rem;align-items:center;">
+                <i class="fas fa-heart"></i> Donate to the Class Fund
+            </a>
+            <p style="font-size:0.75rem;color:var(--text-muted);margin-top:1rem;">Secure payments via Stripe. Questions? Email <a href="mailto:rob.razzante@gmail.com" style="color:var(--green);">rob.razzante@gmail.com</a></p>
+        </div>
+
+    </div>
+</section>
+</main>
+
+<footer>
+    <div class="container">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h4><i class="fas fa-paw"></i> Mayfield Wildcats — Class of 2011</h4>
+                <p>Connecting classmates for our 15-year reunion and beyond.</p>
+            </div>
+            <div class="footer-section footer-nav-gated">
+                <h4>Pages</h4>
+                <a href="events.html">Events</a>
+                <a href="classmates.html">Classmates</a>
+                <a href="network.html">Business Network</a>
+                <a href="class-pride.html">Class Pride</a>
+                <a href="memoriam.html">In Memoriam</a>
+            </div>
+            <div class="footer-section footer-nav-gated">
+                <h4>More</h4>
+                <a href="funds.html">2011 Class Fund</a>
+                <a href="leadership.html">Mayfield Alumni Association</a>
+                <a href="privacy.html">Your Privacy</a>
+                <a href="profile.html">My Profile</a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 Mayfield High School Class of 2011. All rights reserved.</p>
+        </div>
+    </div>
+</footer>
+
+<script src="js/firebase-config.js"></script>
+<script src="js/main.js"></script>
+<script>
+auth.onAuthStateChanged(async () => {
+    try {
+        const snap = await db.collection('stats').doc('funds').get();
+        const balance = snap.exists ? (snap.data().balance || 0) : 1100;
+        document.getElementById('fundBalance').textContent = '$' + balance.toLocaleString();
+    } catch(e) {
+        document.getElementById('fundBalance').textContent = '$1,100';
+    }
+});
+</script>
+</body>
+</html>
