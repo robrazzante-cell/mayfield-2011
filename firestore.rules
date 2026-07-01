@@ -75,6 +75,12 @@ service cloud.firestore {
       allow update, delete: if isAdmin();
     }
 
+    // Donor wall — public read, admin-only write
+    match /donors/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
     // Public stats (classmate count visible to everyone)
     match /stats/{docId} {
       allow read: if true;

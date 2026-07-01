@@ -100,6 +100,19 @@
             <p id="fundBalanceMsg" style="font-size:0.75rem;color:var(--green);margin-top:0.5rem;display:none;">Balance updated!</p>
         </div>
 
+        <!-- DONORS -->
+        <div class="admin-card">
+            <h3><i class="fas fa-heart" style="color:var(--green);"></i> Donors</h3>
+            <p style="font-size:0.82rem;color:var(--text-muted);margin-bottom:1rem;">Add donors manually after receiving a Stripe notification. Name and message appear publicly on the Funds page.</p>
+            <div style="display:flex;flex-direction:column;gap:0.5rem;margin-bottom:1rem;">
+                <input type="text" id="donorName" placeholder="Donor name" style="border:1px solid var(--border);border-radius:var(--radius);padding:0.45rem 0.65rem;font-size:0.875rem;outline:none;">
+                <input type="text" id="donorMessage" placeholder="Message (optional)" style="border:1px solid var(--border);border-radius:var(--radius);padding:0.45rem 0.65rem;font-size:0.875rem;outline:none;">
+                <div><button onclick="addDonor()" class="btn btn-primary btn-sm"><i class="fas fa-plus"></i> Add Donor</button></div>
+            </div>
+            <p id="donorAddMsg" style="font-size:0.75rem;color:var(--green);margin-bottom:0.75rem;display:none;">Donor added!</p>
+            <div id="donorAdminList"></div>
+        </div>
+
         <!-- PENDING APPROVALS -->
         <div class="admin-card" id="pendingCard">
             <h3><i class="fas fa-user-clock" style="color:var(--green);"></i> Pending Approvals</h3>
@@ -377,6 +390,44 @@ window.rejectUser = async function(uid) {
     loadPending();
 };
 
+async function loadDonors() {
+    const snap = await db.collection('donors').orderBy('createdAt', 'desc').get();
+    const el = document.getElementById('donorAdminList');
+    if (snap.empty) { el.innerHTML = '<p style="font-size:0.82rem;color:var(--text-muted);">No donors yet.</p>'; return; }
+    el.innerHTML = `<table class="rsvp-table">
+        <thead><tr><th>Name</th><th>Message</th><th></th></tr></thead>
+        <tbody>${snap.docs.map(doc => {
+            const d = doc.data();
+            return `<tr>
+                <td><strong>${d.name || 'Anonymous'}</strong></td>
+                <td style="color:var(--text-muted);font-size:0.82rem;">${d.message || '—'}</td>
+                <td><button onclick="deleteDonor('${doc.id}')" style="background:none;border:none;cursor:pointer;color:#ccc;font-size:0.8rem;" title="Remove"><i class="fas fa-trash"></i></button></td>
+            </tr>`;
+        }).join('')}</tbody>
+    </table>`;
+}
+
+async function addDonor() {
+    const name = document.getElementById('donorName').value.trim();
+    const message = document.getElementById('donorMessage').value.trim();
+    if (!name) { alert('Enter a donor name.'); return; }
+    await db.collection('donors').add({ name, message, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+    document.getElementById('donorName').value = '';
+    document.getElementById('donorMessage').value = '';
+    const msg = document.getElementById('donorAddMsg');
+    msg.style.display = 'block';
+    setTimeout(() => msg.style.display = 'none', 2500);
+    loadDonors();
+}
+window.addDonor = addDonor;
+
+async function deleteDonor(docId) {
+    if (!confirm('Remove this donor?')) return;
+    await db.collection('donors').doc(docId).delete();
+    loadDonors();
+}
+window.deleteDonor = deleteDonor;
+
 async function loadFundBalance() {
     try {
         const snap = await db.collection('stats').doc('funds').get();
@@ -406,6 +457,7 @@ async function loadAdmin() {
         loadTeachers(),
         loadClassmates(),
         loadFundBalance(),
+        loadDonors(),
     ]);
     updateSummary();
     // Keep public connected count in sync
