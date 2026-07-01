@@ -80,6 +80,13 @@ service cloud.firestore {
       allow update, delete: if isAdmin();
     }
 
+    // Business network listings
+    match /businesses/{docId} {
+      allow read: if isApproved();
+      allow create: if isApproved() && request.resource.data.ownerId == request.auth.uid;
+      allow update, delete: if isAdmin() || (isApproved() && resource.data.ownerId == request.auth.uid);
+    }
+
     // Donor wall — public read, admin-only write
     match /donors/{docId} {
       allow read: if true;
