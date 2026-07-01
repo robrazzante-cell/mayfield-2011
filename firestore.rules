@@ -7,7 +7,11 @@ service cloud.firestore {
     }
 
     function isAdmin() {
-      return isSignedIn() && request.auth.token.email == 'rob.razzante@gmail.com';
+      return isSignedIn() && (
+        request.auth.token.email == 'rob.razzante@gmail.com' ||
+        (exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('role', 'member') == 'admin')
+      );
     }
 
     function userStatus() {
@@ -23,10 +27,11 @@ service cloud.firestore {
     match /users/{userId} {
       allow read: if isSignedIn() && (request.auth.uid == userId || isApproved());
       allow create: if isSignedIn() && request.auth.uid == userId;
-      // Users can update their own profile but cannot change their own status
+      // Users can update their own profile but cannot change their own status or role
       allow update: if isAdmin()
                     || (isSignedIn() && request.auth.uid == userId
-                        && request.resource.data.status == resource.data.status);
+                        && request.resource.data.status == resource.data.status
+                        && request.resource.data.get('role', 'member') == resource.data.get('role', 'member'));
       allow delete: if isAdmin();
     }
 

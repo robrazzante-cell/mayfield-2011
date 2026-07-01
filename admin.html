@@ -206,6 +206,17 @@ async function deleteTeacher(docId) {
     loadTeachers();
 }
 
+window.grantAdmin = async function(uid) {
+    if (!confirm('Grant admin access to this classmate? They will be able to view and manage the admin dashboard.')) return;
+    await db.collection('users').doc(uid).update({ role: 'admin' });
+    loadClassmates();
+};
+window.revokeAdmin = async function(uid) {
+    if (!confirm('Remove admin access from this classmate?')) return;
+    await db.collection('users').doc(uid).update({ role: 'member' });
+    loadClassmates();
+};
+
 async function deleteClassmate(uid) {
     if (!confirm('Remove this classmate\'s access? This deletes their account and all RSVPs from the site.')) return;
     // Check status before deleting so we know whether to decrement counter
@@ -272,20 +283,30 @@ async function loadClassmates() {
     const listEl = document.getElementById('classmateList');
     if (snap.empty) { listEl.innerHTML = '<p style="font-size:0.82rem;color:var(--text-muted);">No classmates yet.</p>'; return; }
     listEl.innerHTML = `<table class="rsvp-table">
-        <thead><tr><th>#</th><th>Name</th><th>Maiden Name</th><th>Email</th><th>Status</th><th>Home Address</th><th>Location</th><th>Employer</th><th></th></tr></thead>
+        <thead><tr><th>#</th><th>Name</th><th>Maiden Name</th><th>Email</th><th>Status</th><th>Role</th><th>Home Address</th><th>Location</th><th>Employer</th><th></th></tr></thead>
         <tbody>${snap.docs.map((doc, i) => {
             const d = doc.data();
             const loc = [d.city, d.state].filter(Boolean).join(', ') || '—';
             const status = d.status || 'approved';
+            const role = d.role || 'member';
             const homeAddr = d.homeStreet
                 ? `${d.homeStreet}, ${d.homeCity || ''}, ${d.homeState || ''} ${d.homeZip || ''}`.trim().replace(/,\s*,/g, ',')
                 : '—';
+            const roleCell = role === 'admin'
+                ? `<span class="badge-sm badge-yes">Admin</span>`
+                : `<span style="font-size:0.78rem;color:var(--text-muted);">Member</span>`;
+            const roleBtn = currentUserIsSuper
+                ? (role === 'admin'
+                    ? `<button onclick="revokeAdmin('${doc.id}')" style="background:none;border:none;cursor:pointer;color:#dc3545;font-size:0.75rem;margin-left:0.4rem;" title="Revoke admin"><i class="fas fa-user-minus"></i></button>`
+                    : `<button onclick="grantAdmin('${doc.id}')" style="background:none;border:none;cursor:pointer;color:var(--green);font-size:0.75rem;margin-left:0.4rem;" title="Grant admin"><i class="fas fa-user-shield"></i></button>`)
+                : '';
             return `<tr>
                 <td style="color:var(--text-muted);">${i+1}</td>
                 <td><strong>${d.displayName || '—'}</strong></td>
                 <td style="color:var(--text-muted);">${d.maidenName || '—'}</td>
                 <td style="font-size:0.78rem;color:var(--text-muted);">${d.email || '—'}</td>
                 <td><span class="badge-sm ${status === 'approved' ? 'badge-yes' : 'badge-no'}">${status}</span></td>
+                <td>${roleCell}${roleBtn}</td>
                 <td style="font-size:0.78rem;color:var(--text-muted);">${homeAddr}</td>
                 <td>${loc}</td>
                 <td>${d.employer || '—'}</td>
@@ -465,7 +486,9 @@ async function loadAdmin() {
     db.collection('stats').doc('classmates').set({ count: approvedSnap.size }).catch(() => {});
 }
 
-auth.onAuthStateChanged(user => {
+let currentUserIsSuper = false;
+
+auth.onAuthStateChanged(async user => {
     const denied = document.getElementById('accessDenied');
     const content = document.getElementById('adminContent');
     if (!user) {
@@ -473,11 +496,20 @@ auth.onAuthStateChanged(user => {
         content.style.display = 'none';
         return;
     }
-    if (user.email !== ADMIN_EMAIL) {
+    // Check email first, then fall back to Firestore role
+    let isAdmin = user.email === ADMIN_EMAIL;
+    if (!isAdmin) {
+        try {
+            const userDoc = await db.collection('users').doc(user.uid).get();
+            isAdmin = userDoc.exists && userDoc.data().role === 'admin';
+        } catch(e) {}
+    }
+    if (!isAdmin) {
         denied.style.display = 'block';
         content.style.display = 'none';
         return;
     }
+    currentUserIsSuper = (user.email === ADMIN_EMAIL);
     denied.style.display = 'none';
     content.style.display = 'block';
     // Update nav
