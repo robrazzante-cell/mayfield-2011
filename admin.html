@@ -69,50 +69,6 @@
 
     <div class="container" id="adminContent" style="display:none;">
 
-        <!-- TEACHER PORTAL LINK -->
-        <div class="admin-card">
-            <h3><i class="fas fa-chalkboard-teacher" style="color:var(--green);"></i> Teacher Portal Link</h3>
-            <p style="font-size:0.82rem;color:var(--text-muted);margin-bottom:0.75rem;">Share this link directly with teachers — it's not in the public nav.</p>
-            <div style="display:flex;gap:0.5rem;align-items:center;">
-                <code id="teacherPortalUrl" style="flex:1;background:var(--bg-light);border:1px solid var(--border);border-radius:var(--radius);padding:0.5rem 0.75rem;font-size:0.82rem;color:var(--text);">https://mayfield-2011.vercel.app/teacher.html</code>
-                <button class="btn btn-outline btn-sm copy-btn" onclick="copyTeacherLink()"><i class="fas fa-copy"></i> Copy</button>
-            </div>
-            <p id="teacherLinkMsg" style="font-size:0.75rem;color:var(--green);margin-top:0.4rem;display:none;">Copied to clipboard!</p>
-        </div>
-
-        <!-- CLASS FUND BALANCE -->
-        <div class="admin-card">
-            <h3><i class="fas fa-hand-holding-usd" style="color:var(--green);"></i> 2011 Class Funds Balance</h3>
-            <p style="font-size:0.82rem;color:var(--text-muted);margin-bottom:1rem;">Update the balance manually after a donation is received. Reflected publicly on the Funds page.</p>
-            <div style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap;">
-                <div>
-                    <div style="font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;color:var(--text-muted);margin-bottom:0.25rem;">Current Balance</div>
-                    <div id="fundBalanceDisplay" class="admin-stat">—</div>
-                </div>
-                <div style="flex:1;min-width:180px;">
-                    <div style="font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;color:var(--text-muted);margin-bottom:0.25rem;">Set New Balance ($)</div>
-                    <div style="display:flex;gap:0.5rem;">
-                        <input type="number" id="fundBalanceInput" min="0" step="1" placeholder="e.g. 1250" style="flex:1;border:1px solid var(--border);border-radius:var(--radius);padding:0.45rem 0.65rem;font-size:0.875rem;outline:none;">
-                        <button onclick="saveFundBalance()" class="btn btn-primary btn-sm"><i class="fas fa-save"></i> Save</button>
-                    </div>
-                </div>
-            </div>
-            <p id="fundBalanceMsg" style="font-size:0.75rem;color:var(--green);margin-top:0.5rem;display:none;">Balance updated!</p>
-        </div>
-
-        <!-- DONORS -->
-        <div class="admin-card">
-            <h3><i class="fas fa-heart" style="color:var(--green);"></i> Donors</h3>
-            <p style="font-size:0.82rem;color:var(--text-muted);margin-bottom:1rem;">Add donors manually after receiving a Stripe notification. Name and message appear publicly on the Funds page.</p>
-            <div style="display:flex;flex-direction:column;gap:0.5rem;margin-bottom:1rem;">
-                <input type="text" id="donorName" placeholder="Donor name" style="border:1px solid var(--border);border-radius:var(--radius);padding:0.45rem 0.65rem;font-size:0.875rem;outline:none;">
-                <input type="text" id="donorMessage" placeholder="Message (optional)" style="border:1px solid var(--border);border-radius:var(--radius);padding:0.45rem 0.65rem;font-size:0.875rem;outline:none;">
-                <div><button onclick="addDonor()" class="btn btn-primary btn-sm"><i class="fas fa-plus"></i> Add Donor</button></div>
-            </div>
-            <p id="donorAddMsg" style="font-size:0.75rem;color:var(--green);margin-bottom:0.75rem;display:none;">Donor added!</p>
-            <div id="donorAdminList"></div>
-        </div>
-
         <!-- PENDING APPROVALS -->
         <div class="admin-card" id="pendingCard">
             <h3><i class="fas fa-user-clock" style="color:var(--green);"></i> Pending Approvals</h3>
@@ -162,6 +118,50 @@
             <h3><i class="fas fa-user-circle" style="color:var(--green);"></i> Classmates Registered on Site</h3>
             <div id="classmateCount" class="stat-row"></div>
             <div id="classmateList"></div>
+        </div>
+
+        <!-- TEACHER PORTAL LINK -->
+        <div class="admin-card">
+            <h3><i class="fas fa-chalkboard-teacher" style="color:var(--green);"></i> Teacher Portal Link</h3>
+            <p style="font-size:0.82rem;color:var(--text-muted);margin-bottom:0.75rem;">Share this link directly with teachers — it's not in the public nav.</p>
+            <div style="display:flex;gap:0.5rem;align-items:center;">
+                <code id="teacherPortalUrl" style="flex:1;background:var(--bg-light);border:1px solid var(--border);border-radius:var(--radius);padding:0.5rem 0.75rem;font-size:0.82rem;color:var(--text);">https://mayfield-2011.vercel.app/teacher.html</code>
+                <button class="btn btn-outline btn-sm copy-btn" onclick="copyTeacherLink()"><i class="fas fa-copy"></i> Copy</button>
+            </div>
+            <p id="teacherLinkMsg" style="font-size:0.75rem;color:var(--green);margin-top:0.4rem;display:none;">Copied to clipboard!</p>
+        </div>
+
+        <!-- CLASS FUND BALANCE -->
+        <div class="admin-card">
+            <h3><i class="fas fa-hand-holding-usd" style="color:var(--green);"></i> 2011 Class Funds Balance</h3>
+            <p style="font-size:0.82rem;color:var(--text-muted);margin-bottom:1rem;">Update the balance manually after a donation is received. Reflected publicly on the Funds page.</p>
+            <div style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap;">
+                <div>
+                    <div style="font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;color:var(--text-muted);margin-bottom:0.25rem;">Current Balance</div>
+                    <div id="fundBalanceDisplay" class="admin-stat">—</div>
+                </div>
+                <div style="flex:1;min-width:180px;">
+                    <div style="font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;color:var(--text-muted);margin-bottom:0.25rem;">Set New Balance ($)</div>
+                    <div style="display:flex;gap:0.5rem;">
+                        <input type="number" id="fundBalanceInput" min="0" step="1" placeholder="e.g. 1250" style="flex:1;border:1px solid var(--border);border-radius:var(--radius);padding:0.45rem 0.65rem;font-size:0.875rem;outline:none;">
+                        <button onclick="saveFundBalance()" class="btn btn-primary btn-sm"><i class="fas fa-save"></i> Save</button>
+                    </div>
+                </div>
+            </div>
+            <p id="fundBalanceMsg" style="font-size:0.75rem;color:var(--green);margin-top:0.5rem;display:none;">Balance updated!</p>
+        </div>
+
+        <!-- DONORS -->
+        <div class="admin-card">
+            <h3><i class="fas fa-heart" style="color:var(--green);"></i> Donors</h3>
+            <p style="font-size:0.82rem;color:var(--text-muted);margin-bottom:1rem;">Add donors manually after receiving a Stripe notification. Name and message appear publicly on the Funds page.</p>
+            <div style="display:flex;flex-direction:column;gap:0.5rem;margin-bottom:1rem;">
+                <input type="text" id="donorName" placeholder="Donor name" style="border:1px solid var(--border);border-radius:var(--radius);padding:0.45rem 0.65rem;font-size:0.875rem;outline:none;">
+                <input type="text" id="donorMessage" placeholder="Message (optional)" style="border:1px solid var(--border);border-radius:var(--radius);padding:0.45rem 0.65rem;font-size:0.875rem;outline:none;">
+                <div><button onclick="addDonor()" class="btn btn-primary btn-sm"><i class="fas fa-plus"></i> Add Donor</button></div>
+            </div>
+            <p id="donorAddMsg" style="font-size:0.75rem;color:var(--green);margin-bottom:0.75rem;display:none;">Donor added!</p>
+            <div id="donorAdminList"></div>
         </div>
 
     </div>
