@@ -79,6 +79,10 @@
                 <div class="stat-label">Events</div>
             </div>
             <div class="stat-box">
+                <div class="stat-number" id="statFunds">—</div>
+                <div class="stat-label">Class Funds</div>
+            </div>
+            <div class="stat-box">
                 <div class="stat-number">15</div>
                 <div class="stat-label">Years Since Grad</div>
             </div>
@@ -120,10 +124,10 @@
                 <h3>In Memoriam</h3>
                 <p>Honoring the classmates we've lost along the way</p>
             </a>
-            <a href="leadership.html#alumni-membership" class="feature-tile">
-                <div class="feature-icon"><i class="fas fa-id-card"></i></div>
-                <h3>Alumni Association</h3>
-                <p>Join the Alumni Association</p>
+            <a href="funds.html" class="feature-tile">
+                <div class="feature-icon"><i class="fas fa-hand-holding-usd"></i></div>
+                <h3>Class Funds</h3>
+                <p>Support the reunion and see who's contributed</p>
             </a>
         </div>
     </div>
@@ -233,6 +237,14 @@
                 const statsSnap = await db.collection('stats').doc('classmates').get();
                 el.textContent = statsSnap.exists ? (statsSnap.data().count || 0) : 0;
             }
+        } catch(e) {}
+
+        // Load class funds balance
+        try {
+            const fundsSnap = await db.collection('stats').doc('funds').get();
+            const balance = fundsSnap.exists ? (fundsSnap.data().balance || 1100) : 1100;
+            const fundsEl = document.getElementById('statFunds');
+            if (fundsEl) fundsEl.textContent = '$' + balance.toLocaleString();
         } catch(e) {}
     });
 
