@@ -79,10 +79,6 @@
                 <div class="stat-label">Events</div>
             </div>
             <div class="stat-box">
-                <div class="stat-number" id="statFunds">—</div>
-                <div class="stat-label">Class Funds</div>
-            </div>
-            <div class="stat-box">
                 <div class="stat-number">15</div>
                 <div class="stat-label">Years Since Grad</div>
             </div>
@@ -239,13 +235,7 @@
             }
         } catch(e) {}
 
-        // Load class funds balance
-        try {
-            const fundsSnap = await db.collection('stats').doc('funds').get();
-            const balance = fundsSnap.exists ? (fundsSnap.data().balance || 1100) : 1100;
-            const fundsEl = document.getElementById('statFunds');
-            if (fundsEl) fundsEl.textContent = '$' + balance.toLocaleString();
-        } catch(e) {}
+
     });
 
     // Live countdown to homecoming tailgate: Sep 18, 2026 5:15 PM EDT
