@@ -107,17 +107,22 @@
             <div id="lunchList"></div>
         </div>
 
-        <!-- TEACHER PORTAL -->
-        <div class="admin-card">
-            <h3><i class="fas fa-chalkboard-teacher" style="color:var(--green);"></i> Teacher Portal RSVPs</h3>
-            <div id="teacherList"></div>
-        </div>
-
         <!-- CLASSMATES REGISTERED -->
         <div class="admin-card">
             <h3><i class="fas fa-user-circle" style="color:var(--green);"></i> Classmates Registered on Site</h3>
             <div id="classmateCount" class="stat-row"></div>
             <div id="classmateList"></div>
+            <div id="classmatePager" style="display:none;display:flex;justify-content:space-between;align-items:center;margin-top:1rem;font-size:0.82rem;">
+                <button onclick="classmatesPage(-1)" class="btn btn-outline btn-sm"><i class="fas fa-chevron-left"></i> Prev</button>
+                <span id="classmatePageLabel" style="color:var(--text-muted);"></span>
+                <button onclick="classmatesPage(1)" class="btn btn-outline btn-sm">Next <i class="fas fa-chevron-right"></i></button>
+            </div>
+        </div>
+
+        <!-- TEACHER PORTAL -->
+        <div class="admin-card">
+            <h3><i class="fas fa-chalkboard-teacher" style="color:var(--green);"></i> Teacher Portal RSVPs</h3>
+            <div id="teacherList"></div>
         </div>
 
         <!-- TEACHER PORTAL LINK -->
@@ -276,16 +281,23 @@ async function loadTeachers() {
     </table>`;
 }
 
-async function loadClassmates() {
-    const snap = await db.collection('users').get();
-    const el = document.getElementById('classmateCount');
-    el.innerHTML = statBlock(snap.size, 'Registered');
+let allClassmateDocs = [];
+let classmateCurrentPage = 1;
+const CLASSMATE_PAGE_SIZE = 10;
+
+function renderClassmatePage() {
     const listEl = document.getElementById('classmateList');
-    if (snap.empty) { listEl.innerHTML = '<p style="font-size:0.82rem;color:var(--text-muted);">No classmates yet.</p>'; return; }
+    const pager = document.getElementById('classmatePager');
+    const label = document.getElementById('classmatePageLabel');
+    const totalPages = Math.ceil(allClassmateDocs.length / CLASSMATE_PAGE_SIZE);
+    const start = (classmateCurrentPage - 1) * CLASSMATE_PAGE_SIZE;
+    const pageDocs = allClassmateDocs.slice(start, start + CLASSMATE_PAGE_SIZE);
+
     listEl.innerHTML = `<table class="rsvp-table">
         <thead><tr><th>#</th><th>Name</th><th>Maiden Name</th><th>Email</th><th>Status</th><th>Role</th><th>Home Address</th><th>Location</th><th>Employer</th><th></th></tr></thead>
-        <tbody>${snap.docs.map((doc, i) => {
+        <tbody>${pageDocs.map((doc, i) => {
             const d = doc.data();
+            const globalIdx = start + i + 1;
             const loc = [d.city, d.state].filter(Boolean).join(', ') || '—';
             const status = d.status || 'approved';
             const role = d.role || 'member';
@@ -301,7 +313,7 @@ async function loadClassmates() {
                     : `<button onclick="grantAdmin('${doc.id}')" style="background:none;border:none;cursor:pointer;color:var(--green);font-size:0.75rem;margin-left:0.4rem;" title="Grant admin"><i class="fas fa-user-shield"></i></button>`)
                 : '';
             return `<tr>
-                <td style="color:var(--text-muted);">${i+1}</td>
+                <td style="color:var(--text-muted);">${globalIdx}</td>
                 <td><strong>${d.displayName || '—'}</strong></td>
                 <td style="color:var(--text-muted);">${d.maidenName || '—'}</td>
                 <td style="font-size:0.78rem;color:var(--text-muted);">${d.email || '—'}</td>
@@ -314,6 +326,31 @@ async function loadClassmates() {
             </tr>`;
         }).join('')}</tbody>
     </table>`;
+
+    if (totalPages > 1) {
+        pager.style.display = 'flex';
+        label.textContent = `Page ${classmateCurrentPage} of ${totalPages}`;
+        pager.querySelector('button:first-child').disabled = classmateCurrentPage === 1;
+        pager.querySelector('button:last-child').disabled = classmateCurrentPage === totalPages;
+    } else {
+        pager.style.display = 'none';
+    }
+}
+
+window.classmatesPage = function(dir) {
+    const totalPages = Math.ceil(allClassmateDocs.length / CLASSMATE_PAGE_SIZE);
+    classmateCurrentPage = Math.max(1, Math.min(totalPages, classmateCurrentPage + dir));
+    renderClassmatePage();
+};
+
+async function loadClassmates() {
+    const snap = await db.collection('users').get();
+    document.getElementById('classmateCount').innerHTML = statBlock(snap.size, 'Registered');
+    const listEl = document.getElementById('classmateList');
+    if (snap.empty) { listEl.innerHTML = '<p style="font-size:0.82rem;color:var(--text-muted);">No classmates yet.</p>'; return; }
+    allClassmateDocs = snap.docs;
+    classmateCurrentPage = 1;
+    renderClassmatePage();
 }
 
 function updateSummary() {
