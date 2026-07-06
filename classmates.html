@@ -87,6 +87,19 @@
 
         <div id="classmate-map"></div>
 
+        <!-- Profile completion nudge for signed-in users without a location -->
+        <div id="locationNudge" style="display:none;margin-top:1rem;background:#f0f7f2;border:1px solid #b7d9c2;border-radius:10px;padding:0.9rem 1.1rem;display:none;align-items:center;gap:0.85rem;flex-wrap:wrap;">
+            <i class="fas fa-map-marker-alt" style="color:var(--green);font-size:1.2rem;flex-shrink:0;"></i>
+            <div style="flex:1;min-width:180px;">
+                <strong style="font-size:0.875rem;">Your pin isn't on the map yet!</strong>
+                <div style="font-size:0.78rem;color:var(--text-muted);margin-top:0.1rem;">Add your city in your profile so classmates can see where you ended up.</div>
+            </div>
+            <div style="display:flex;gap:0.5rem;align-items:center;flex-shrink:0;">
+                <a href="profile.html" class="btn btn-primary btn-sm"><i class="fas fa-user-edit"></i> Update Profile</a>
+                <button onclick="dismissLocationNudge()" style="background:none;border:none;cursor:pointer;color:var(--text-muted);font-size:1rem;padding:0.25rem;" title="Dismiss">✕</button>
+            </div>
+        </div>
+
 
         <hr class="divider">
 
@@ -194,14 +207,14 @@ const greenIcon = L.divIcon({
     iconSize: [14,14], iconAnchor: [7,7]
 });
 
-L.marker([41.5164, -81.4627], {icon: L.divIcon({
+L.marker([41.5359456, -81.4582958], {icon: L.divIcon({
     className:'',
     html:'<div style="width:22px;height:22px;border-radius:50%;background:#2A772A;border:3px solid white;box-shadow:0 2px 6px rgba(0,0,0,0.5);"></div>',
     iconSize:[22,22], iconAnchor:[11,11]
-})}).addTo(map).bindPopup('<strong>Mayfield High School</strong>');
+})}).addTo(map).bindPopup('<strong>Mayfield High School</strong><br>6116 Wilson Mills Rd');
 
 async function loadAll() {
-    const snap = await db.collection('users').where('lat','!=',null).get();
+    const snap = await db.collection('users').where('status','==','approved').get();
     allDocs = snap.docs;
 
     allMarkers.forEach(m => map.removeLayer(m.marker));
@@ -235,6 +248,10 @@ function buildStateFilters() {
         const name = STATE_NAMES[abbr] || abbr;
         bar.innerHTML += `<button class="filter-btn" onclick="applyFilter('${abbr}',this)">${name} (${count})</button>`;
     });
+    const noLoc = allDocs.filter(d => !d.data().state).length;
+    if (noLoc > 0) {
+        bar.innerHTML += `<button class="filter-btn" onclick="applyFilter('none',this)">No Location (${noLoc})</button>`;
+    }
 }
 
 function applyFilter(state, btn) {
@@ -243,10 +260,12 @@ function applyFilter(state, btn) {
 
     const filtered = state === 'all'
         ? allDocs
-        : allDocs.filter(doc => normalizeState(doc.data().state || '') === state);
+        : state === 'none'
+            ? allDocs.filter(doc => !doc.data().state)
+            : allDocs.filter(doc => normalizeState(doc.data().state || '') === state);
 
     allMarkers.forEach(m => {
-        if (state === 'all' || m.stateAbbr === state) {
+        if (state === 'all' || state === 'none' || m.stateAbbr === state) {
             m.marker.addTo(map);
         } else {
             map.removeLayer(m.marker);
@@ -268,6 +287,8 @@ function renderDirectory(docs) {
         const d = doc.data();
         const initials = (d.displayName || 'MW').split(' ').map(n=>n[0]).join('').slice(0,2).toUpperCase();
         const location = [d.city, d.state].filter(Boolean).join(', ');
+        const locationDisplay = location || 'N/A';
+        const pinColor = location ? 'var(--green)' : 'var(--border)';
         return `
         <div class="card no-hover" style="text-align:center;padding:1.25rem 1rem;">
             ${d.photoURL
@@ -275,7 +296,7 @@ function renderDirectory(docs) {
                 : `<div class="avatar-initials" style="width:64px;height:64px;font-size:1.35rem;margin:0 auto 0.75rem;">${initials}</div>`}
             <div style="font-size:0.875rem;font-weight:700;">${d.displayName || 'Classmate'}</div>
             ${d.employer ? `<div style="font-size:0.75rem;color:var(--text-muted);">${d.employer}</div>` : ''}
-            ${location ? `<div style="font-size:0.75rem;color:var(--text-muted);margin-top:0.2rem;"><i class="fas fa-map-marker-alt" style="color:var(--green);font-size:0.7rem;"></i> ${location}</div>` : ''}
+            <div style="font-size:0.75rem;color:var(--text-muted);margin-top:0.2rem;"><i class="fas fa-map-marker-alt" style="color:${pinColor};font-size:0.7rem;"></i> ${locationDisplay}</div>
             ${d.linkedin ? `<a href="${d.linkedin}" target="_blank" style="font-size:0.75rem;color:var(--green);text-decoration:none;display:inline-flex;align-items:center;gap:0.2rem;margin-top:0.4rem;"><i class="fab fa-linkedin"></i> LinkedIn</a>` : ''}
         </div>`;
     }).join('');
@@ -313,10 +334,24 @@ async function saveLocation() {
 }
 window.saveLocation = saveLocation;
 
-auth.onAuthStateChanged(user => {
+function dismissLocationNudge() {
+    const el = document.getElementById('locationNudge');
+    if (el) el.style.display = 'none';
+    localStorage.setItem('nudgeDismissed', '1');
+}
+window.dismissLocationNudge = dismissLocationNudge;
+
+auth.onAuthStateChanged(async user => {
     const btn = document.getElementById('addPinBtn');
     if (btn) btn.style.display = user ? 'inline-flex' : 'none';
-    loadAll();
+    await loadAll();
+
+    if (user && !localStorage.getItem('nudgeDismissed')) {
+        const snap = await db.collection('users').doc(user.uid).get();
+        const d = snap.exists ? snap.data() : {};
+        const nudge = document.getElementById('locationNudge');
+        if (nudge && !d.city) nudge.style.display = 'flex';
+    }
 });
 </script>
 </body>

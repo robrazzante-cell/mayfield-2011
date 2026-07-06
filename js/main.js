@@ -281,7 +281,7 @@ function formatCurrency(n) {
 function showWelcomeTour(user) {
     const firstName = user.displayName ? user.displayName.split(' ')[0] : 'Wildcat';
     const features = [
-        ['fa-map-marked-alt', 'Classmate Map', 'Pin your city and see where the Class of 2011 spread after graduation.'],
+        ['fa-map-marked-alt', 'Add Your Pin to the Map', 'Complete your profile with your city and you\'ll appear on the classmate map. Takes 30 seconds — go to <em>My Profile</em> now.'],
         ['fa-briefcase', 'Business Network', 'List your business or find a classmate to hire.'],
         ['fa-football-ball', 'Events', 'Homecoming tailgate Sep 18 · Mayfield vs Barberton. School tour &amp; lunch Sep 19. RSVP now.'],
         ['fa-trophy', 'Class Pride', 'Class superlatives, song, colors, and memories from our time at Mayfield.'],
