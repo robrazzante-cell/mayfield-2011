@@ -60,8 +60,8 @@
 
 <div class="page-header">
     <div class="container">
-        <h1><i class="fas fa-map-marked-alt"></i> Classmates</h1>
-        <p>See where the Class of 2011 has spread across the country — and the world</p>
+        <h1><i class="fas fa-users"></i> Classmate Directory</h1>
+        <p>Find your classmates and see where the Class of 2011 has spread</p>
     </div>
 </div>
 <div class="breadcrumb">
@@ -74,21 +74,16 @@
 <section class="section">
     <div class="container">
 
-        <!-- MAP -->
+        <!-- CLASSMATE DIRECTORY -->
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;flex-wrap:wrap;gap:0.5rem;">
-            <div>
-                <h2 class="section-title" style="margin-bottom:0.15rem;">Classmate Map</h2>
-                <p style="font-size:0.82rem;color:var(--text-muted);"><i class="fas fa-lock" style="color:var(--green);"></i> Pins show city-level location only — exact address is never shared</p>
-            </div>
+            <h2 class="section-title" style="margin-bottom:0;">Classmate Directory</h2>
             <a href="profile.html" class="btn btn-primary btn-sm" id="addPinBtn" style="display:none;">
                 <i class="fas fa-map-marker-alt"></i> Add My Location
             </a>
         </div>
 
-        <div id="classmate-map"></div>
-
-        <!-- Profile completion nudge for signed-in users without a location -->
-        <div id="locationNudge" style="display:none;margin-top:1rem;background:#f0f7f2;border:1px solid #b7d9c2;border-radius:10px;padding:0.9rem 1.1rem;display:none;align-items:center;gap:0.85rem;flex-wrap:wrap;">
+        <!-- Profile completion nudge -->
+        <div id="locationNudge" style="display:none;margin-bottom:1rem;background:#f0f7f2;border:1px solid #b7d9c2;border-radius:10px;padding:0.9rem 1.1rem;align-items:center;gap:0.85rem;flex-wrap:wrap;">
             <i class="fas fa-map-marker-alt" style="color:var(--green);font-size:1.2rem;flex-shrink:0;"></i>
             <div style="flex:1;min-width:180px;">
                 <strong style="font-size:0.875rem;">Your pin isn't on the map yet!</strong>
@@ -100,14 +95,16 @@
             </div>
         </div>
 
-
-        <hr class="divider">
-
-        <!-- CLASSMATE DIRECTORY -->
-        <h2 class="section-title">Classmate Directory</h2>
-        <div class="filter-bar" id="filterBar">
-            <button class="filter-btn active" onclick="applyFilter('all', this)">All</button>
+        <!-- A–Z letter picker -->
+        <div id="letterBar" style="display:flex;flex-wrap:wrap;gap:0.3rem;margin-bottom:0.75rem;">
+            <button class="filter-btn active" onclick="applyLetter('all',this)">All</button>
         </div>
+
+        <!-- State filter -->
+        <div class="filter-bar" id="filterBar" style="margin-bottom:1.25rem;">
+            <button class="filter-btn active" onclick="applyFilter('all', this)">All States</button>
+        </div>
+
         <div class="grid-4" id="classmatesGrid">
             <!-- Populated by JS -->
             <div style="text-align:center;color:var(--text-muted);grid-column:1/-1;padding:2rem 0;">
@@ -115,14 +112,26 @@
                 <p style="margin-top:0.5rem;font-size:0.875rem;">Loading classmates...</p>
             </div>
         </div>
+
+        <hr class="divider">
+
+        <!-- MAP -->
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;flex-wrap:wrap;gap:0.5rem;">
+            <div>
+                <h2 class="section-title" style="margin-bottom:0.15rem;">Classmate Map</h2>
+                <p style="font-size:0.82rem;color:var(--text-muted);"><i class="fas fa-lock" style="color:var(--green);"></i> Pins show city-level location only — exact address is never shared</p>
+            </div>
+        </div>
+        <div id="classmate-map"></div>
+
     </div>
 </section>
 
 <section class="signin-prompt" id="signinPrompt">
     <div class="container">
         <div class="paw-divider"><i class="fas fa-paw"></i></div>
-        <h2>Add your pin to the map</h2>
-        <p>Sign in to add your city to the classmate map and appear in the directory.</p>
+        <h2>Join the Classmate Directory</h2>
+        <p>Sign in to appear in the directory, add your city to the map, and connect with classmates.</p>
         <button class="btn btn-primary" style="margin-top:1.25rem;" onclick="handleAuth()">
             <i class="fab fa-google"></i> Sign In with Google
         </button>
@@ -195,6 +204,8 @@ function normalizeState(input) {
 
 let allDocs = [];
 let allMarkers = [];
+let activeLetter = 'all';
+let activeState = 'all';
 
 const map = L.map('classmate-map').setView([41.519, -81.462], 5);
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -213,6 +224,19 @@ L.marker([41.5359456, -81.4582958], {icon: L.divIcon({
     iconSize:[22,22], iconAnchor:[11,11]
 })}).addTo(map).bindPopup('<strong>Mayfield High School</strong><br>6116 Wilson Mills Rd');
 
+function lastName(displayName) {
+    const parts = (displayName || '').trim().split(/\s+/);
+    return parts.length > 1 ? parts[parts.length - 1] : parts[0] || '';
+}
+
+function sortedDocs(docs) {
+    return [...docs].sort((a, b) => {
+        const la = lastName(a.data().displayName).toLowerCase();
+        const lb = lastName(b.data().displayName).toLowerCase();
+        return la.localeCompare(lb);
+    });
+}
+
 async function loadAll() {
     const snap = await db.collection('users').where('status','==','approved').get();
     allDocs = snap.docs;
@@ -223,15 +247,31 @@ async function loadAll() {
         const d = doc.data();
         if (d.lat && d.lng) {
             const stateAbbr = normalizeState(d.state || '');
+            const lastN = lastName(d.displayName);
             const marker = L.marker([d.lat, d.lng], {icon: greenIcon})
                 .addTo(map)
                 .bindPopup(`<strong>${d.displayName || 'Classmate'}</strong><br>${d.city || ''}${d.state ? ', ' + d.state : ''}`);
-            allMarkers.push({ marker, stateAbbr });
+            allMarkers.push({ marker, stateAbbr, lastN });
         }
     });
 
+    buildLetterBar();
     buildStateFilters();
-    renderDirectory(allDocs);
+    applyFilters();
+}
+
+function buildLetterBar() {
+    const letters = new Set();
+    allDocs.forEach(doc => {
+        const first = lastName(doc.data().displayName)[0];
+        if (first) letters.add(first.toUpperCase());
+    });
+    const sorted = [...letters].sort();
+    const bar = document.getElementById('letterBar');
+    bar.innerHTML = `<button class="filter-btn active" onclick="applyLetter('all',this)">All</button>`;
+    sorted.forEach(l => {
+        bar.innerHTML += `<button class="filter-btn" onclick="applyLetter('${l}',this)">${l}</button>`;
+    });
 }
 
 function buildStateFilters() {
@@ -243,7 +283,7 @@ function buildStateFilters() {
     const states = Object.entries(counts).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]));
 
     const bar = document.getElementById('filterBar');
-    bar.innerHTML = `<button class="filter-btn active" onclick="applyFilter('all',this)">All (${allDocs.length})</button>`;
+    bar.innerHTML = `<button class="filter-btn active" onclick="applyFilter('all',this)">All States</button>`;
     states.forEach(([abbr, count]) => {
         const name = STATE_NAMES[abbr] || abbr;
         bar.innerHTML += `<button class="filter-btn" onclick="applyFilter('${abbr}',this)">${name} (${count})</button>`;
@@ -254,33 +294,52 @@ function buildStateFilters() {
     }
 }
 
-function applyFilter(state, btn) {
-    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+function applyLetter(letter, btn) {
+    activeLetter = letter;
+    document.querySelectorAll('#letterBar .filter-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
+    applyFilters();
+}
+window.applyLetter = applyLetter;
 
-    const filtered = state === 'all'
-        ? allDocs
-        : state === 'none'
-            ? allDocs.filter(doc => !doc.data().state)
-            : allDocs.filter(doc => normalizeState(doc.data().state || '') === state);
-
-    allMarkers.forEach(m => {
-        if (state === 'all' || state === 'none' || m.stateAbbr === state) {
-            m.marker.addTo(map);
-        } else {
-            map.removeLayer(m.marker);
-        }
-    });
-
-    renderDirectory(filtered);
+function applyFilter(state, btn) {
+    activeState = state;
+    document.querySelectorAll('#filterBar .filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    applyFilters();
 }
 window.applyFilter = applyFilter;
+
+function applyFilters() {
+    let filtered = allDocs;
+
+    if (activeState !== 'all') {
+        filtered = activeState === 'none'
+            ? filtered.filter(doc => !doc.data().state)
+            : filtered.filter(doc => normalizeState(doc.data().state || '') === activeState);
+    }
+
+    if (activeLetter !== 'all') {
+        filtered = filtered.filter(doc => {
+            const first = lastName(doc.data().displayName)[0] || '';
+            return first.toUpperCase() === activeLetter;
+        });
+    }
+
+    // Sync map markers with state filter (letter doesn't affect map)
+    allMarkers.forEach(m => {
+        const show = activeState === 'all' || activeState === 'none' || m.stateAbbr === activeState;
+        show ? m.marker.addTo(map) : map.removeLayer(m.marker);
+    });
+
+    renderDirectory(sortedDocs(filtered));
+}
 
 function renderDirectory(docs) {
     const grid = document.getElementById('classmatesGrid');
     if (!grid) return;
     if (docs.length === 0) {
-        grid.innerHTML = '<div style="text-align:center;color:var(--text-muted);grid-column:1/-1;padding:2rem 0;"><i class="fas fa-user-friends" style="font-size:2rem;display:block;margin-bottom:0.5rem;"></i>No classmates in this location yet.</div>';
+        grid.innerHTML = '<div style="text-align:center;color:var(--text-muted);grid-column:1/-1;padding:2rem 0;"><i class="fas fa-user-friends" style="font-size:2rem;display:block;margin-bottom:0.5rem;"></i>No classmates match this filter.</div>';
         return;
     }
     grid.innerHTML = docs.map(doc => {
@@ -301,38 +360,6 @@ function renderDirectory(docs) {
         </div>`;
     }).join('');
 }
-
-function showPinForm() {
-    const box = document.getElementById('pinFormBox');
-    if (box) box.style.display = box.style.display === 'none' ? 'block' : 'none';
-}
-window.showPinForm = showPinForm;
-
-async function saveLocation() {
-    const user = auth.currentUser;
-    if (!user) { alert('Please sign in first.'); return; }
-    const city = document.getElementById('pinCity').value.trim();
-    const rawState = document.getElementById('pinState').value.trim();
-    if (!city || !rawState) { alert('Please enter both city and state.'); return; }
-    const state = normalizeState(rawState);
-
-    try {
-        const res = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(city + ', ' + state)}&format=json&limit=1`);
-        const results = await res.json();
-        if (!results.length) { alert('City not found. Try again.'); return; }
-        const lat = parseFloat(results[0].lat);
-        const lng = parseFloat(results[0].lon);
-        const latFuzzy = Math.round(lat * 10) / 10;
-        const lngFuzzy = Math.round(lng * 10) / 10;
-        await db.collection('users').doc(user.uid).update({ city, state, lat: latFuzzy, lng: lngFuzzy });
-        document.getElementById('pinFormBox').style.display = 'none';
-        alert('📍 Your location has been added to the map!');
-        loadAll();
-    } catch(e) {
-        alert('Error saving location. Please try again.');
-    }
-}
-window.saveLocation = saveLocation;
 
 function dismissLocationNudge() {
     const el = document.getElementById('locationNudge');
