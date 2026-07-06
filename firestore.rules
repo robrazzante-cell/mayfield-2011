@@ -67,6 +67,13 @@ service cloud.firestore {
     }
 
     // Reunion suggestions
+    // Teacher nominations from classmates
+    match /teacher_requests/{docId} {
+      allow read: if isApproved();
+      allow create: if isApproved() && request.resource.data.submittedBy == request.auth.uid;
+      allow delete: if isAdmin();
+    }
+
     match /reunion_suggestions/{docId} {
       allow read: if isApproved();
       allow create: if isApproved();
