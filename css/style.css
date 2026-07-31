@@ -646,3 +646,72 @@ footer {
     .stat-box { min-width: 80px; padding: 0.75rem 0.875rem; }
 }
 
+@media (max-width: 640px) {
+    /* iOS zoom prevention — all form inputs must be 16px */
+    input, select, textarea,
+    .form-group input, .form-group select, .form-group textarea,
+    .comment-form textarea { font-size: 16px !important; }
+
+    /* Tap targets */
+    .btn, .filter-btn, .btn-signin, .nav-menu > li > a,
+    button:not(.nav-toggle):not(.modal-close):not(.btn-flag) { min-height: 44px; }
+
+    /* Container */
+    .container { padding: 0 1rem; }
+
+    /* Hero */
+    .hero { padding: 2rem 0 1.75rem; }
+    .hero-subtitle { font-size: 1rem; }
+    .countdown-container { padding: 1.25rem 1rem; }
+    .countdown-number { font-size: 1.75rem; }
+    .countdown-unit { min-width: 48px; }
+
+    /* Page header */
+    .page-header { padding: 1.25rem 0; }
+    .page-header h1 { font-size: 1.25rem; }
+
+    /* Sections */
+    .section { padding: 2rem 0; }
+
+    /* Cards */
+    .card { padding: 1rem; }
+    .feature-tile { padding: 1.25rem 1rem; }
+
+    /* Fund display */
+    .fund-display { padding: 1.25rem 1rem; }
+    .fund-amount { font-size: 2rem; }
+
+    /* Modal — nearly full screen, safe on short phones */
+    .modal {
+        padding: 1.25rem;
+        max-height: calc(100svh - 2rem);
+        border-radius: var(--radius);
+    }
+
+    /* Comment form — stack textarea + button vertically */
+    .comment-form { flex-direction: column; }
+    .comment-form textarea { height: 72px; }
+    .comment-form .btn { width: 100%; justify-content: center; }
+
+    /* classmates.html: 3-col location form → stack */
+    .location-form { grid-template-columns: 1fr !important; }
+
+    /* Map — shorter on phone */
+    #classmate-map { height: 280px; }
+
+    /* admin: stat-row tighter */
+    .stat-row { gap: 1rem; }
+
+    /* Yearbook steps — reduce gap */
+    .yearbook-step { gap: 0.75rem; padding: 1rem; }
+
+    /* Officer bottom flex — wrap on very small screens */
+    .officer-bottom { flex-wrap: wrap; gap: 0.75rem; }
+
+    /* Footer bottom — stack */
+    .footer-bottom { flex-direction: column; text-align: center; }
+
+    /* Section title smaller */
+    .section-title { font-size: 1.15rem; }
+}
+
