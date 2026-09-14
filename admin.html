@@ -307,8 +307,9 @@ async function emailAttendees(eventId) {
     }
     if (!emails.length) { alert('No email addresses found for these RSVPs.'); return; }
     const label = (EVENT_LABELS[eventId] || eventId);
-    const subject = encodeURIComponent(`Mayfield Class of 2011 — ${label}`);
-    window.location.href = `mailto:?bcc=${emails.join(',')}&subject=${subject}`;
+    const subject = encodeURIComponent(label);
+    const bcc = encodeURIComponent(emails.join(','));
+    window.open(`https://mail.google.com/mail/?view=cm&fs=1&tf=1&bcc=${bcc}&su=${subject}`, '_blank');
 }
 window.emailAttendees = emailAttendees;
 
@@ -414,7 +415,8 @@ function emailAllRegistrants() {
     const emails = approvedRegistrantEmails();
     if (!emails.length) { alert('No registered classmate emails found.'); return; }
     const subject = encodeURIComponent('Mayfield Class of 2011 — Reunion Update');
-    window.location.href = `mailto:?bcc=${emails.join(',')}&subject=${subject}`;
+    const bcc = encodeURIComponent(emails.join(','));
+    window.open(`https://mail.google.com/mail/?view=cm&fs=1&tf=1&bcc=${bcc}&su=${subject}`, '_blank');
 }
 window.emailAllRegistrants = emailAllRegistrants;
 
