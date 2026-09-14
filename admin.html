@@ -268,6 +268,49 @@ async function deleteClassmate(uid) {
 
 const EVENT_LABELS = { tailgate: 'Homecoming Tailgate', 'campus-tour': 'School Tour', 'teacher-meetup': 'Lunch with Teachers' };
 
+// Mirrors the tile content on events.html — keep these in sync if the tiles change.
+const EVENT_DETAILS = {
+    tailgate: {
+        lines: [
+            '📍 Alumni Pavilion — next to the football field',
+            '📅 Fri, Sep 18, 2026 · 5:15 – 6:45 PM',
+            '💵 No charge',
+            '🏈 Mayfield vs Barberton · 7:00 PM kickoff',
+        ],
+        blurb: 'Hosted by the Mayfield Alumni Association. Spouses and guests are welcome — hope to see you there!',
+    },
+    'campus-tour': {
+        lines: [
+            '📍 6116 Wilson Mills Road, Mayfield Village, OH 44143',
+            '📅 Sat, Sep 19, 2026 · 11:00 AM (about 1.5 hours)',
+            '🚗 Park in the back of the school near the Pavilion',
+            '🚪 Enter through Door 16 in the back',
+        ],
+        blurb: "Please arrive on time — the doors will be locked and late arrivals may not be able to enter. Hosted by Wayne Farinacci of the Alumni Association.",
+    },
+    'teacher-meetup': {
+        lines: [
+            '📍 Location: TBD',
+            '📅 Sat, Sep 19, 2026 · 12:30 PM',
+            '🍽️ Lunch provided',
+        ],
+        blurb: 'See you there!',
+    },
+};
+
+function buildEventEmailBody(eventId) {
+    const label = EVENT_LABELS[eventId] || eventId;
+    const details = EVENT_DETAILS[eventId];
+    if (!details) return `Just a reminder about the ${label}!`;
+    return [
+        `Just a reminder about the ${label}!`,
+        '',
+        ...details.lines,
+        '',
+        details.blurb,
+    ].join('\n');
+}
+
 let summaryData = {};
 let rsvpDocsCache = {};
 
@@ -309,7 +352,8 @@ async function emailAttendees(eventId) {
     const label = (EVENT_LABELS[eventId] || eventId);
     const subject = encodeURIComponent(label);
     const to = encodeURIComponent(emails.join(','));
-    window.open(`https://mail.google.com/mail/?view=cm&fs=1&tf=1&to=${to}&su=${subject}`, '_blank');
+    const body = encodeURIComponent(buildEventEmailBody(eventId));
+    window.open(`https://mail.google.com/mail/?view=cm&fs=1&tf=1&to=${to}&su=${subject}&body=${body}`, '_blank');
 }
 window.emailAttendees = emailAttendees;
 
@@ -411,12 +455,22 @@ function approvedRegistrantEmails() {
         .map(d => d.data().email);
 }
 
+function buildReunionSummaryBody() {
+    const eventIds = ['tailgate', 'campus-tour', 'teacher-meetup'];
+    const sections = eventIds.map(id => {
+        const details = EVENT_DETAILS[id];
+        return [`${EVENT_LABELS[id]}:`, ...details.lines].join('\n');
+    });
+    return ['Here\'s the reunion weekend rundown:', '', sections.join('\n\n')].join('\n');
+}
+
 function emailAllRegistrants() {
     const emails = approvedRegistrantEmails();
     if (!emails.length) { alert('No registered classmate emails found.'); return; }
     const subject = encodeURIComponent('Mayfield Class of 2011 — Reunion Update');
     const to = encodeURIComponent(emails.join(','));
-    window.open(`https://mail.google.com/mail/?view=cm&fs=1&tf=1&to=${to}&su=${subject}`, '_blank');
+    const body = encodeURIComponent(buildReunionSummaryBody());
+    window.open(`https://mail.google.com/mail/?view=cm&fs=1&tf=1&to=${to}&su=${subject}&body=${body}`, '_blank');
 }
 window.emailAllRegistrants = emailAllRegistrants;
 
