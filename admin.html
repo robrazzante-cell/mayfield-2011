@@ -88,7 +88,6 @@
             <div class="stat-row" id="summaryStats">
                 <div style="color:var(--text-muted);font-size:0.875rem;"><i class="fas fa-spinner fa-spin"></i> Loading...</div>
             </div>
-            <button class="btn btn-outline btn-sm copy-btn" onclick="copyHeadcount()"><i class="fas fa-copy"></i> Copy for Wayne</button>
         </div>
 
         <!-- TAILGATE -->
@@ -128,6 +127,11 @@
         <div class="admin-card">
             <h3><i class="fas fa-user-circle" style="color:var(--green);"></i> Classmates Registered on Site</h3>
             <div id="classmateCount" class="stat-row"></div>
+            <div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:1rem;">
+                <button class="btn btn-primary btn-sm" onclick="emailAllRegistrants()"><i class="fas fa-envelope"></i> Email All Registrants</button>
+                <button class="btn btn-outline btn-sm copy-btn" onclick="copyRegistrantEmails()"><i class="fas fa-copy"></i> Copy Emails</button>
+            </div>
+            <p style="font-size:0.75rem;color:var(--text-muted);margin:-0.5rem 0 0.75rem;">If the list is long, some mail apps cut off the BCC field from the button above — use "Copy Emails" and paste into BCC yourself as a backup.</p>
             <div id="classmateList"></div>
             <div id="classmatePager" style="display:none;display:flex;justify-content:space-between;align-items:center;margin-top:1rem;font-size:0.82rem;">
                 <button onclick="classmatesPage(-1)" class="btn btn-outline btn-sm"><i class="fas fa-chevron-left"></i> Prev</button>
@@ -400,6 +404,27 @@ async function loadClassmates() {
     renderClassmatePage();
 }
 
+function approvedRegistrantEmails() {
+    return allClassmateDocs
+        .filter(d => (d.data().status || 'approved') === 'approved' && d.data().email)
+        .map(d => d.data().email);
+}
+
+function emailAllRegistrants() {
+    const emails = approvedRegistrantEmails();
+    if (!emails.length) { alert('No registered classmate emails found.'); return; }
+    const subject = encodeURIComponent('Mayfield Class of 2011 — Reunion Update');
+    window.location.href = `mailto:?bcc=${emails.join(',')}&subject=${subject}`;
+}
+window.emailAllRegistrants = emailAllRegistrants;
+
+function copyRegistrantEmails() {
+    const emails = approvedRegistrantEmails();
+    if (!emails.length) { alert('No registered classmate emails found.'); return; }
+    navigator.clipboard.writeText(emails.join(', ')).then(() => alert('Registrant emails copied to clipboard!'));
+}
+window.copyRegistrantEmails = copyRegistrantEmails;
+
 function updateSummary() {
     const events = [
         { id: 'tailgate', label: 'Tailgate' },
@@ -411,30 +436,6 @@ function updateSummary() {
         return statBlock(d.total, e.label + ' Total');
     }).join('');
 }
-
-function copyHeadcount() {
-    const lines = [
-        'Mayfield Class of 2011 — Reunion Headcount',
-        new Date().toLocaleDateString('en-US', {month:'long', day:'numeric', year:'numeric'}),
-        '',
-        'Homecoming Tailgate (Sep 18):',
-        `  Classmates: ${summaryData['tailgate']?.classmates || 0}`,
-        `  Guests: ${summaryData['tailgate']?.guests || 0}`,
-        `  Total: ${summaryData['tailgate']?.total || 0}`,
-        '',
-        'School Tour (Sep 19, 11am):',
-        `  Classmates: ${summaryData['campus-tour']?.classmates || 0}`,
-        `  Guests: ${summaryData['campus-tour']?.guests || 0}`,
-        `  Total: ${summaryData['campus-tour']?.total || 0}`,
-        '',
-        'Lunch with Teachers (Sep 19, 12:30pm):',
-        `  Classmates: ${summaryData['teacher-meetup']?.classmates || 0}`,
-        `  Guests: ${summaryData['teacher-meetup']?.guests || 0}`,
-        `  Total: ${summaryData['teacher-meetup']?.total || 0}`,
-    ];
-    navigator.clipboard.writeText(lines.join('\n')).then(() => alert('Headcount copied to clipboard!'));
-}
-window.copyHeadcount = copyHeadcount;
 
 function copyTeacherLink() {
     navigator.clipboard.writeText('https://mayfield-2011.vercel.app/teacher.html').then(() => {
