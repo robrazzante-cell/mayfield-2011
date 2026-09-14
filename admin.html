@@ -95,6 +95,10 @@
         <div class="admin-card">
             <h3><i class="fas fa-football-ball" style="color:var(--green);"></i> Homecoming Tailgate — Fri Sep 18</h3>
             <div id="tailgateStats" class="stat-row"></div>
+            <div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:1rem;">
+                <button class="btn btn-primary btn-sm" onclick="emailAttendees('tailgate')"><i class="fas fa-envelope"></i> Email Attendees</button>
+                <button class="btn btn-outline btn-sm copy-btn" onclick="copyRoster('tailgate')"><i class="fas fa-copy"></i> Copy Roster</button>
+            </div>
             <div id="tailgateList"></div>
         </div>
 
@@ -102,6 +106,10 @@
         <div class="admin-card">
             <h3><i class="fas fa-school" style="color:var(--green);"></i> School Tour — Sat Sep 19 · 11:00 AM</h3>
             <div id="tourStats" class="stat-row"></div>
+            <div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:1rem;">
+                <button class="btn btn-primary btn-sm" onclick="emailAttendees('campus-tour')"><i class="fas fa-envelope"></i> Email Attendees</button>
+                <button class="btn btn-outline btn-sm copy-btn" onclick="copyRoster('campus-tour')"><i class="fas fa-copy"></i> Copy Roster</button>
+            </div>
             <div id="tourList"></div>
         </div>
 
@@ -109,6 +117,10 @@
         <div class="admin-card">
             <h3><i class="fas fa-utensils" style="color:var(--green);"></i> Lunch with Teachers — Sat Sep 19 · 12:30 PM</h3>
             <div id="lunchStats" class="stat-row"></div>
+            <div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:1rem;">
+                <button class="btn btn-primary btn-sm" onclick="emailAttendees('teacher-meetup')"><i class="fas fa-envelope"></i> Email Attendees</button>
+                <button class="btn btn-outline btn-sm copy-btn" onclick="copyRoster('teacher-meetup')"><i class="fas fa-copy"></i> Copy Roster</button>
+            </div>
             <div id="lunchList"></div>
         </div>
 
@@ -250,7 +262,10 @@ async function deleteClassmate(uid) {
     setTimeout(updateSummary, 1500);
 }
 
+const EVENT_LABELS = { tailgate: 'Homecoming Tailgate', 'campus-tour': 'School Tour', 'teacher-meetup': 'Lunch with Teachers' };
+
 let summaryData = {};
+let rsvpDocsCache = {};
 
 async function loadEvent(eventId, statsElId, listElId) {
     const snap = await db.collection('rsvps').where('eventId','==',eventId).get();
@@ -258,6 +273,7 @@ async function loadEvent(eventId, statsElId, listElId) {
     const guests = snap.docs.filter(d => d.data().plusOne).length;
     const total = classmates + guests;
     summaryData[eventId] = { classmates, guests, total };
+    rsvpDocsCache[eventId] = snap.docs.map(d => ({ id: d.id, ...d.data() }));
     document.getElementById(statsElId).innerHTML =
         statBlock(classmates, 'Classmates') +
         statBlock(guests, 'Bringing +1') +
@@ -265,6 +281,32 @@ async function loadEvent(eventId, statsElId, listElId) {
     document.getElementById(listElId).innerHTML = rsvpTable(snap.docs, eventId, statsElId, listElId);
     return { classmates, guests, total };
 }
+
+function copyRoster(eventId) {
+    const docs = (rsvpDocsCache[eventId] || []).slice().sort((a, b) => (a.userName||'').localeCompare(b.userName||''));
+    if (!docs.length) { alert('No RSVPs yet for this event.'); return; }
+    const lines = docs.map(d => (d.userName || 'Unknown') + (d.plusOne ? ' (+1)' : ''));
+    navigator.clipboard.writeText(lines.join('\n')).then(() => alert('Roster copied to clipboard!'));
+}
+window.copyRoster = copyRoster;
+
+async function emailAttendees(eventId) {
+    const docs = rsvpDocsCache[eventId] || [];
+    if (!docs.length) { alert('No RSVPs yet for this event.'); return; }
+    const uids = [...new Set(docs.map(d => d.userId).filter(Boolean))];
+    const emails = [];
+    // Firestore 'in' queries max out at 10 values per query — chunk accordingly.
+    for (let i = 0; i < uids.length; i += 10) {
+        const chunk = uids.slice(i, i + 10);
+        const snap = await db.collection('users').where(firebase.firestore.FieldPath.documentId(), 'in', chunk).get();
+        snap.docs.forEach(d => { if (d.data().email) emails.push(d.data().email); });
+    }
+    if (!emails.length) { alert('No email addresses found for these RSVPs.'); return; }
+    const label = (EVENT_LABELS[eventId] || eventId);
+    const subject = encodeURIComponent(`Mayfield Class of 2011 — ${label}`);
+    window.location.href = `mailto:?bcc=${emails.join(',')}&subject=${subject}`;
+}
+window.emailAttendees = emailAttendees;
 
 async function loadTeachers() {
     const snap = await db.collection('teachers').where('interest','==','yes').get();
