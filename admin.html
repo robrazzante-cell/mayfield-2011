@@ -131,7 +131,7 @@
                 <button class="btn btn-primary btn-sm" onclick="emailAllRegistrants()"><i class="fas fa-envelope"></i> Email All Registrants</button>
                 <button class="btn btn-outline btn-sm copy-btn" onclick="copyRegistrantEmails()"><i class="fas fa-copy"></i> Copy Emails</button>
             </div>
-            <p style="font-size:0.75rem;color:var(--text-muted);margin:-0.5rem 0 0.75rem;">If the list is long, some mail apps cut off the BCC field from the button above — use "Copy Emails" and paste into BCC yourself as a backup.</p>
+            <p style="font-size:0.75rem;color:var(--text-muted);margin:-0.5rem 0 0.75rem;">If the list is long, some mail apps cut off the recipient field from the button above — use "Copy Emails" and paste it in yourself as a backup.</p>
             <div id="classmateList"></div>
             <div id="classmatePager" style="display:none;display:flex;justify-content:space-between;align-items:center;margin-top:1rem;font-size:0.82rem;">
                 <button onclick="classmatesPage(-1)" class="btn btn-outline btn-sm"><i class="fas fa-chevron-left"></i> Prev</button>
@@ -308,8 +308,8 @@ async function emailAttendees(eventId) {
     if (!emails.length) { alert('No email addresses found for these RSVPs.'); return; }
     const label = (EVENT_LABELS[eventId] || eventId);
     const subject = encodeURIComponent(label);
-    const bcc = encodeURIComponent(emails.join(','));
-    window.open(`https://mail.google.com/mail/?view=cm&fs=1&tf=1&bcc=${bcc}&su=${subject}`, '_blank');
+    const to = encodeURIComponent(emails.join(','));
+    window.open(`https://mail.google.com/mail/?view=cm&fs=1&tf=1&to=${to}&su=${subject}`, '_blank');
 }
 window.emailAttendees = emailAttendees;
 
@@ -415,8 +415,8 @@ function emailAllRegistrants() {
     const emails = approvedRegistrantEmails();
     if (!emails.length) { alert('No registered classmate emails found.'); return; }
     const subject = encodeURIComponent('Mayfield Class of 2011 — Reunion Update');
-    const bcc = encodeURIComponent(emails.join(','));
-    window.open(`https://mail.google.com/mail/?view=cm&fs=1&tf=1&bcc=${bcc}&su=${subject}`, '_blank');
+    const to = encodeURIComponent(emails.join(','));
+    window.open(`https://mail.google.com/mail/?view=cm&fs=1&tf=1&to=${to}&su=${subject}`, '_blank');
 }
 window.emailAllRegistrants = emailAllRegistrants;
 
