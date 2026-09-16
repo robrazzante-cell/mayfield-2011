@@ -114,7 +114,7 @@
 
         <!-- LUNCH WITH TEACHERS -->
         <div class="admin-card">
-            <h3><i class="fas fa-utensils" style="color:var(--green);"></i> Lunch with Teachers — Sat Sep 19 · 12:30 PM</h3>
+            <h3><i class="fas fa-utensils" style="color:var(--green);"></i> Lunch — Sat Sep 19 · 12:30 PM</h3>
             <div id="lunchStats" class="stat-row"></div>
             <div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:1rem;">
                 <button class="btn btn-primary btn-sm" onclick="emailAttendees('teacher-meetup')"><i class="fas fa-envelope"></i> Email Attendees</button>
@@ -266,7 +266,7 @@ async function deleteClassmate(uid) {
     setTimeout(updateSummary, 1500);
 }
 
-const EVENT_LABELS = { tailgate: 'Homecoming Tailgate', 'campus-tour': 'School Tour', 'teacher-meetup': 'Lunch with Teachers' };
+const EVENT_LABELS = { tailgate: 'Homecoming Tailgate', 'campus-tour': 'School Tour', 'teacher-meetup': 'Lunch' };
 
 // Mirrors the tile content on events.html — keep these in sync if the tiles change.
 const EVENT_DETAILS = {

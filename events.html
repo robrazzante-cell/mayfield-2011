@@ -152,17 +152,16 @@
 <!-- LUNCH WITH TEACHERS -->
 <section class="section" id="teacher-meetup">
     <div class="container">
-        <div class="event-two-col">
+        <div>
             <div>
-                <span class="badge badge-green" style="margin-bottom:0.75rem;display:inline-block;">Faculty</span>
-                <h2 class="section-title" style="margin-bottom:0.75rem;">Lunch with Teachers</h2>
+                <h2 class="section-title" style="margin-bottom:0.75rem;">Lunch</h2>
                 <div style="display:flex;flex-direction:column;gap:0.6rem;margin-bottom:1.25rem;">
                     <div class="event-meta"><i class="fas fa-map-marker-alt" style="color:var(--green);width:16px;"></i> Panini's Bar &amp; Grill — 6237 Wilson Mills Road, Highland Heights, OH 44143</div>
                     <div class="event-meta"><i class="far fa-calendar" style="color:var(--green);width:16px;"></i> Sat, Sep 19, 2026 &middot; 12:30 PM</div>
                     <div class="event-meta"><i class="fas fa-utensils" style="color:var(--green);width:16px;"></i> Lunch provided</div>
                 </div>
                 <p style="font-size:0.875rem;line-height:1.7;color:var(--text-muted);margin-bottom:1.25rem;">
-                    Currently recruiting teachers — we're reaching out to faculty who shaped the Class of 2011. Sit down for lunch, reconnect, and say thank you. <strong>Who do you want to see there?</strong> Submit a name below and we'll do our best to reach them.
+                    We're reaching out to teachers who shaped the Class of 2011, but it may end up being just classmates who register — turnout isn't guaranteed. Teachers or not, we'll still have lunch. <strong>Who do you want to see there?</strong> Submit a name below and we'll do our best to reach them.
                 </p>
                 <div id="rsvpContainer-teacher">
                     <button class="btn btn-primary" onclick="rsvp('teacher-meetup')" id="rsvpBtn-teacher-meetup">
@@ -183,19 +182,6 @@
                         </button>
                     </div>
                     <p id="teacherNomMsg" style="font-size:0.75rem;color:var(--green);margin-top:0.4rem;display:none;"></p>
-                </div>
-            </div>
-            <div>
-                <div class="card no-hover" style="background:var(--bg-light);">
-                    <h4 style="margin-bottom:0.85rem;font-size:0.875rem;"><i class="fas fa-chalkboard-teacher" style="color:var(--green);"></i> Teachers Joining Lunch</h4>
-                    <div id="teacherRsvpList">
-                        <p style="font-size:0.82rem;color:var(--text-muted);font-style:italic;">Loading...</p>
-                    </div>
-                    <div id="teacherNomSection" style="display:none;">
-                        <hr style="border:none;border-top:1px solid var(--border);margin:0.85rem 0;">
-                        <p style="font-size:0.75rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:0.6rem;">Requested by classmates</p>
-                        <div id="teacherNomList"></div>
-                    </div>
                 </div>
             </div>
         </div>
@@ -431,7 +417,7 @@ async function confirmRsvp(eventId, plusOne) {
 }
 window.confirmRsvp = confirmRsvp;
 
-const EVENT_LABELS = { tailgate: 'Homecoming Tailgate', 'campus-tour': 'School Tour', 'teacher-meetup': 'Lunch with Teachers' };
+const EVENT_LABELS = { tailgate: 'Homecoming Tailgate', 'campus-tour': 'School Tour', 'teacher-meetup': 'Lunch' };
 
 async function showRsvpList(eventId) {
     document.getElementById('rsvpListTitle').textContent = (EVENT_LABELS[eventId] || eventId) + ' — Who\'s Going';
@@ -459,57 +445,6 @@ window.showRsvpList = showRsvpList;
 function closeRsvpList() { document.getElementById('rsvpListModal').style.display = 'none'; }
 window.closeRsvpList = closeRsvpList;
 
-async function loadTeacherRsvps() {
-    const el = document.getElementById('teacherRsvpList');
-    if (!el) return;
-    try {
-        const snap = await db.collection('teachers').where('interest', '==', 'yes').get();
-        if (snap.empty) {
-            el.innerHTML = '<p style="font-size:0.82rem;color:var(--text-muted);font-style:italic;">No teacher RSVPs yet — check back soon.</p>';
-        } else {
-            const teachers = snap.docs.map(d => d.data()).sort((a, b) => (a.lastName || '').localeCompare(b.lastName || ''));
-            el.innerHTML = teachers.map(t => `
-                <div style="display:flex;align-items:center;gap:0.65rem;padding:0.45rem 0;border-bottom:1px solid var(--border);">
-                    <div style="width:32px;height:32px;border-radius:50%;background:var(--green-light);color:var(--green);font-size:0.65rem;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;border:1px solid var(--border);">
-                        ${(t.firstName || '?')[0]}${(t.lastName || '?')[0]}
-                    </div>
-                    <div>
-                        <div style="font-weight:600;font-size:0.875rem;color:var(--text);">${t.firstName} ${t.lastName}</div>
-                        ${t.subject ? `<div style="font-size:0.75rem;color:var(--text-muted);">${t.subject}</div>` : ''}
-                    </div>
-                </div>`).join('');
-        }
-    } catch(e) {
-        el.innerHTML = '<p style="font-size:0.82rem;color:var(--text-muted);font-style:italic;">Sign in to see who\'s joining.</p>';
-    }
-    loadTeacherNominations();
-}
-
-async function loadTeacherNominations() {
-    const section = document.getElementById('teacherNomSection');
-    const list = document.getElementById('teacherNomList');
-    if (!section || !list) return;
-    try {
-        const snap = await db.collection('teacher_requests').orderBy('submittedAt', 'asc').get();
-        if (snap.empty) { section.style.display = 'none'; return; }
-        // Deduplicate by normalized name, count votes
-        const counts = {};
-        snap.docs.forEach(doc => {
-            const name = (doc.data().name || '').trim();
-            const key = name.toLowerCase();
-            if (!counts[key]) counts[key] = { name, votes: 0 };
-            counts[key].votes++;
-        });
-        const sorted = Object.values(counts).sort((a, b) => b.votes - a.votes || a.name.localeCompare(b.name));
-        list.innerHTML = sorted.map(r => `
-            <div style="display:flex;align-items:center;justify-content:space-between;padding:0.35rem 0;border-bottom:1px solid var(--border);">
-                <span style="font-size:0.875rem;color:var(--text);">${r.name}</span>
-                ${r.votes > 1 ? `<span style="font-size:0.72rem;background:var(--green-light);color:var(--green);border:1px solid var(--border);border-radius:20px;padding:0.1rem 0.45rem;font-weight:700;">${r.votes} votes</span>` : ''}
-            </div>`).join('');
-        section.style.display = 'block';
-    } catch(e) {}
-}
-
 async function submitTeacherNom() {
     const user = auth.currentUser;
     if (!user) return;
@@ -528,7 +463,6 @@ async function submitTeacherNom() {
         msg.textContent = '✓ Submitted! Thanks for the nomination.';
         msg.style.display = 'block';
         setTimeout(() => msg.style.display = 'none', 3500);
-        loadTeacherNominations();
     } catch(e) {
         msg.textContent = 'Something went wrong. Please try again.';
         msg.style.color = '#c0392b';
@@ -539,7 +473,6 @@ window.submitTeacherNom = submitTeacherNom;
 
 auth.onAuthStateChanged(user => {
     loadRSVPs();
-    loadTeacherRsvps();
     const nomForm = document.getElementById('teacherNomForm');
     if (nomForm) nomForm.style.display = user ? 'block' : 'none';
 });
