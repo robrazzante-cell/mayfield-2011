@@ -468,9 +468,9 @@ function emailAllRegistrants() {
     const emails = approvedRegistrantEmails();
     if (!emails.length) { alert('No registered classmate emails found.'); return; }
     const subject = encodeURIComponent('Mayfield Class of 2011 — Reunion Update');
-    const to = encodeURIComponent(emails.join(','));
+    const bcc = encodeURIComponent(emails.join(','));
     const body = encodeURIComponent(buildReunionSummaryBody());
-    window.open(`https://mail.google.com/mail/?view=cm&fs=1&tf=1&to=${to}&su=${subject}&body=${body}`, '_blank');
+    window.open(`https://mail.google.com/mail/?view=cm&fs=1&tf=1&bcc=${bcc}&su=${subject}&body=${body}`, '_blank');
 }
 window.emailAllRegistrants = emailAllRegistrants;
 
